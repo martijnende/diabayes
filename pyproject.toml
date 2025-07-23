@@ -1,0 +1,38 @@
+[project]
+name = "diabayes"
+version = "0.0.0"
+requires-python = "> 3.0"
+authors = [
+    { name = "Martijn van den Ende", email = "martijnende@gmail.com" },
+]
+dependencies = [
+    "jax",
+    "equinox",
+    "diffrax",
+    "optax",
+    "optimistix",
+    "matplotlib",
+    "ipympl",
+    "ipython",
+    "jupyter",
+]
+
+[project.optional-dependencies]
+dev = ["black", "isort", "twine"]
+gpu = ["jax[cuda12]"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["diabayes"]
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["test"]
+pythonpath = ["scripts"]
