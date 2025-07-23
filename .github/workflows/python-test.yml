@@ -2,9 +2,9 @@ name: Python Unit Tests
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
