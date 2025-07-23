@@ -23,14 +23,16 @@ def rsf(variables: Variables, params: RSFParams, constants: RSFConstants) -> Flo
 
 @eqx.filter_jit
 def ageing_law(
-    variables: Variables, params: RSFParams, constants: RSFConstants
+    v: Float, variables: Variables, params: RSFParams, constants: RSFConstants
 ) -> Float:
-    return 1 - variables.v * variables.state / params.Dc
+    return 1 - v * variables.state / params.Dc
 
 
 @eqx.filter_jit
-def springblock(variables: Variables, constants: SpringBlockConstants) -> Float:
-    return constants.k * (constants.v_lp - variables.v)
+def springblock(
+    v: Float, variables: Variables, constants: SpringBlockConstants
+) -> Float:
+    return constants.k * (constants.v_lp - v)
 
 
 class Forward:
@@ -54,7 +56,7 @@ class Forward:
         friction_constants: Constants,
         block_constants: BlockConstants,
     ) -> Variables:
-        variables.v = self.friction_model(variables, params, friction_constants)
-        dstate = self.state_evolution(variables, params, friction_constants)
-        dmu = self.stress_transfer(variables, block_constants)
+        v = self.friction_model(variables, params, friction_constants)
+        dstate = self.state_evolution(v, variables, params, friction_constants)
+        dmu = self.stress_transfer(v, variables, block_constants)
         return Variables(mu=dmu, state=dstate)

@@ -6,33 +6,17 @@ from jaxtyping import Float
 
 
 @tree_util.register_pytree_node_class
-@dataclass(frozen=False)
+@dataclass(frozen=True)
 class Variables:
     mu: Float
     state: Float
-    v: Float = 0.0
 
     def tree_flatten(self):
-        return (self.mu, self.state), self.v
+        return (self.mu, self.state), None
 
     @classmethod
     def tree_unflatten(cls, aux_data, children):
-        return cls(mu=children[0], state=children[1], v=aux_data)
-
-
-# @tree_util.register_pytree_node_class
-# @dataclass(frozen=False)
-# class RSFParams:
-#     a: Float
-#     b: Float
-#     Dc: Float
-
-#     def tree_flatten(self):
-#         return (self.a, self.b, self.Dc), None
-
-#     @classmethod
-#     def tree_unflatten(cls, aux_data, children):
-#         return cls(*children)
+        return cls(*children)
 
 
 @dataclass(frozen=True)

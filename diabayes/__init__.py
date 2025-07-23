@@ -4,5 +4,6 @@ from diabayes.typedefs import (
     Params,
     RSFConstants,
     RSFParams,
+    SpringBlockConstants,
     Variables,
 )

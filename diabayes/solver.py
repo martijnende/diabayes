@@ -34,9 +34,6 @@ class ODESolver:
         self,
         t: Float,
         variables: Variables,
-        # params: Params,
-        # friction_constants: Constants,
-        # block_constants: BlockConstants,
         args: Tuple[Params, Constants, BlockConstants],
     ) -> Variables:
         params, friction_constants, block_constants = args
