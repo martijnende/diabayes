@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Protocol, Union
+from typing import Any, Protocol, Union
 
 from jax import tree_util
 from jaxtyping import Float

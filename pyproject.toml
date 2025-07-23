@@ -17,12 +17,12 @@ dependencies = [
     "ipython",
     "jupyter",
     "pytest",
-    "flake8",
 ]
 
 [project.optional-dependencies]
 dev = ["black", "isort", "twine"]
 gpu = ["jax[cuda12]"]
+docs = ["pydata-sphinx-theme", "sphinx-design", "sphinx-copybutton", "sphinx"]
 
 [build-system]
 requires = ["setuptools"]
