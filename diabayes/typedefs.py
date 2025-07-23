@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Callable, Union
 
 from jax import tree_util
 from jaxtyping import Float
@@ -27,15 +27,21 @@ class RSFParams:
 
 
 @dataclass(frozen=True)
+class RSFConstants:
+    v0: Float
+    mu0: Float
+
+
+@dataclass(frozen=True)
 class CNSParams:
     phi_c: Float
     Z: Float
 
 
 @dataclass(frozen=True)
-class RSFConstants:
-    v0: Float
-    mu0: Float
+class CNSConstants:
+    phi_c: Float
+    Z: Float
 
 
 @dataclass(frozen=True)
@@ -44,6 +50,17 @@ class SpringBlockConstants:
     v_lp: Float
 
 
-Params = Union[RSFParams, CNSParams]
-Constants = Union[RSFConstants]
-BlockConstants = Union[SpringBlockConstants]
+# These typedefs should only be used for type checking,
+# and should not be instantiated.
+_Params = Union[RSFParams, CNSParams]
+_Constants = Union[RSFConstants]
+_BlockConstants = Union[SpringBlockConstants]
+
+_FrictionModel = Union[
+    Callable[[Variables, RSFParams, RSFConstants], Float],
+    Callable[[Variables, CNSParams, CNSConstants], Float],
+]
+_StateEvolution = Union[
+    Callable[[Float, Variables, RSFParams, RSFConstants], Float],
+    Callable[[Float, Variables, CNSParams, CNSConstants], Float],
+]

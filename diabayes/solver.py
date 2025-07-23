@@ -5,7 +5,7 @@ import jax
 from jaxtyping import Array, Float
 
 from diabayes.forward_models import Forward
-from diabayes.typedefs import BlockConstants, Constants, Params, Variables
+from diabayes.typedefs import Variables, _BlockConstants, _Constants, _Params
 
 jax.config.update("jax_enable_x64", True)
 
@@ -34,7 +34,7 @@ class ODESolver:
         self,
         t: Float,
         variables: Variables,
-        args: Tuple[Params, Constants, BlockConstants],
+        args: Tuple[_Params, _Constants, _BlockConstants],
     ) -> Variables:
         params, friction_constants, block_constants = args
         return self.forward_model(
@@ -48,9 +48,9 @@ class ODESolver:
         self,
         t: Float[Array, "Nt"],
         y0: Variables,
-        params: Params,
-        friction_constants: Constants,
-        block_constants: BlockConstants,
+        params: _Params,
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
         adjoint: Union[None, dfx.AbstractAdjoint] = None,
     ) -> dfx.Solution:
 

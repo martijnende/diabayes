@@ -2,16 +2,18 @@ from typing import Callable
 
 import equinox as eqx
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from jaxtyping import Float
 
 from diabayes.typedefs import (
-    BlockConstants,
-    Constants,
-    Params,
     RSFConstants,
     RSFParams,
     SpringBlockConstants,
     Variables,
+    _BlockConstants,
+    _Constants,
+    _FrictionModel,
+    _Params,
+    _StateEvolution,
 )
 
 
@@ -39,9 +41,9 @@ class Forward:
 
     def __init__(
         self,
-        friction_model: Callable[[Variables, Params, Constants], Float],
-        state_evolution: Callable[[Variables, Params, Constants], Float],
-        block_type: Callable[[Variables, BlockConstants], Float],
+        friction_model: _FrictionModel,
+        state_evolution: _StateEvolution,
+        block_type: Callable[[Float, Variables, _BlockConstants], Float],
     ) -> None:
         self.friction_model = friction_model
         self.state_evolution = state_evolution
@@ -52,9 +54,9 @@ class Forward:
     def __call__(
         self,
         variables: Variables,
-        params: Params,
-        friction_constants: Constants,
-        block_constants: BlockConstants,
+        params: _Params,
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
     ) -> Variables:
         v = self.friction_model(variables, params, friction_constants)
         dstate = self.state_evolution(v, variables, params, friction_constants)
