@@ -5,15 +5,15 @@ import jax.numpy as jnp
 from jaxtyping import Float
 
 from diabayes.typedefs import (
+    FrictionModel,
     RSFConstants,
     RSFParams,
     SpringBlockConstants,
+    StateEvolution,
     Variables,
     _BlockConstants,
     _Constants,
-    _FrictionModel,
     _Params,
-    _StateEvolution,
 )
 
 
@@ -41,8 +41,8 @@ class Forward:
 
     def __init__(
         self,
-        friction_model: _FrictionModel,
-        state_evolution: _StateEvolution,
+        friction_model: FrictionModel,
+        state_evolution: StateEvolution,
         block_type: Callable[[Float, Variables, _BlockConstants], Float],
     ) -> None:
         self.friction_model = friction_model

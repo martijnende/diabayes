@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Union
+from typing import Any, Callable, Protocol, Union
 
 from jax import tree_util
 from jaxtyping import Float
@@ -50,17 +50,18 @@ class SpringBlockConstants:
     v_lp: Float
 
 
+class FrictionModel(Protocol):
+    def __call__(self, variables: Variables, params: Any, constants: Any) -> Float: ...
+
+
+class StateEvolution(Protocol):
+    def __call__(
+        self, v: Float, variables: Variables, params: Any, constants: Any
+    ) -> Float: ...
+
+
 # These typedefs should only be used for type checking,
 # and should not be instantiated.
 _Params = Union[RSFParams, CNSParams]
 _Constants = Union[RSFConstants]
 _BlockConstants = Union[SpringBlockConstants]
-
-_FrictionModel = Union[
-    Callable[[Variables, RSFParams, RSFConstants], Float],
-    Callable[[Variables, CNSParams, CNSConstants], Float],
-]
-_StateEvolution = Union[
-    Callable[[Float, Variables, RSFParams, RSFConstants], Float],
-    Callable[[Float, Variables, CNSParams, CNSConstants], Float],
-]

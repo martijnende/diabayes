@@ -17,6 +17,7 @@ dependencies = [
     "ipython",
     "jupyter",
     "pytest",
+    "flake8",
 ]
 
 [project.optional-dependencies]
