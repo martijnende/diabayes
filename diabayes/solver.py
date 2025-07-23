@@ -1,7 +1,9 @@
 from typing import Tuple, Union
 
 import diffrax as dfx
+import equinox as eqx
 import jax
+import optimistix as optx
 from jaxtyping import Array, Float
 
 from diabayes.forward_models import Forward
@@ -80,5 +82,51 @@ class ODESolver:
         )
 
         assert sol is not None
+
+        return sol
+
+    @eqx.filter_jit
+    def _residuals(
+        self,
+        params: _Params,
+        t: Float[Array, "N"],
+        mu: Float[Array, "N"],
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
+    ) -> Float[Array, "N"]:
+        adjoint = dfx.ForwardMode()
+        theta0 = params.Dc / friction_constants.v0
+        y0 = Variables(mu=mu[0], state=theta0)
+        result = self.solve_forward(
+            t, y0, params, friction_constants, block_constants, adjoint
+        )
+        mu_hat = result.ys.mu
+        return mu - mu_hat
+
+    def initial_inversion(
+        self,
+        t: Float[Array, "Nt"],
+        mu: Float[Array, "Nt"],
+        params: _Params,
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
+        verbose: bool = False,
+    ) -> optx.Solution:
+
+        if verbose:
+            verbose_opts = frozenset(["step", "loss"])
+        else:
+            verbose_opts = None
+
+        options = {"autodiff_mode": "fwd"}
+
+        _residuals = lambda params, mu: self._residuals(
+            params, t, mu, friction_constants, block_constants
+        )
+
+        lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose_opts)
+        sol = optx.least_squares(
+            _residuals, lm_solver, params, args=mu, options=options
+        )
 
         return sol

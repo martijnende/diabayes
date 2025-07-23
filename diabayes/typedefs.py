@@ -19,11 +19,19 @@ class Variables:
         return cls(*children)
 
 
+@tree_util.register_pytree_node_class
 @dataclass(frozen=True)
 class RSFParams:
     a: Float
     b: Float
     Dc: Float
+
+    def tree_flatten(self):
+        return (self.a, self.b, self.Dc), None
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children):
+        return cls(*children)
 
 
 @dataclass(frozen=True)
