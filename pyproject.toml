@@ -7,6 +7,7 @@ authors = [
 ]
 dependencies = [
     "jax",
+    "jaxtyping",
     "equinox",
     "diffrax",
     "optax",
@@ -15,6 +16,7 @@ dependencies = [
     "ipympl",
     "ipython",
     "jupyter",
+    "pytest",
 ]
 
 [project.optional-dependencies]
