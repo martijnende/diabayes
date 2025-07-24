@@ -6,47 +6,42 @@ from jax import tree_util
 from jaxtyping import Float
 
 
+class Container:
+
+    @classmethod
+    def tree_unflatten(cls, aux_data, children):
+        return cls(*children)
+
+    @classmethod
+    def from_array(cls, x: Iterable):
+        return cls.tree_unflatten(None, x)
+
+    def tree_flatten(self):
+        raise NotImplementedError
+
+    def to_array(self):
+        return jnp.array(self.tree_flatten()[0])
+
+
 @tree_util.register_pytree_node_class
 @dataclass(frozen=True)
-class Variables:
+class Variables(Container):
     mu: Float
     state: Float
 
     def tree_flatten(self):
         return (self.mu, self.state), None
 
-    @classmethod
-    def tree_unflatten(cls, aux_data, children):
-        return cls(*children)
-
-    def to_array(self):
-        return jnp.array([self.mu, self.state])
-
-    @classmethod
-    def from_array(cls, x: Iterable):
-        return cls(*x)
-
 
 @tree_util.register_pytree_node_class
 @dataclass(frozen=True)
-class RSFParams:
+class RSFParams(Container):
     a: Float
     b: Float
     Dc: Float
 
     def tree_flatten(self):
         return (self.a, self.b, self.Dc), None
-
-    @classmethod
-    def tree_unflatten(cls, aux_data, children):
-        return cls(*children)
-
-    def to_array(self):
-        return jnp.array([self.a, self.b, self.Dc])
-
-    @classmethod
-    def from_array(cls, x: Iterable):
-        return cls(*x)
 
 
 @dataclass(frozen=True)
@@ -55,10 +50,14 @@ class RSFConstants:
     mu0: Float
 
 
+@tree_util.register_pytree_node_class
 @dataclass(frozen=True)
-class CNSParams:
+class CNSParams(Container):
     phi_c: Float
     Z: Float
+
+    def tree_flatten(self):
+        return (self.phi_c, self.Z), None
 
 
 @dataclass(frozen=True)
