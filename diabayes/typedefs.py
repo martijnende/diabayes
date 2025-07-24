@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Protocol, Union
 
+import jax.numpy as jnp
 from jax import tree_util
 from jaxtyping import Float
 
@@ -18,6 +19,9 @@ class Variables:
     def tree_unflatten(cls, aux_data, children):
         return cls(*children)
 
+    def to_array(self):
+        return jnp.array([self.mu, self.state])
+
 
 @tree_util.register_pytree_node_class
 @dataclass(frozen=True)
@@ -32,6 +36,9 @@ class RSFParams:
     @classmethod
     def tree_unflatten(cls, aux_data, children):
         return cls(*children)
+
+    def to_array(self):
+        return jnp.array([self.a, self.b, self.Dc])
 
 
 @dataclass(frozen=True)

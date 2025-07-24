@@ -95,12 +95,14 @@ class ODESolver:
         block_constants: _BlockConstants,
     ) -> Float[Array, "N"]:
         adjoint = dfx.ForwardMode()
-        theta0 = params.Dc / friction_constants.v0
+        # TODO: replace this with something like `get_steadystate()`
+        # because this is different for e.g. CNS
+        theta0 = params.Dc / friction_constants.v0  # type:ignore
         y0 = Variables(mu=mu[0], state=theta0)
         result = self.solve_forward(
             t, y0, params, friction_constants, block_constants, adjoint
         )
-        mu_hat = result.ys.mu
+        mu_hat = result.ys.mu  # type:ignore
         return mu - mu_hat
 
     def initial_inversion(
@@ -116,7 +118,7 @@ class ODESolver:
         if verbose:
             verbose_opts = frozenset(["step", "loss"])
         else:
-            verbose_opts = None
+            verbose_opts = frozenset([])
 
         options = {"autodiff_mode": "fwd"}
 
