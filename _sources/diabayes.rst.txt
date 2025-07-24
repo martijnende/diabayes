@@ -1,0 +1,53 @@
+diabayes package
+================
+
+Submodules
+----------
+
+diabayes.SVI module
+-------------------
+
+.. automodule:: diabayes.SVI
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+diabayes.forward\_models module
+-------------------------------
+
+.. automodule:: diabayes.forward_models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+diabayes.inversion module
+-------------------------
+
+.. automodule:: diabayes.inversion
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+diabayes.solver module
+----------------------
+
+.. automodule:: diabayes.solver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+diabayes.typedefs module
+------------------------
+
+.. automodule:: diabayes.typedefs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: diabayes
+   :members:
+   :undoc-members:
+   :show-inheritance:
