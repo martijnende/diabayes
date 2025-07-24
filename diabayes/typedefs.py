@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Protocol, Union
+from typing import Any, Iterable, Protocol, Union
 
 import jax.numpy as jnp
 from jax import tree_util
@@ -22,6 +22,10 @@ class Variables:
     def to_array(self):
         return jnp.array([self.mu, self.state])
 
+    @classmethod
+    def from_array(cls, x: Iterable):
+        return cls(*x)
+
 
 @tree_util.register_pytree_node_class
 @dataclass(frozen=True)
@@ -39,6 +43,10 @@ class RSFParams:
 
     def to_array(self):
         return jnp.array([self.a, self.b, self.Dc])
+
+    @classmethod
+    def from_array(cls, x: Iterable):
+        return cls(*x)
 
 
 @dataclass(frozen=True)
