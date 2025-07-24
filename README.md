@@ -1,6 +1,16 @@
 # DiaBayes: rock friction inversion tools
 
-Documentation | [Installation](#installation) | [How to cite?](#how-to-cite)
+[![GitHub Release](https://img.shields.io/github/release/martijnende/diabase.svg?style=flat)]() 
+[![tests](https://github.com/martijnende/diabayes/actions/workflows/python-test.yml/badge.svg)](https://github.com/martijnende/diabayes/actions/workflows/python-test.yml)
+[![documentation](https://github.com/martijnende/diabayes/actions/workflows/build-docs.yml/badge.svg)](https://martijnende.github.io/diabayes)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- [![PyPi Version](https://img.shields.io/pypi/v/diabayes.svg)](https://pypi.python.org/pypi/diabayes/) -->
+
+[Documentation](https://martijnende.github.io/diabayes) | [Example usage](#example-usage) | [Installation](#installation) | [How to cite?](#how-to-cite)
+
+## Example usage
+
+See `examples/simple_example.ipynb` for a self-contained Jupyter notebook that illustrates forward and inverse modelling.
 
 ## Installation
 
@@ -18,3 +28,5 @@ pip install .[gpu,dev]
 ```
 
 ## How to cite?
+
+A publication describing this software package is underway. Until then, feel free to refer to this repository.
