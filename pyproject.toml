@@ -23,7 +23,13 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["black", "isort", "twine"]
 gpu = ["jax[cuda12]"]
-docs = ["pydata-sphinx-theme", "sphinx-design", "sphinx-copybutton", "sphinx"]
+docs = [
+    "make",
+    "pydata-sphinx-theme",
+    "sphinx",
+    "sphinx-copybutton",
+    "sphinx-design"
+]
 
 [build-system]
 requires = ["setuptools"]

@@ -1,0 +1,10 @@
+name: Setup project
+description: Checkout code, install dependencies
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip install .[dev,docs]
