@@ -46,6 +46,7 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/modules';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -306,11 +307,77 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="diabayes.html">diabayes package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.html#diabayes-svi-module">diabayes.SVI module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.html#diabayes-forward-models-module">diabayes.forward_models module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.html#diabayes-solver-module">diabayes.solver module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.html#diabayes-typedefs-module">diabayes.typedefs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.html#module-diabayes.SVI">diabayes.SVI module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.SVI.compute_phi"><code class="docutils literal notranslate"><span class="pre">compute_phi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.SVI.mapped_log_likelihood"><code class="docutils literal notranslate"><span class="pre">mapped_log_likelihood()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.html#module-diabayes.forward_models">diabayes.forward_models module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.forward_models.Forward"><code class="docutils literal notranslate"><span class="pre">Forward</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.forward_models.ageing_law"><code class="docutils literal notranslate"><span class="pre">ageing_law()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.forward_models.rsf"><code class="docutils literal notranslate"><span class="pre">rsf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.forward_models.springblock"><code class="docutils literal notranslate"><span class="pre">springblock()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.html#module-diabayes.solver">diabayes.solver module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver"><code class="docutils literal notranslate"><span class="pre">ODESolver</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.atol"><code class="docutils literal notranslate"><span class="pre">ODESolver.atol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.checkpoints"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.forward_model"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.initial_inversion"><code class="docutils literal notranslate"><span class="pre">ODESolver.initial_inversion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.rtol"><code class="docutils literal notranslate"><span class="pre">ODESolver.rtol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.solve_forward"><code class="docutils literal notranslate"><span class="pre">ODESolver.solve_forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.html#module-diabayes.typedefs">diabayes.typedefs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSConstants"><code class="docutils literal notranslate"><span class="pre">CNSConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSConstants.Z"><code class="docutils literal notranslate"><span class="pre">CNSConstants.Z</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSConstants.phi_c"><code class="docutils literal notranslate"><span class="pre">CNSConstants.phi_c</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSParams"><code class="docutils literal notranslate"><span class="pre">CNSParams</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSParams.Z"><code class="docutils literal notranslate"><span class="pre">CNSParams.Z</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSParams.phi_c"><code class="docutils literal notranslate"><span class="pre">CNSParams.phi_c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSParams.tree_flatten"><code class="docutils literal notranslate"><span class="pre">CNSParams.tree_flatten()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container"><code class="docutils literal notranslate"><span class="pre">Container</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container.from_array"><code class="docutils literal notranslate"><span class="pre">Container.from_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container.to_array"><code class="docutils literal notranslate"><span class="pre">Container.to_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container.tree_flatten"><code class="docutils literal notranslate"><span class="pre">Container.tree_flatten()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container.tree_unflatten"><code class="docutils literal notranslate"><span class="pre">Container.tree_unflatten()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.FrictionModel"><code class="docutils literal notranslate"><span class="pre">FrictionModel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFConstants"><code class="docutils literal notranslate"><span class="pre">RSFConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFConstants.mu0"><code class="docutils literal notranslate"><span class="pre">RSFConstants.mu0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFConstants.v0"><code class="docutils literal notranslate"><span class="pre">RSFConstants.v0</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFParams"><code class="docutils literal notranslate"><span class="pre">RSFParams</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFParams.Dc"><code class="docutils literal notranslate"><span class="pre">RSFParams.Dc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFParams.a"><code class="docutils literal notranslate"><span class="pre">RSFParams.a</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFParams.b"><code class="docutils literal notranslate"><span class="pre">RSFParams.b</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFParams.tree_flatten"><code class="docutils literal notranslate"><span class="pre">RSFParams.tree_flatten()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.SpringBlockConstants"><code class="docutils literal notranslate"><span class="pre">SpringBlockConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.SpringBlockConstants.k"><code class="docutils literal notranslate"><span class="pre">SpringBlockConstants.k</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.SpringBlockConstants.v_lp"><code class="docutils literal notranslate"><span class="pre">SpringBlockConstants.v_lp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.StateEvolution"><code class="docutils literal notranslate"><span class="pre">StateEvolution</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Variables"><code class="docutils literal notranslate"><span class="pre">Variables</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Variables.mu"><code class="docutils literal notranslate"><span class="pre">Variables.mu</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Variables.state"><code class="docutils literal notranslate"><span class="pre">Variables.state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Variables.tree_flatten"><code class="docutils literal notranslate"><span class="pre">Variables.tree_flatten()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.html#module-diabayes">Module contents</a></li>
 </ul>
 </li>
 </ul>
