@@ -46,6 +46,23 @@ def compute_phi(theta: Particles, gradp: Gradients, gradq: Gradients) -> Gradien
     Compute the Stein variational gradients for a set of
     particles (`theta`) and the gradients of the log-likelihood
     function (`gradp`) and the log-prior (`gradq`).
+
+    Parameters
+    ----------
+    theta : Particles
+        The set of invertible parameters ("particles")
+        of shape (Nparticles, Ndimensions)
+    gradp, gradq : Gradients
+        The gradients of the log-likelihood (`gradp`) and the
+        log-prior (`gradq`) with respect to the invertible parameters.
+        Has a shape (Nparticles, Ndimensions)
+
+    Returns
+    -------
+    grad_theta : Gradients
+        The directional gradients for the particle updates, e.g.
+        `new_theta = theta + step_size * grad_theta`. Has the same
+        shape as `theta` and `gradp, gradq`.
     """
     h = _median_trick_h(theta)
     K, grad_K = _exponential_kernel(theta, h)
