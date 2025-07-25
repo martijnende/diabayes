@@ -20,14 +20,6 @@ diabayes.forward\_models module
    :undoc-members:
    :show-inheritance:
 
-diabayes.inversion module
--------------------------
-
-.. automodule:: diabayes.inversion
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 diabayes.solver module
 ----------------------
 
