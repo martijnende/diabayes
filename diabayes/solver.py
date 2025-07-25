@@ -7,7 +7,13 @@ import optimistix as optx
 from jaxtyping import Array, Float
 
 from diabayes.forward_models import Forward
-from diabayes.typedefs import Variables, _BlockConstants, _Constants, _Params
+from diabayes.typedefs import (
+    BayesianSolution,
+    Variables,
+    _BlockConstants,
+    _Constants,
+    _Params,
+)
 
 jax.config.update("jax_enable_x64", True)
 
@@ -105,7 +111,7 @@ class ODESolver:
         mu_hat = result.ys.mu  # type:ignore
         return mu - mu_hat
 
-    def initial_inversion(
+    def max_likelihood_inversion(
         self,
         t: Float[Array, "Nt"],
         mu: Float[Array, "Nt"],
@@ -132,3 +138,13 @@ class ODESolver:
         )
 
         return sol
+
+    def bayesian_inversion(
+        self,
+        t: Float[Array, "Nt"],
+        mu: Float[Array, "Nt"],
+        params: _Params,
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
+        verbose: bool = False,
+    ) -> BayesianSolution: ...

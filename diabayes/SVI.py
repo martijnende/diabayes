@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, TypeAlias
 
 import equinox as eqx
 import jax
@@ -10,24 +10,24 @@ from jaxtyping import Array, Float
 
 from diabayes.typedefs import Variables, _Params
 
-Particles = Float[Array, "N M"]
-Gradients = Float[Array, "N M"]
+ParticleArray = Float[Array, "N M"]
+GradientArray: TypeAlias = ParticleArray
 
 
 @eqx.filter_jit
-def _distance(x: Particles) -> Float[Array, "N N"]:
+def _distance(x: ParticleArray) -> Float[Array, "N N"]:
     return jnp.square(x[:, None] - x[None]).sum(axis=-1)
 
 
 @eqx.filter_value_and_grad
-def _exponential_kernel(theta: Particles, h: float) -> Float[Array, "N N"]:
+def _exponential_kernel(theta: ParticleArray, h: float) -> Float[Array, "N N"]:
     """Radial basis distance between the particles `theta`"""
     pairwise_dists_sq = _distance(theta)
     return jnp.exp(-pairwise_dists_sq / h)
 
 
 @eqx.filter_jit
-def _median_trick_h(theta: Particles) -> Float:
+def _median_trick_h(theta: ParticleArray) -> Float:
     """
     Compute the scaling factor `h` proportional to the
     squared median of the RMS distance between all pairs
@@ -36,12 +36,14 @@ def _median_trick_h(theta: Particles) -> Float:
     pairwise_dists_sq = _distance(theta)
     # Replace this one with jnp.nanmedian to avoid spreading NaNs?
     med_sq = jnp.median(jnp.sqrt(pairwise_dists_sq))
-    h = med_sq**2 / jnp.log(theta.shape[0] + 1)
+    h = med_sq**2 / jnp.log(len(theta) + 1)
     return h
 
 
 @eqx.filter_jit
-def compute_phi(theta: Particles, gradp: Gradients, gradq: Gradients) -> Gradients:
+def compute_phi(
+    theta: ParticleArray, gradp: GradientArray, gradq: GradientArray
+) -> GradientArray:
     """
     Compute the Stein variational gradients for a set of
     particles (`theta`) and the gradients of the log-likelihood
@@ -49,10 +51,10 @@ def compute_phi(theta: Particles, gradp: Gradients, gradq: Gradients) -> Gradien
 
     Parameters
     ----------
-    theta : Particles
+    theta : ParticleArray
         The set of invertible parameters ("particles")
         of shape (Nparticles, Ndimensions)
-    gradp, gradq : Gradients
+    gradp, gradq : GradientArray
         The gradients of the log-likelihood (`gradp`) and the
         log-prior (`gradq`) with respect to the invertible parameters.
         Has a shape (Nparticles, Ndimensions)
@@ -66,7 +68,7 @@ def compute_phi(theta: Particles, gradp: Gradients, gradq: Gradients) -> Gradien
     """
     h = _median_trick_h(theta)
     K, grad_K = _exponential_kernel(theta, h)
-    grad_theta = (jnp.matmul(K, gradp) + jnp.matmul(K, gradq) + grad_K) / gradp.shape[0]
+    grad_theta = (jnp.matmul(K, gradp) + jnp.matmul(K, gradq) + grad_K) / len(gradp)
     return -grad_theta
 
 

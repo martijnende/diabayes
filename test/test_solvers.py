@@ -64,7 +64,7 @@ class TestSolvers:
         mu = result.ys.mu
 
         # Invert parameters
-        result_inv = solver.initial_inversion(
+        result_inv = solver.max_likelihood_inversion(
             t, mu, params2, constants, block_constants, verbose=False
         )
         params_inv = result_inv.value
