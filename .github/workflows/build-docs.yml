@@ -25,7 +25,7 @@ jobs:
 
     - name: Generate .rst files from package
       run: |
-        sphinx-apidoc -o docs/source diabayes
+        sphinx-apidoc -o docs/source/api diabayes
 
     - name: Build Sphinx HTML documentation
       run: |
