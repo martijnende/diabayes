@@ -7,7 +7,7 @@ authors = [
 ]
 dependencies = [
     "jax",
-    "jax-tqdm",
+    "jax_tqdm",
     "jaxtyping",
     "equinox",
     "diffrax",

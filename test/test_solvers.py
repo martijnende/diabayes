@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 
 import diabayes as db
@@ -5,6 +6,8 @@ from diabayes.forward_models import Forward, ageing_law, rsf, springblock
 from diabayes.solver import ODESolver
 
 from .aux import init_params
+
+jax.config.update("jax_enable_x64", True)
 
 
 class TestSolvers:
@@ -21,19 +24,27 @@ class TestSolvers:
 
         t = jnp.linspace(0.0, 100.0, 1000)
         result = solver.solve_forward(t, variables, params, constants, block_constants)
+        result_jax = solver._solve_forward(
+            t, variables, params, constants, block_constants
+        )
 
         assert result is not None
-        assert result.ys is not None
+        assert result_jax is not None
+        assert result_jax.ys is not None
+
+        diff = result.to_array() - result_jax.ys.to_array()
+
+        assert jnp.allclose(result.to_array(), result_jax.ys.to_array())
 
         # Steady-state tests
 
-        mu_final = result.ys.mu[-1]
+        mu_final = result.mu[-1]
         mu_pred = constants.mu0 + (params.a - params.b) * jnp.log(
             block_constants.v_lp / constants.v0
         )
         assert jnp.allclose(mu_final, mu_pred)
 
-        state_final = result.ys.state[-1]
+        state_final = result.state[-1]
         state_pred = params.Dc / block_constants.v_lp
         assert jnp.allclose(state_final, state_pred)
 
@@ -53,15 +64,12 @@ class TestSolvers:
         solver = ODESolver(forward)
 
         # Forward simulation to generate "observations"
-        t = jnp.linspace(0.0, 100.0, 1000)
+        t = jnp.linspace(0.0, 20.0, 1000)
         result = solver.solve_forward(t, variables, params, constants, block_constants)
-
-        assert result is not None
-        assert result.ys is not None
 
         # Perturb parameters (initial guess parameters)
         params2 = db.RSFParams(a=params.a * 1.1, b=params.b * 0.9, Dc=params.Dc * 5)
-        mu = result.ys.mu
+        mu = result.mu
 
         # Invert parameters
         result_inv = solver.max_likelihood_inversion(
@@ -75,9 +83,8 @@ class TestSolvers:
         )
 
         assert result2 is not None
-        assert result2.ys is not None
 
         # Check that inverted parameters and resulting friction
         # curves are identical to the original ones
         assert jnp.allclose(params.to_array(), params_inv.to_array())
-        assert jnp.allclose(result.ys.to_array(), result2.ys.to_array())
+        assert jnp.allclose(result.to_array(), result2.to_array())

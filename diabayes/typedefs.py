@@ -25,6 +25,12 @@ Parameter containers
 
 class Container:
 
+    def __len__(self):
+        return len(self.tree_flatten()[0])
+
+    def __iter__(self):
+        return iter(self.tree_flatten()[0])
+
     @classmethod
     def tree_unflatten(cls, aux_data, children):
         return cls(*children)

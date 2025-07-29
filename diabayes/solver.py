@@ -1,14 +1,23 @@
-from typing import Tuple, Union
+from time import time_ns
+from typing import Any, Callable, Tuple, Union
 
 import diffrax as dfx
 import equinox as eqx
 import jax
+import jax.numpy as jnp
+import jax.random as jr
+import optax
 import optimistix as optx
+from jax import lax
+from jax_tqdm import scan_tqdm
 from jaxtyping import Array, Float
+from scipy.integrate import solve_ivp
 
 from diabayes.forward_models import Forward
 from diabayes.typedefs import (
     BayesianSolution,
+    RSFParams,
+    RSFParticles,
     Variables,
     _BlockConstants,
     _Constants,
@@ -24,6 +33,7 @@ class ODESolver:
     rtol: float
     atol: float
     checkpoints: int
+    learning_rate: float = 1e-2
 
     def __init__(
         self,
@@ -38,6 +48,61 @@ class ODESolver:
         self.checkpoints = checkpoints
         pass
 
+    def solve_forward(
+        self,
+        t: Float[Array, "Nt"],
+        y0: Variables,
+        params: _Params,
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
+    ) -> Any:
+        """
+        Solve a forward problem using SciPy's `solve_ivp` routine.
+        While this routine doesn't propagate any gradients, it is
+        much faster to initialise and to perform a single forward
+        run. Hence for playing around with different parameters,
+        it is preferred over a JITed JAX implementation.
+
+        Parameters
+        ----------
+        t : Float[Array, "Nt"]
+            A vector of time samples where a solution is requested
+        y0 : Variables
+            The initial values (fricton and state) wrapped in a
+            `Variables` container.
+        params : _Params
+            The (invertible) parameters that govern the dynamics,
+            wrapped in a `Params` container.
+        friction_constants : _Constants
+            A container object containing the friction constants
+        block_constants : _BlockConstants
+            A container object containing the block constants
+
+        Returns
+        -------
+        result : Variables
+            Solution time series of friction and state
+        """
+
+        _forward = lambda t, y, *args: self.forward_model(
+            Variables.from_array(y), *args
+        ).to_array()
+
+        result = solve_ivp(
+            fun=_forward,
+            t_span=(t.min(), t.max()),
+            y0=y0.to_array(),
+            t_eval=t,
+            args=(params, friction_constants, block_constants),
+            rtol=self.rtol,
+            atol=self.atol,
+        )
+
+        assert result.y is not None
+
+        return Variables.from_array(result.y)
+
+    @eqx.filter_jit
     def _forward_wrapper(
         self,
         t: Float,
@@ -52,7 +117,30 @@ class ODESolver:
             block_constants=block_constants,
         )
 
-    def solve_forward(
+    @eqx.filter_jit
+    def _forward_wrapper_SVI(
+        self,
+        y0: Float[Array, "2"],
+        params: Float[Array, "..."],
+        t: Float[Array, "Nt"],
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
+    ) -> Variables:
+        result = self._solve_forward(
+            t=t,
+            y0=Variables.from_array(y0),
+            params=RSFParams.from_array(params),
+            friction_constants=friction_constants,
+            block_constants=block_constants,
+        )
+
+        assert result is not None
+        assert result.ys is not None
+
+        return result.ys
+
+    @eqx.filter_jit
+    def _solve_forward(
         self,
         t: Float[Array, "Nt"],
         y0: Variables,
@@ -105,7 +193,7 @@ class ODESolver:
         # because this is different for e.g. CNS
         theta0 = params.Dc / friction_constants.v0  # type:ignore
         y0 = Variables(mu=mu[0], state=theta0)
-        result = self.solve_forward(
+        result = self._solve_forward(
             t, y0, params, friction_constants, block_constants, adjoint
         )
         mu_hat = result.ys.mu  # type:ignore
@@ -143,8 +231,73 @@ class ODESolver:
         self,
         t: Float[Array, "Nt"],
         mu: Float[Array, "Nt"],
+        noise_std: Float,
         params: _Params,
         friction_constants: _Constants,
         block_constants: _BlockConstants,
-        verbose: bool = False,
-    ) -> BayesianSolution: ...
+        Nparticles: int = 1000,
+        Nsteps: int = 150,
+        key: Union[None, int, jax.Array] = None,
+    ) -> None:
+
+        assert isinstance(
+            params, RSFParams
+        ), "Bayesian inversion is only implemented for RSF"
+
+        if key is None:
+            key = jr.PRNGKey(time_ns())
+        elif isinstance(key, int):
+            key = jr.PRNGKey(key)
+
+        key, split_key = jr.split(key)
+
+        scale = jnp.ones(len(params)) * 0.1
+        inv_scale = 1 / (jnp.sqrt(2) * scale)
+        log_params = jnp.log(params.to_array())
+
+        # Sample particles from a log-normal distribution
+        log_particles = RSFParticles.generate(
+            N=Nparticles, loc=log_params, scale=scale, key=split_key
+        ).to_array()
+
+        # Instantiate optimiser
+        opt = optax.adam(learning_rate=self.learning_rate)
+        opt_state = opt.init(log_particles)
+
+        from functools import partial
+
+        forward_fn = partial(
+            self._forward_wrapper_SVI,
+            t=t,
+            friction_constants=friction_constants,
+            block_constants=block_constants,
+        )
+
+        from diabayes.SVI import compute_phi, mapped_log_likelihood
+
+        @scan_tqdm(Nsteps)
+        def body_fun(carry, i):
+            params, state = carry
+            loss, gradp = mapped_log_likelihood(
+                params, mu, noise_std, friction_constants.v0, forward_fn
+            )
+            """
+            Sometimes the adjoint back-propagation becomes unstable, 
+            producing NaNs in the gradients. By setting the NaN-gradients
+            to zero, the particle will be attracted towards the prior.
+            This is fine, because in the next step the gradients will
+            likely be stable again and the particle will continue
+            to be attracted by the maximum likelihood
+            """
+            nan_count = jnp.isnan(gradp).sum() / gradp.shape[1]
+            gradp = jnp.asarray(jnp.where(jnp.isnan(gradp), 0.0, gradp))
+            gradq = -2 * (params - log_params) * inv_scale
+            phi = compute_phi(params, gradp, gradq)
+            updates, state = opt.update(phi, state, params)
+            params = optax.apply_updates(params, updates)
+            return (params, state), (loss.mean(), nan_count, params)
+
+        carry = (log_particles, opt_state)
+        _, (loss, nan_count, states) = lax.scan(body_fun, carry, jnp.arange(Nsteps))
+
+        return states
