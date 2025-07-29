@@ -287,7 +287,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for diabayes.SVI</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeAlias</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">equinox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eqx</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
@@ -299,82 +299,100 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.typedefs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variables</span><span class="p">,</span> <span class="n">_Params</span>
 
-<span class="n">Particles</span> <span class="o">=</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N M&quot;</span><span class="p">]</span>
-<span class="n">Gradients</span> <span class="o">=</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N M&quot;</span><span class="p">]</span>
+<span class="n">ParticleArray</span> <span class="o">=</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N M&quot;</span><span class="p">]</span>
+<span class="n">GradientArray</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">ParticleArray</span>
 
 
 <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_distance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Particles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N N&quot;</span><span class="p">]:</span>
-    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-
-<span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_value_and_grad</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_exponential_kernel</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">Particles</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N N&quot;</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Radial basis distance between the particles `theta`&quot;&quot;&quot;</span>
-    <span class="n">pairwise_dists_sq</span> <span class="o">=</span> <span class="n">_distance</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">pairwise_dists_sq</span> <span class="o">/</span> <span class="n">h</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_distance</span><span class="p">(</span><span class="n">x1</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N N&quot;</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
 
 <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_median_trick_h</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">Particles</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_exponential_kernel</span><span class="p">(</span>
+    <span class="n">x1</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N N&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Radial basis distance between two particles `x1` and `x2`&quot;&quot;&quot;</span>
+    <span class="n">dist_sq</span> <span class="o">=</span> <span class="n">_distance</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dist_sq</span> <span class="o">/</span> <span class="n">h</span><span class="p">)</span>
+
+
+<span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_median_trick_h</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the scaling factor `h` proportional to the</span>
 <span class="sd">    squared median of the RMS distance between all pairs</span>
 <span class="sd">    of particles.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">pairwise_dists_sq</span> <span class="o">=</span> <span class="n">_distance</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">dist_sq</span> <span class="o">=</span> <span class="n">_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
     <span class="c1"># Replace this one with jnp.nanmedian to avoid spreading NaNs?</span>
-    <span class="n">med_sq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pairwise_dists_sq</span><span class="p">))</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="n">med_sq</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">med_sq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist_sq</span><span class="p">))</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">med_sq</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">h</span>
 
 
 <div class="viewcode-block" id="compute_phi">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.SVI.compute_phi">[docs]</a>
 <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_phi</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">Particles</span><span class="p">,</span> <span class="n">gradp</span><span class="p">:</span> <span class="n">Gradients</span><span class="p">,</span> <span class="n">gradq</span><span class="p">:</span> <span class="n">Gradients</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gradients</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_phi</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">,</span> <span class="n">gradp</span><span class="p">:</span> <span class="n">GradientArray</span><span class="p">,</span> <span class="n">gradq</span><span class="p">:</span> <span class="n">GradientArray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Stein variational gradients for a set of</span>
-<span class="sd">    particles (`theta`) and the gradients of the log-likelihood</span>
+<span class="sd">    particles (`x`) and the gradients of the log-likelihood</span>
 <span class="sd">    function (`gradp`) and the log-prior (`gradq`).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    theta : Particles</span>
+<span class="sd">    x : ParticleArray</span>
 <span class="sd">        The set of invertible parameters (&quot;particles&quot;)</span>
 <span class="sd">        of shape (Nparticles, Ndimensions)</span>
-<span class="sd">    gradp, gradq : Gradients</span>
+<span class="sd">    gradp, gradq : GradientArray</span>
 <span class="sd">        The gradients of the log-likelihood (`gradp`) and the</span>
 <span class="sd">        log-prior (`gradq`) with respect to the invertible parameters.</span>
 <span class="sd">        Has a shape (Nparticles, Ndimensions)</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    grad_theta : Gradients</span>
+<span class="sd">    grad_x : Gradients</span>
 <span class="sd">        The directional gradients for the particle updates, e.g.</span>
-<span class="sd">        `new_theta = theta + step_size * grad_theta`. Has the same</span>
-<span class="sd">        shape as `theta` and `gradp, gradq`.</span>
+<span class="sd">        `new_x = x + step_size * grad_x`. Has the same</span>
+<span class="sd">        shape as `x` and `gradp, gradq`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="n">_median_trick_h</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="n">K</span><span class="p">,</span> <span class="n">grad_K</span> <span class="o">=</span> <span class="n">_exponential_kernel</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-    <span class="n">grad_theta</span> <span class="o">=</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">gradp</span><span class="p">)</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">gradq</span><span class="p">)</span> <span class="o">+</span> <span class="n">grad_K</span><span class="p">)</span> <span class="o">/</span> <span class="n">gradp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">return</span> <span class="o">-</span><span class="n">grad_theta</span></div>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">_median_trick_h</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">map_over_a</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">map_over_b</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">map1</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">_exponential_kernel</span><span class="p">,</span> <span class="n">map_over_a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">map1</span><span class="p">,</span> <span class="n">map_over_b</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+    <span class="n">map1</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">_exponential_kernel</span><span class="p">),</span> <span class="n">map_over_a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">grad_kernel</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">map1</span><span class="p">,</span> <span class="n">map_over_b</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">grad_K</span> <span class="o">=</span> <span class="n">grad_kernel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">grad_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">gradp</span><span class="p">)</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">gradq</span><span class="p">)</span> <span class="o">+</span> <span class="n">grad_K</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">gradp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">grad_x</span></div>
 
 
 
 <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_value_and_grad</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_log_likelihood</span><span class="p">(</span>
-    <span class="n">log_params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
+    <span class="n">log_params</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">],</span>
     <span class="n">mu_obs</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nt&quot;</span><span class="p">],</span>
-    <span class="n">sigma</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
-    <span class="n">forward_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_Params</span><span class="p">],</span> <span class="n">Variables</span><span class="p">],</span>
+    <span class="n">noise_std</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+    <span class="n">v0</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+    <span class="n">forward_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]],</span> <span class="n">Variables</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
     <span class="c1"># Transform the log_params by taking exponential</span>
-    <span class="n">params</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">log_params</span><span class="p">)</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_params</span><span class="o">.</span><span class="n">to_array</span><span class="p">()))</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_params</span><span class="p">)</span>
+    <span class="c1"># Get initial values</span>
+    <span class="c1"># TODO: replace with `get_steady_state` or something</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mu_obs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">v0</span><span class="p">])</span>
     <span class="c1"># Forward pass to get friction curve</span>
-    <span class="n">mu_hat</span> <span class="o">=</span> <span class="n">forward_fn</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">mu</span>
+    <span class="n">mu_hat</span> <span class="o">=</span> <span class="n">forward_fn</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">mu</span>
     <span class="c1"># Log-likelihood of residuals</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">mu_obs</span> <span class="o">-</span> <span class="n">mu_hat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">mu_obs</span> <span class="o">-</span> <span class="n">mu_hat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">noise_std</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">p</span>
 
 
@@ -384,7 +402,7 @@
 <span class="sd">likelihood and its gradient (hence it needs 2 values for the out_axes).</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">mapped_log_likelihood</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
-    <span class="n">_log_likelihood</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">out_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">_log_likelihood</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">out_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 
