@@ -35,7 +35,7 @@ def _median_trick_h(x: ParticleArray) -> Float:
     squared median of the RMS distance between all pairs
     of particles.
     """
-    dist_sq = _distance(x, x)
+    dist_sq = jnp.square(x[:, None] - x[None]).sum(axis=-1)
     # Replace this one with jnp.nanmedian to avoid spreading NaNs?
     med_sq = jnp.median(jnp.sqrt(dist_sq))
     h = med_sq**2 / jnp.log(len(x) + 1)

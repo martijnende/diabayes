@@ -9,7 +9,7 @@ import jax.random as jr
 import optax
 import optimistix as optx
 from jax import lax
-from jax_tqdm import scan_tqdm
+from jax_tqdm import scan_tqdm  # type:ignore
 from jaxtyping import Array, Float
 from scipy.integrate import solve_ivp
 
@@ -238,7 +238,7 @@ class ODESolver:
         Nparticles: int = 1000,
         Nsteps: int = 150,
         key: Union[None, int, jax.Array] = None,
-    ) -> None:
+    ):
 
         assert isinstance(
             params, RSFParams
@@ -298,6 +298,8 @@ class ODESolver:
             return (params, state), (loss.mean(), nan_count, params)
 
         carry = (log_particles, opt_state)
-        _, (loss, nan_count, states) = lax.scan(body_fun, carry, jnp.arange(Nsteps))
+        _, (loss, nan_count, states) = lax.scan(
+            body_fun, carry, jnp.arange(Nsteps)  # type:ignore
+        )
 
         return states
