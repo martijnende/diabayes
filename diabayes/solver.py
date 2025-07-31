@@ -1,3 +1,4 @@
+from functools import partial
 from time import time_ns
 from typing import Any, Callable, Tuple, Union
 
@@ -14,6 +15,7 @@ from jaxtyping import Array, Float
 from scipy.integrate import solve_ivp
 
 from diabayes.forward_models import Forward
+from diabayes.SVI import compute_phi, mapped_log_likelihood
 from diabayes.typedefs import (
     BayesianSolution,
     RSFParams,
@@ -264,16 +266,12 @@ class ODESolver:
         opt = optax.adam(learning_rate=self.learning_rate)
         opt_state = opt.init(log_particles)
 
-        from functools import partial
-
         forward_fn = partial(
             self._forward_wrapper_SVI,
             t=t,
             friction_constants=friction_constants,
             block_constants=block_constants,
         )
-
-        from diabayes.SVI import compute_phi, mapped_log_likelihood
 
         @scan_tqdm(Nsteps)
         def body_fun(carry, i):
@@ -302,4 +300,4 @@ class ODESolver:
             body_fun, carry, jnp.arange(Nsteps)  # type:ignore
         )
 
-        return states
+        return BayesianSolution(states, loss, nan_count)
