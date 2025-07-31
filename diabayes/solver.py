@@ -239,17 +239,19 @@ class ODESolver:
         block_constants: _BlockConstants,
         Nparticles: int = 1000,
         Nsteps: int = 150,
-        key: Union[None, int, jax.Array] = None,
+        rng: Union[None, int, jax.Array] = None,
     ):
 
         assert isinstance(
             params, RSFParams
         ), "Bayesian inversion is only implemented for RSF"
 
-        if key is None:
+        if rng is None:
             key = jr.PRNGKey(time_ns())
-        elif isinstance(key, int):
-            key = jr.PRNGKey(key)
+        elif isinstance(rng, int):
+            key = jr.PRNGKey(rng)
+        else:
+            key = rng
 
         key, split_key = jr.split(key)
 

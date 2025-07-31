@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from time import time_ns
 from typing import Any, Iterable, NamedTuple, Protocol, Tuple, TypeAlias, Union
 
+import equinox as eqx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
@@ -205,7 +206,7 @@ class Statistics(NamedTuple):
         return getattr(self, x)
 
 
-class ParamStatistics(NamedTuple):
+class ParamStatistics(eqx.Module):
 
     @classmethod
     def from_state(cls, state):
@@ -217,7 +218,7 @@ class ParamStatistics(NamedTuple):
         return getattr(self, x)
 
     def get_param_names(self) -> Tuple:
-        return self._fields[:-1]
+        return tuple(self.__dataclass_fields__.keys())[:-1]
 
 
 class RSFStatistics(ParamStatistics):
@@ -273,11 +274,11 @@ class BayesianSolution:
         ax.plot(self.log_likelihood)
         ax.set_ylabel("log-likelihood")
 
-        for i, (ax, chains) in enumerate(
-            zip(axes[1:], self.chains.transpose((2, 0, 1)))
+        for i, (ax, chains, param) in enumerate(
+            zip(axes[1:], self.chains.transpose((2, 0, 1)), params)
         ):
             ax.plot(chains, c="k", alpha=0.1, lw=1)
-            ax.set_ylabel(f"Parameter {i+1}")
+            ax.set_ylabel(f"Parameter {param}")
 
         ax.set_xlabel("step")
 
