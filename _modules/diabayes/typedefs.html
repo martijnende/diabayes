@@ -288,20 +288,13 @@
                   
   <h1>Source code for diabayes.typedefs</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Any</span><span class="p">,</span>
-    <span class="n">Iterable</span><span class="p">,</span>
-    <span class="n">NamedTuple</span><span class="p">,</span>
-    <span class="n">Protocol</span><span class="p">,</span>
-    <span class="n">Sequence</span><span class="p">,</span>
-    <span class="n">Tuple</span><span class="p">,</span>
-    <span class="n">TypeAlias</span><span class="p">,</span>
-    <span class="n">Union</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">time_ns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.random</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">tree_util</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">jaxtyping</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
 
@@ -543,54 +536,16 @@
 
 
 
-<div class="viewcode-block" id="Chains">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Chains">[docs]</a>
-<span class="nd">@tree_util</span><span class="o">.</span><span class="n">register_pytree_node_class</span>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Chains</span><span class="p">(</span><span class="n">Container</span><span class="p">):</span>
-
-    <span class="n">_chains</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Particles</span><span class="p">]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-
-        <span class="c1"># Check if the requested selection is of the kind `x[1, 3]` or `x[1, 3, 2]`</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="p">(</span>
-                <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">3</span>
-            <span class="p">),</span> <span class="s2">&quot;Chains do not support item selection with more than 3 indices&quot;</span>
-
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">idx</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
-
-            <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">idx</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-
-        <span class="c1"># Else the selection is of the kind `x[4]`</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Chains.tree_flatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Chains.tree_flatten">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">,</span> <span class="kc">None</span></div>
-
-
-<div class="viewcode-block" id="Chains.to_array">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Chains.to_array">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">])</span></div>
-</div>
-
-
-
 <span class="c1"># Alias gradients for semantic clarity</span>
 <span class="n">Gradients</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Particles</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">-----------------</span>
+<span class="sd">Inversion results</span>
+<span class="sd">-----------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">Chains</span> <span class="o">=</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps Nparticles Nparams&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="Statistics">
@@ -600,22 +555,67 @@
     <span class="n">median</span><span class="p">:</span> <span class="n">Float</span>
     <span class="n">std</span><span class="p">:</span> <span class="n">Float</span>
     <span class="n">q5</span><span class="p">:</span> <span class="n">Float</span>
-    <span class="n">q95</span><span class="p">:</span> <span class="n">Float</span></div>
+    <span class="n">q95</span><span class="p">:</span> <span class="n">Float</span>
+
+<div class="viewcode-block" id="Statistics.from_array">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Statistics.from_array">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]):</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">q5</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">q95</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="n">median</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">std</span><span class="p">,</span> <span class="n">q5</span><span class="o">=</span><span class="n">q5</span><span class="p">,</span> <span class="n">q95</span><span class="o">=</span><span class="n">q95</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Statistics.get">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Statistics.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ParamStatistics">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.ParamStatistics">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParamStatistics</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ParamStatistics.from_state">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.ParamStatistics.from_state">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">Statistics</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">stats</span> <span class="o">+</span> <span class="p">(</span><span class="n">cov</span><span class="p">,)))</span>  <span class="c1"># type:ignore</span></div>
+
+
+<div class="viewcode-block" id="ParamStatistics.get">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.ParamStatistics.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Statistics</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParamStatistics.get_param_names">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.ParamStatistics.get_param_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_param_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+</div>
 
 
 
 <div class="viewcode-block" id="RSFStatistics">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.RSFStatistics">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">RSFStatistics</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RSFStatistics</span><span class="p">(</span><span class="n">ParamStatistics</span><span class="p">):</span>
+
     <span class="n">a</span><span class="p">:</span> <span class="n">Statistics</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">Statistics</span>
-    <span class="n">Dc</span><span class="p">:</span> <span class="n">Statistics</span></div>
+    <span class="n">Dc</span><span class="p">:</span> <span class="n">Statistics</span>
+    <span class="n">cov</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N N&quot;</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="CNSStatistics">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.CNSStatistics">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">CNSStatistics</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CNSStatistics</span><span class="p">(</span><span class="n">ParamStatistics</span><span class="p">):</span>
     <span class="n">a</span><span class="p">:</span> <span class="n">Statistics</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">Statistics</span>
     <span class="n">Dc</span><span class="p">:</span> <span class="n">Statistics</span></div>
@@ -628,14 +628,159 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">BayesianSolution</span><span class="p">:</span>
 
     <span class="n">chains</span><span class="p">:</span> <span class="n">Chains</span>
-    <span class="n">statistics</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFStatistics</span><span class="p">,</span> <span class="n">CNSStatistics</span><span class="p">]</span>
+    <span class="n">log_likelihood</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">]</span>
+    <span class="n">nan_count</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">]</span>
+    <span class="n">statistics</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFStatistics</span><span class="p">,</span> <span class="n">CNSStatistics</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chains</span><span class="p">:</span> <span class="n">Chains</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">chains</span>
-        <span class="n">final_state</span> <span class="o">=</span> <span class="n">chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">chains</span><span class="p">:</span> <span class="n">Chains</span><span class="p">,</span>
+        <span class="n">log_likelihood</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">],</span>
+        <span class="n">nan_count</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_likelihood</span> <span class="o">=</span> <span class="n">log_likelihood</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nan_count</span> <span class="o">=</span> <span class="n">nan_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">RSFStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span>
 
-        <span class="c1"># TODO: final_state contains N particles</span>
-        <span class="c1">#</span>
+<div class="viewcode-block" id="BayesianSolution.plot_convergence">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution.plot_convergence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">()</span>
+        <span class="n">nparams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+            <span class="n">nrows</span><span class="o">=</span><span class="n">nparams</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="p">(</span><span class="n">nparams</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">sharex</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_likelihood</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;log-likelihood&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">chains</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;step&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="BayesianSolution.cornerplot">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution.cornerplot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cornerplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">()</span>
+        <span class="n">nparams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+            <span class="n">nrows</span><span class="o">=</span><span class="n">nparams</span><span class="p">,</span>
+            <span class="n">ncols</span><span class="o">=</span><span class="n">nparams</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">sharex</span><span class="o">=</span><span class="s2">&quot;col&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">axrow</span><span class="p">,</span> <span class="n">param1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">params</span><span class="p">)):</span>
+            <span class="n">axrow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">param1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">param2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">axrow</span><span class="p">,</span> <span class="n">params</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="n">fig</span><span class="o">.</span><span class="n">delaxes</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="n">stat1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param1</span><span class="p">)</span>
+                <span class="n">stat2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param2</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">stat2</span><span class="o">.</span><span class="n">median</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">nbins</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+                    <span class="n">xerr</span> <span class="o">=</span> <span class="p">[[</span><span class="n">stat2</span><span class="o">.</span><span class="n">median</span> <span class="o">-</span> <span class="n">stat2</span><span class="o">.</span><span class="n">q5</span><span class="p">],</span> <span class="p">[</span><span class="n">stat2</span><span class="o">.</span><span class="n">q95</span> <span class="o">-</span> <span class="n">stat2</span><span class="o">.</span><span class="n">median</span><span class="p">]]</span>
+                    <span class="n">yerr</span> <span class="o">=</span> <span class="p">[[</span><span class="n">stat1</span><span class="o">.</span><span class="n">median</span> <span class="o">-</span> <span class="n">stat1</span><span class="o">.</span><span class="n">q5</span><span class="p">],</span> <span class="p">[</span><span class="n">stat1</span><span class="o">.</span><span class="n">q95</span> <span class="o">-</span> <span class="n">stat1</span><span class="o">.</span><span class="n">median</span><span class="p">]]</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+                        <span class="n">stat2</span><span class="o">.</span><span class="n">median</span><span class="p">,</span>
+                        <span class="n">stat1</span><span class="o">.</span><span class="n">median</span><span class="p">,</span>
+                        <span class="n">xerr</span><span class="o">=</span><span class="n">xerr</span><span class="p">,</span>
+                        <span class="n">yerr</span><span class="o">=</span><span class="n">yerr</span><span class="p">,</span>
+                        <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+                        <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span>
+                        <span class="n">capsize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">nparams</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">param2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">()</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">_fields</span>
+        <span class="n">nl</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">tab</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span>
+        <span class="n">gutter</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">tab</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">gutter</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;Bayesian inversion results&quot;</span> <span class="o">+</span> <span class="n">nl</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">nl</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Number of particles:</span><span class="se">\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">nl</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Number of iterations:</span><span class="se">\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">nl</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Number of parameters:</span><span class="se">\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">nl</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">gutter</span> <span class="o">+</span> <span class="n">header</span> <span class="o">+</span> <span class="n">nl</span>
+        <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="n">param_stats</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span>
+            <span class="p">)</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">stat</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">tab</span> <span class="o">+</span> <span class="n">param_stats</span> <span class="o">+</span> <span class="n">nl</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">nl</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<div class="viewcode-block" id="BayesianSolution.sample">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution.sample">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">solver</span><span class="p">,</span>
+        <span class="n">y0</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
+        <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nt&quot;</span><span class="p">],</span>
+        <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
+        <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
+        <span class="n">nsamples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">rng</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">time_ns</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">rng</span>
+
+        <span class="n">key</span><span class="p">,</span> <span class="n">split_key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">split_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nsamples</span><span class="p">,),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">sample_results</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">_forward_wrapper_SVI</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">out_axes</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)(</span><span class="n">y0</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span> <span class="n">samples</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">sample_results</span></div>
+</div>
+
 </pre></div>
 
                 </article>

@@ -336,6 +336,11 @@
 <li class="toctree-l2"><a class="reference internal" href="diabayes.html#module-diabayes.typedefs">diabayes.typedefs module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution"><code class="docutils literal notranslate"><span class="pre">BayesianSolution</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution.chains"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.chains</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution.cornerplot"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.cornerplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution.log_likelihood"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.log_likelihood</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution.nan_count"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.nan_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution.plot_convergence"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.plot_convergence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution.sample"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.sample()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution.statistics"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.statistics</span></code></a></li>
 </ul>
 </li>
@@ -356,11 +361,6 @@
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.CNSStatistics.b"><code class="docutils literal notranslate"><span class="pre">CNSStatistics.b</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Chains"><code class="docutils literal notranslate"><span class="pre">Chains</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Chains.to_array"><code class="docutils literal notranslate"><span class="pre">Chains.to_array()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Chains.tree_flatten"><code class="docutils literal notranslate"><span class="pre">Chains.tree_flatten()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container"><code class="docutils literal notranslate"><span class="pre">Container</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container.from_array"><code class="docutils literal notranslate"><span class="pre">Container.from_array()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Container.to_array"><code class="docutils literal notranslate"><span class="pre">Container.to_array()</span></code></a></li>
@@ -370,6 +370,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.FrictionModel"><code class="docutils literal notranslate"><span class="pre">FrictionModel</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Gradients"><code class="docutils literal notranslate"><span class="pre">Gradients</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.ParamStatistics"><code class="docutils literal notranslate"><span class="pre">ParamStatistics</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.ParamStatistics.from_state"><code class="docutils literal notranslate"><span class="pre">ParamStatistics.from_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.ParamStatistics.get"><code class="docutils literal notranslate"><span class="pre">ParamStatistics.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.ParamStatistics.get_param_names"><code class="docutils literal notranslate"><span class="pre">ParamStatistics.get_param_names()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Particles"><code class="docutils literal notranslate"><span class="pre">Particles</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Particles.from_array"><code class="docutils literal notranslate"><span class="pre">Particles.from_array()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Particles.generate"><code class="docutils literal notranslate"><span class="pre">Particles.generate()</span></code></a></li>
@@ -398,6 +404,7 @@
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFStatistics.Dc"><code class="docutils literal notranslate"><span class="pre">RSFStatistics.Dc</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFStatistics.a"><code class="docutils literal notranslate"><span class="pre">RSFStatistics.a</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFStatistics.b"><code class="docutils literal notranslate"><span class="pre">RSFStatistics.b</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.RSFStatistics.cov"><code class="docutils literal notranslate"><span class="pre">RSFStatistics.cov</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.SpringBlockConstants"><code class="docutils literal notranslate"><span class="pre">SpringBlockConstants</span></code></a><ul>
@@ -407,6 +414,8 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.StateEvolution"><code class="docutils literal notranslate"><span class="pre">StateEvolution</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Statistics"><code class="docutils literal notranslate"><span class="pre">Statistics</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Statistics.from_array"><code class="docutils literal notranslate"><span class="pre">Statistics.from_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Statistics.get"><code class="docutils literal notranslate"><span class="pre">Statistics.get()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Statistics.mean"><code class="docutils literal notranslate"><span class="pre">Statistics.mean</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Statistics.median"><code class="docutils literal notranslate"><span class="pre">Statistics.median</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="diabayes.html#diabayes.typedefs.Statistics.q5"><code class="docutils literal notranslate"><span class="pre">Statistics.q5</span></code></a></li>
