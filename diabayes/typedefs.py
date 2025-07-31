@@ -1,15 +1,6 @@
 from dataclasses import dataclass
 from time import time_ns
-from typing import (
-    Any,
-    Iterable,
-    NamedTuple,
-    Protocol,
-    Sequence,
-    Tuple,
-    TypeAlias,
-    Union,
-)
+from typing import Any, Iterable, NamedTuple, Protocol, Tuple, TypeAlias, Union
 
 import jax
 import jax.numpy as jnp
@@ -17,8 +8,6 @@ import jax.random as jr
 import matplotlib.pyplot as plt
 from jax import tree_util
 from jaxtyping import Array, Float
-
-from diabayes.solver import ODESolver
 
 """
 --------------------
@@ -369,7 +358,7 @@ class BayesianSolution:
 
     def sample(
         self,
-        solver: ODESolver,
+        solver,
         y0: Variables,
         t: Float[Array, "Nt"],
         friction_constants: _Constants,
