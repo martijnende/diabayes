@@ -1,6 +1,6 @@
 from functools import partial
 from time import time_ns
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Tuple, Union
 
 import diffrax as dfx
 import equinox as eqx

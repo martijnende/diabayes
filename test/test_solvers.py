@@ -32,8 +32,6 @@ class TestSolvers:
         assert result_jax is not None
         assert result_jax.ys is not None
 
-        diff = result.to_array() - result_jax.ys.to_array()
-
         assert jnp.allclose(result.to_array(), result_jax.ys.to_array())
 
         # Steady-state tests

@@ -1,7 +1,6 @@
 import jax.numpy as jnp
 
-import diabayes as db
-from diabayes.typedefs import Chains, RSFParams, RSFParticles, RSFStatistics, Variables
+from diabayes.typedefs import RSFParams, RSFParticles, Variables
 
 
 class TestTypedefs:

@@ -1,14 +1,11 @@
-from typing import Callable, Tuple, TypeAlias
+from typing import Callable, TypeAlias
 
 import equinox as eqx
 import jax
 import jax.numpy as jnp
-import optax
-from jax import lax
-from jax_tqdm import scan_tqdm  # type:ignore
 from jaxtyping import Array, Float
 
-from diabayes.typedefs import Variables, _Params
+from diabayes.typedefs import Variables
 
 ParticleArray = Float[Array, "N M"]
 GradientArray: TypeAlias = ParticleArray
