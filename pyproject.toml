@@ -29,7 +29,10 @@ docs = [
     "pydata-sphinx-theme",
     "sphinx",
     "sphinx-copybutton",
+    "sphinx-togglebutton",
+    "sphinx-hoverxref",
     "sphinx-design",
+    "sphinxcontrib-bibtex",
 ]
 
 [build-system]

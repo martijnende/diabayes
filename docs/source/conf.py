@@ -17,17 +17,25 @@ extensions = [
     "myst_parser",
     "sphinx_design",
     "sphinx_copybutton",
+    "sphinxcontrib.bibtex",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
-    "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
+    "sphinx_togglebutton",
+    "hoverxref.extension",
 ]
 
 pygments_style = "sphinx"
 napoleon_numpy_docstring = True
-html_show_sourcelink = False
+
+bibtex_default_style = "unsrt"  # or plain, alpha, unsrt, abbrv
+bibtex_bibfiles = ["references.bib"]
+hoverxref_role_types = {
+    "cite": "tooltip",  # Show tooltip for :cite: role
+    "numref": "tooltip",  # Show tooltip for :numref: role
+}
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -38,18 +46,12 @@ exclude_patterns = []
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
+html_show_sourcelink = False
 
 myst_enable_extensions = [
     "dollarmath",
     "amsmath",
 ]
-
-# Configuration for intersphinx.
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
-    "numpy": ("https://numpy.org/doc/stable", None),
-    "xarray": ("https://docs.xarray.dev/en/stable", None),
-}
 
 html_sidebars = {
     "getting-started": [],  # Prevent an empty navigation bar from appearing
