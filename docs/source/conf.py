@@ -14,9 +14,10 @@ author = "Martijn van den Ende"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    "myst_parser",
     "sphinx_design",
     "sphinx_copybutton",
-    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -26,6 +27,7 @@ extensions = [
 
 pygments_style = "sphinx"
 napoleon_numpy_docstring = True
+html_show_sourcelink = False
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -42,4 +44,9 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "xarray": ("https://docs.xarray.dev/en/stable", None),
+}
+
+html_sidebars = {
+    "getting-started": [],  # Prevent an empty navigation bar from appearing
+    "community": [],
 }

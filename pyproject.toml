@@ -25,10 +25,11 @@ dev = ["black", "isort", "twine"]
 gpu = ["jax[cuda12]"]
 docs = [
     "make",
+    "myst-nb",
     "pydata-sphinx-theme",
     "sphinx",
     "sphinx-copybutton",
-    "sphinx-design"
+    "sphinx-design",
 ]
 
 [build-system]
