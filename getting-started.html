@@ -46,6 +46,8 @@
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'getting-started';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -316,22 +318,135 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="getting-started">
+  <section class="tex2jax_ignore mathjax_ignore" id="getting-started">
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
 <section id="installation-guide">
 <h2>Installation guide<a class="headerlink" href="#installation-guide" title="Link to this heading">#</a></h2>
+<p>It is recommended to create a dedicated Python environment using either <code class="docutils literal notranslate"><span class="pre">conda</span></code> or <code class="docutils literal notranslate"><span class="pre">venv</span></code>. DiaBayes will install numerous JAX-related packages that might conflict with your existing Python environments, especially when GPU support is enabled (which installs CUDA binaries). To create a new environment using <code class="docutils literal notranslate"><span class="pre">conda</span></code>, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>diabayes<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11<span class="w"> </span>pip
+conda<span class="w"> </span>activate<span class="w"> </span>diabayes
+</pre></div>
+</div>
+<p>You can then install the latest version using <code class="docutils literal notranslate"><span class="pre">pip</span></code> directly from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/martijnende/diabayes.git#egg=diabayes&quot;</span>
+</pre></div>
+</div>
+<p>To enable Nvidia GPU support (CUDA version 12):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/martijnende/diabayes.git#egg=diabayes[gpu]&quot;</span>
+</pre></div>
+</div>
+<p>If you plan to make direct changes to the code base, you can clone the repository and install from the local repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/martijnende/diabayes.git
+<span class="nb">cd</span><span class="w"> </span>diabayes
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>gpu<span class="o">]</span>
+</pre></div>
+</div>
+<p>Note that you’ll need to repeat <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> every time you make changes. If you also plan to push these changes to the original DiaBayes project, please include the development and documentation tools:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>gpu,docs,dev<span class="o">]</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">dev</span></code> packages include <a class="reference external" href="https://github.com/psf/black"><code class="docutils literal notranslate"><span class="pre">black</span></code></a> and <a class="reference external" href="https://github.com/PyCQA/isort"><code class="docutils literal notranslate"><span class="pre">isort</span></code></a>, which (re-)structure your code to a consistent format whenever you execute these in the repository root directory.</p>
 </section>
+<section id="basic-usage">
+<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading">#</a></h2>
 <section id="variables-parameters-constants">
-<h2>Variables, parameters, constants<a class="headerlink" href="#variables-parameters-constants" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+<h3>Variables, parameters, constants<a class="headerlink" href="#variables-parameters-constants" title="Link to this heading">#</a></h3>
+<p>DiaBayes can accommodate several physical models that each come with their own set of parameters. To assist in the bookkeeping of the variables, parameters, and constants, DiaBayes uses special containers that allow access to their contents by name. For example, variables are declared as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">diabayes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">db</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="mf">10.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The container items can then be accessed through <code class="docutils literal notranslate"><span class="pre">y.mu</span></code> and <code class="docutils literal notranslate"><span class="pre">y.state</span></code>. If you’we used Python’s <code class="docutils literal notranslate"><span class="pre">namedtuple</span></code> collection before then this should feel familiar. Invertible parameters and constants are declared in a similar way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># RSF parameters</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">RSFParams</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">Dc</span><span class="o">=</span><span class="n">Dc</span><span class="p">)</span>
+<span class="c1"># RSF constants</span>
+<span class="n">constants</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">RSFConstants</span><span class="p">(</span><span class="n">v0</span><span class="o">=</span><span class="n">v0</span><span class="p">,</span> <span class="n">mu0</span><span class="o">=</span><span class="n">mu0</span><span class="p">)</span>
+<span class="c1"># Spring-block constants</span>
+<span class="n">block_constants</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">SpringBlockConstants</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">v_lp</span><span class="o">=</span><span class="n">v1</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="forward-models">
-<h2>Forward models<a class="headerlink" href="#forward-models" title="Link to this heading">#</a></h2>
+<h3>Forward models<a class="headerlink" href="#forward-models" title="Link to this heading">#</a></h3>
+<p>The physics that underlies your experiment is encoded by a <em>forward model</em>. A DiaBayes <code class="docutils literal notranslate"><span class="pre">Forward</span></code> model is composed of three components:</p>
+<ol class="arabic simple">
+<li><p>A friction law, which is an equation that takes the friction and “state” as an input, and returns the instanteneous slip rate as an output, i.e. <span class="math notranslate nohighlight">\(v(t) = f(\mu(t), \theta(t))\)</span>.</p></li>
+<li><p>A state evolution law, which returns the time derivative of the “state” variable.</p></li>
+<li><p>A stress transfer model, which describes how the local slip rate results in a change in shear stress on the fault interface.</p></li>
+</ol>
+<p>These three components can be mixed and matched according to the user’s needs. For example, one could compile a forward model with regularised rate-and-state friction, the slip law for state evolution, and a non-inertial spring-block analogue for the stress transfer. Or one could pick the <em>Chen-Niemeijer-Spiers</em> friction model with its corresponding state (porosity) evolution law coupled with an inertial spring-block to simulate stick-slip motion. See the <a class="reference internal" href="user-guide/forward/index.html"><span class="doc std std-doc">User Guide on forward modelling</span></a> for more information about the various forward model components that have been implemented.</p>
+<p>Here is an example of a classical rate-and-state friction model combined with the ageing law and a non-inertial spring-block:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.forward_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Forward</span><span class="p">,</span> <span class="n">rsf</span><span class="p">,</span> <span class="n">ageing_law</span><span class="p">,</span> <span class="n">springblock</span>
+<span class="n">forward</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">(</span><span class="n">friction_model</span><span class="o">=</span><span class="n">rsf</span><span class="p">,</span> <span class="n">state_evolution</span><span class="o">=</span><span class="n">ageing_law</span><span class="p">,</span> <span class="n">block_type</span><span class="o">=</span><span class="n">springblock</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This forward model can then be handed over to a solver that takes care of the forward (and inverse) modelling:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.solver</span><span class="w"> </span><span class="kn">import</span> <span class="n">ODESolver</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">ODESolver</span><span class="p">(</span><span class="n">forward_model</span><span class="o">=</span><span class="n">forward</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ODESolver</span></code> class contains a number of public and private methods that take care of unpacking the various containers (<code class="docutils literal notranslate"><span class="pre">Variables</span></code>, <code class="docutils literal notranslate"><span class="pre">RSFConstants</span></code>, etc.) and casting the forward models in a common format to make them compatible for an ODE solver. Getting a forward solution from DiaBayes is a single function call:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve_forward</span><span class="p">(</span>
+    <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+    <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
+    <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This <code class="docutils literal notranslate"><span class="pre">result</span></code> is a <code class="docutils literal notranslate"><span class="pre">Variables</span></code> container that contains the time series of the relevant variables (e.g. friction and state for rate-and-state friction) that can be accessed e.g. through <code class="docutils literal notranslate"><span class="pre">result.mu</span></code>, <code class="docutils literal notranslate"><span class="pre">result.state</span></code>, etc.</p>
 </section>
 <section id="inversion">
-<h2>Inversion<a class="headerlink" href="#inversion" title="Link to this heading">#</a></h2>
+<h3>Inversion<a class="headerlink" href="#inversion" title="Link to this heading">#</a></h3>
+<p>DiaBayes currently has two flavours if inversion implemented. The <em>maximum-likelihood</em> inversion uses the Levenberg-Marquardt method with adjoint back-propagation through the ODE to search for a single set of physical parameters that minimise the misfit between the predicted friction curve and the measured one. The second flavour is a form of <em>Bayesian inversion</em>, which estimates the probability that a given set of parameters describes the observed friction within the measurement uncertainties. See the <a class="reference internal" href="user-guide/inversion/index.html"><span class="doc std std-doc">User Guide on inverse modelling</span></a> for an in-depth discussion of these two inversion approaches.</p>
+<p>Performing a maximum-likelihood inversion involves a single function call that has a similar signature as the forward solver:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mu_measured</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">initial_guess_params</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">inv_result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">max_likelihood_inversion</span><span class="p">(</span>
+    <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_measured</span><span class="p">,</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">initial_guess_params</span><span class="p">,</span>
+    <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
+    <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The return value <code class="docutils literal notranslate"><span class="pre">inv_result</span></code> is an <a class="reference external" href="https://docs.kidger.site/optimistix/api/solution/#optimistix.Solution"><code class="docutils literal notranslate"><span class="pre">optimistix.Solution</span></code></a> object that contains the maximum-likelihood solution of the parameters, as well as diagnostic information. This maximum-likelihood estimate can then be used for subsequent Bayesian inversion to estimate the uncertainties and trade-offs in the parameters:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_inv</span> <span class="o">=</span> <span class="n">inv_result</span><span class="o">.</span><span class="n">value</span>
+<span class="n">noise_amplitude</span> <span class="o">=</span> <span class="mf">1e-3</span>  <span class="c1"># Estimate of the measurement uncertainty</span>
+<span class="n">bayesian_result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">bayesian_inversion</span><span class="p">(</span>
+    <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_measured</span><span class="p">,</span> <span class="n">noise_std</span><span class="o">=</span><span class="n">noise_amplitude</span><span class="p">,</span> 
+    <span class="n">params</span><span class="o">=</span><span class="n">params_inv</span><span class="p">,</span> <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span> 
+    <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span> 
+    <span class="n">Nparticles</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">Nsteps</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example, the posterior distribution is estimated by means of a particle swarm consisting of 1500 particles, which converge to an equilibrium over 100 steps.</p>
+<p>The return value of <code class="docutils literal notranslate"><span class="pre">bayesian_inversion</span></code> is a <code class="docutils literal notranslate"><span class="pre">BayesianSolution</span></code> object, which not only contains the posterior samples, but also several diagnostic and visualisation routines. To evaluate whether the inversion converged to an equilibrium state, use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bayesian_result</span><span class="o">.</span><span class="n">plot_convergence</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>To visualise the posterior distributions over the inverted parameters, use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bayesian_result</span><span class="o">.</span><span class="n">cornerplot</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>To draw samples from the posterior distribution (<code class="docutils literal notranslate"><span class="pre">samples</span></code>), and their corresponding friction time series (<code class="docutils literal notranslate"><span class="pre">sample_results</span></code>), use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span><span class="p">,</span> <span class="n">sample_results</span> <span class="o">=</span> <span class="n">bayesian_result</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+    <span class="n">solver</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span>
+    <span class="n">constants</span><span class="p">,</span> 
+    <span class="n">block_constants</span><span class="p">,</span>
+    <span class="n">nsamples</span><span class="o">=</span><span class="mi">100</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p>See <code class="docutils literal notranslate"><span class="pre">examples/simple_example.ipynb</span></code> for a basic tutorial on how to use DiaBayes in practice.</p>
+</section>
+<section id="getting-help">
+<h2>Getting help<a class="headerlink" href="#getting-help" title="Link to this heading">#</a></h2>
+<p>If it is unclear on how to use the DiaBayes API, if you encountered a bug, or if you want to contribute a new feature, head over to the <a class="reference internal" href="community.html"><span class="doc std std-doc">DiaBayes Community page</span></a>. There you will find useful links and resources, frequently encountered issues, and suggestions.</p>
 </section>
 </section>
 
@@ -383,9 +498,14 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-guide">Installation guide</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables-parameters-constants">Variables, parameters, constants</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-models">Forward models</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inversion">Inversion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-usage">Basic usage</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#variables-parameters-constants">Variables, parameters, constants</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-models">Forward models</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inversion">Inversion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-help">Getting help</a></li>
 </ul>
   </nav></div>
 
