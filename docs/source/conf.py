@@ -17,7 +17,7 @@ extensions = [
     "myst_parser",
     "sphinx_design",
     "sphinx_copybutton",
-    "sphinx.ext.autosummary",
+    "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -38,6 +38,11 @@ exclude_patterns = []
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
+
+myst_enable_extensions = [
+    "dollarmath",
+    "amsmath",
+]
 
 # Configuration for intersphinx.
 intersphinx_mapping = {
