@@ -33,14 +33,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.bundle.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-shadow.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-punk.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-noir.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-light.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-borderless.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/micromodal.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -49,16 +41,11 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../_static/js/hoverxref.js"></script>
-    <script src="../../_static/js/tooltipster.bundle.min.js"></script>
-    <script src="../../_static/js/micromodal.min.js"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -214,6 +201,10 @@
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -288,6 +279,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../friction_experiments.html">Rock friction experiments</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../forward/index.html">Forward modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../forward/rate-and-state.html">Rate-and-state friction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../forward/chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
@@ -366,6 +358,30 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="bayesian-inversion">
 <h1>Bayesian inversion<a class="headerlink" href="#bayesian-inversion" title="Link to this heading">#</a></h1>
+<p>Bayesian inversion refers to a family of inversion methods that aim to estimate the <em>probability</em> that a given set of parameters <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> can explain the measured data <span class="math notranslate nohighlight">\(\mu_{obs}\)</span>. This probability is expressed in terms of the <em>posterior distribution</em> over the parameters, which comprises a likelihood term and a prior probability term, usually written as:</p>
+<div class="math notranslate nohighlight" id="equation-bayes">
+<span class="eqno">(1)<a class="headerlink" href="#equation-bayes" title="Link to this equation">#</a></span>\[p\left(\mathcal{P} | \mu_{obs} \right) \propto p\left(\mu_{obs} | \mathcal{P} \right) p\left(\mathcal{P}\right)\]</div>
+<p>For those new to Bayesian statistics: <span class="math notranslate nohighlight">\(p\left(a|b \right)\)</span> is read as “the probability that <span class="math notranslate nohighlight">\(a\)</span> is true given that <span class="math notranslate nohighlight">\(b\)</span> is true” (loosely speaking). The first term on the right-hand side is called the <em>likelihood</em> term, and the second term is the <em>prior</em> probability (or simply “prior”). The likelihood term can be estimated by running a forward simulation (with a given <span class="math notranslate nohighlight">\(\mathcal{P}\)</span>) and calculating the mismatch with the observations; the maximum-likelihood inversion discussed in <a class="reference internal" href="max-likelihood.html"><span class="doc std std-doc">the previous section</span></a> aims to find <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> that maximises this term. However, Bayesian inversion also takes into account that one might have a-priori information about <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> itself, before observing any data (the prior). For example, we might expect <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> to be positive, or be constrained by independent measurements, etc. Lastly, the proportionality constant, which quantifies the probability of observing the data, is unknown but irrelevant for the inversion.</p>
+<section id="gradients-of-the-posterior">
+<h2>Gradients of the posterior<a class="headerlink" href="#gradients-of-the-posterior" title="Link to this heading">#</a></h2>
+<p>In practice, most Bayesian inversion methods sample the logaritm of <span class="math notranslate nohighlight">\(p\)</span>, hence Eq. <a class="reference internal" href="#equation-bayes">(1)</a> becomes:</p>
+<div class="math notranslate nohighlight" id="equation-logbayes">
+<span class="eqno">(2)<a class="headerlink" href="#equation-logbayes" title="Link to this equation">#</a></span>\[\ln p\left(\mathcal{P} | \mu_{obs} \right) \propto \ln p\left(\mu_{obs} | \mathcal{P} \right) + \ln p\left(\mathcal{P}\right)\]</div>
+<p>To permit an informed exploration of the posterior distribution, gradient information is used to guide the search direction within the parameter space. To see how our forward simulations fit into this, let’s consider a normal (Gaussian) likelihood distribution:</p>
+<div class="math notranslate nohighlight" id="equation-gaussian">
+<span class="eqno">(3)<a class="headerlink" href="#equation-gaussian" title="Link to this equation">#</a></span>\[p\left(\mu_{obs} | \mathcal{P} \right) \propto \prod_t \exp \left( - \left[ \frac{\mu_{obs}(t) - \mathrm{Forward}\left[t, \mathcal{P}\right]}{\sqrt{2} \nu} \right]^2 \right)\]</div>
+<p>To avoid confusion with the normal stress (often denoted <span class="math notranslate nohighlight">\(\sigma\)</span>), the standard deviation (also often denoted by <span class="math notranslate nohighlight">\(\sigma\)</span>) is here denoted by <span class="math notranslate nohighlight">\(\nu\)</span>. This standard deviation is expected to be proportional to the measurement noise amplitude in <span class="math notranslate nohighlight">\(\mu_{obs}\)</span>. The logarithm of Eq. <a class="reference internal" href="#equation-gaussian">(3)</a> turns the product into a summation:</p>
+<div class="math notranslate nohighlight" id="equation-log-gaussian">
+<span class="eqno">(4)<a class="headerlink" href="#equation-log-gaussian" title="Link to this equation">#</a></span>\[\ln p\left(\mu_{obs} | \mathcal{P} \right) \propto - \sum_t \left[ \frac{\mu_{obs}(t) - \mathrm{Forward}\left[t, \mathcal{P}\right]}{\sqrt{2} \nu} \right]^2\]</div>
+<p>Lastly, the derivative of the log-likelihood with respect to <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> can then be found by virtue of the chain rule, and differentiation through the ODE solution:</p>
+<div class="math notranslate nohighlight" id="equation-grad-log-gaussian">
+<span class="eqno">(5)<a class="headerlink" href="#equation-grad-log-gaussian" title="Link to this equation">#</a></span>\[\frac{\partial \ln p\left(\mu_{obs} | \mathcal{P} \right)}{\partial \mathcal{P}} \propto \sum_t \frac{\mu_{obs}(t) - \mathrm{Forward}\left[t, \mathcal{P}\right]}{2 \nu^2} \frac{\partial \mathrm{Forward}}{\partial \mathcal{P}}\]</div>
+<p>Because of the differentiability of the DiaBayes forward models, the gradient term on the right-hand side can be precisely calculated. A similar procedure is applied to obtain the gradients of the prior distribution.</p>
+<p>By doing gradient descent on <span class="math notranslate nohighlight">\(-\partial \ln p\left(\mathcal{P} | \mu_{obs} \right) / \partial \mathcal{P}\)</span>, one arrives as the maximum a-posteriori estimate, which strikes a balance between the likelihood and prior terms. But this is not what we want: the point of doing Bayesian inversion, is to gain insight into the <em>distribution</em> of parameter probabilities, not just a single estimate thereof. To estimate the posterior distribution, one needs to perform some kind of sampling of the neighbourhood around the maximum posterior. There are numerous methods that can do this, many of which have been implemented into the <a class="reference external" href="https://blackjax-devs.github.io/blackjax/">Blackjax</a> library. However, DiaBayes implements its own Bayesian sampler: <em>Stein Variational Inference</em>.</p>
+</section>
+<section id="stein-variational-inference">
+<h2>Stein Variational Inference<a class="headerlink" href="#stein-variational-inference" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
 
@@ -402,6 +418,25 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gradients-of-the-posterior">Gradients of the posterior</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stein-variational-inference">Stein Variational Inference</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

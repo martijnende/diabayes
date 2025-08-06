@@ -33,14 +33,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.bundle.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-shadow.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-punk.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-noir.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-light.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-borderless.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/micromodal.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -49,16 +41,11 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../_static/js/hoverxref.js"></script>
-    <script src="../../_static/js/tooltipster.bundle.min.js"></script>
-    <script src="../../_static/js/micromodal.min.js"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -288,6 +275,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../friction_experiments.html">Rock friction experiments</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../forward/index.html">Forward modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../forward/rate-and-state.html">Rate-and-state friction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../forward/chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
@@ -363,9 +351,40 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="inverse-modelling">
 <h1>Inverse modelling<a class="headerlink" href="#inverse-modelling" title="Link to this heading">#</a></h1>
+<p>Given a set of observations <span class="math notranslate nohighlight">\(\mu_{obs}(t)\)</span> (i.e., a <em>friction curve</em>), and a suitable <a class="reference internal" href="../forward/index.html"><span class="doc std std-doc">forward model</span></a> with parameters <span class="math notranslate nohighlight">\(\mathcal{P}\)</span>, what are the parameter values that can explain the observations? We could choose some random <span class="math notranslate nohighlight">\(\mathcal{P}\)</span>, run a forward simulation, and see if the forward solution <span class="math notranslate nohighlight">\(\mu(t) = \mathrm{Forward}[t, \mathcal{P}]\)</span> matches <span class="math notranslate nohighlight">\(\mu_{obs}(t)\)</span>. If not, change <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> a little bit and try again, until an acceptable agreement between <span class="math notranslate nohighlight">\(\mu(t)\)</span> and <span class="math notranslate nohighlight">\(\mu_{obs}(t)\)</span> is found.</p>
+<p>Of course, we can do this more systematically. Define an objective function (or “loss” function in Machine/Deep Learning jargon):</p>
+<div class="math notranslate nohighlight" id="equation-loss-fn">
+<span class="eqno">(1)<a class="headerlink" href="#equation-loss-fn" title="Link to this equation">#</a></span>\[\mathcal{L} = \frac{1}{T} \int_0^T \left(\mu_{obs} - \mathrm{Forward}[t, \mathcal{P}] \right)^2 \mathrm{d} t\]</div>
+<p>In practice, the integral over <span class="math notranslate nohighlight">\(t\)</span> is replaced by a summation (since <span class="math notranslate nohighlight">\(\mu_{obs}\)</span> is sampled at discrete time intervals), but for the theory it makes sense to keep the integral for now. The “best” parameter values are those that result in the smallest value of <span class="math notranslate nohighlight">\(\mathcal{L}\)</span>, i.e.:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{P}^* = \underset{\mathcal{P}}{\arg \min} \, \left\{ \frac{1}{T} \int_0^T \left(\mu_{obs} - \mathrm{Forward}[t, \mathcal{P}] \right)^2 \mathrm{d} t \right\}\]</div>
+<p>A classical approach to finding <span class="math notranslate nohighlight">\(\mathcal{P}^*\)</span> is performing gradient descent on Eq. <a class="reference internal" href="#equation-loss-fn">(1)</a>: we compute the gradient of <span class="math notranslate nohighlight">\(\mathcal{L}\)</span> with respect to <span class="math notranslate nohighlight">\(\mathcal{P}\)</span>, and then take a small step down the gradient. By repeating this procedure multiple times, we expect to eventually arrive at the (local) minimum, where the gradients are zero (and so we automatically stop there). Quantitatively, this reads:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{P}^{i+1} = \mathcal{P}^i - \eta \left.\frac{\mathrm{d} \mathcal{L}}{\mathrm{d} \mathcal{P}} \right\vert_{\mathcal{P}^i}\]</div>
+<p>There are more advanced gradient-descent algorithms, like ADAM<a class="footnote-reference brackets" href="#footcite-kingma2014" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> (as used by DiaBayes), but they are all just different flavours of this general concept.</p>
+<p>The challenge now is to find the derivative term on the right-hand side. By virtue of the <a class="reference external" href="https://en.wikipedia.org/wiki/Leibniz_integral_rule">Leibniz integral rule</a>, the total derivative of <span class="math notranslate nohighlight">\(\mathcal{L}\)</span> becomes a partial derivative of <span class="math notranslate nohighlight">\(\mathrm{Forward}[t, \mathcal{P}]\)</span> with respect to <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> inside the integral. But how does one differentiate the solution of an ODE with respect to its parameters? The solution at any point <span class="math notranslate nohighlight">\(t_i\)</span> depends on the entire history from <span class="math notranslate nohighlight">\(t = t_0\)</span> up to <span class="math notranslate nohighlight">\(t_i\)</span>, and so the derivatives at time <span class="math notranslate nohighlight">\(t_i\)</span> depend on the derivatives at <span class="math notranslate nohighlight">\(t_{i-1}, t_{i-2}, \dots\)</span>. Fortunately, there is an elegant approach to solve this recursive problem, which is called the <a class="reference external" href="https://en.wikipedia.org/wiki/Adjoint_state_method"><em>adjoint state method</em></a> (or simply “adjoint method”).</p>
+<p>It is beyond the scope of the user guide to explain this method here, but there are numerous lecture notes and blog posts out there that describe this approach in the context of continuous-time ODEs (and also Neural ODEs<a class="footnote-reference brackets" href="#footcite-chen2018-neuralode" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>). Conveniently, this method is built into the solvers of the <a class="reference external" href="https://docs.kidger.site/diffrax/">Diffrax</a> library<a class="footnote-reference brackets" href="#footcite-kidger2021" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, and so in the spirit of the underlying JAX library, any operations involving an ODE solution are differentiable with respect to its parameters. DiaBayes builds further on this, integrating the gradients coming out of the adjoint back-propagation into gradient-based inversion algorithms. DiaBayes implements two flavours of inversion methods, which are the <a class="reference internal" href="max-likelihood.html"><span class="doc std std-doc">maximum-likelihood inversion</span></a> and <a class="reference internal" href="bayesian.html"><span class="doc std std-doc">Bayesian inversion</span></a> that are discussed in the next sections.</p>
 <div class="toctree-wrapper compound">
 </div>
+<p class="rubric">References</p>
+<div class="docutils container" id="id4">
+</div>
 </section>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-kingma2014" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Diederik P. Kingma and Jimmy Ba. Adam: a method for stochastic optimization. 2014. <a class="reference external" href="https://doi.org/10.48550/ARXIV.1412.6980">doi:10.48550/ARXIV.1412.6980</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-chen2018-neuralode" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Ricky T. Q. Chen, Yulia Rubanova, Jesse Bettencourt, and David Duvenaud. Neural ordinary differential equations. 2018. <a class="reference external" href="https://doi.org/10.48550/ARXIV.1806.07366">doi:10.48550/ARXIV.1806.07366</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-kidger2021" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Patrick Kidger. <em>On Neural Differential Equations</em>. PhD thesis, University of Oxford, 2021.</p>
+</aside>
+</aside>
 
 
                 </article>

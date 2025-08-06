@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>User Guide &#8212; DiaBayes  documentation</title>
+    <title>Rock friction experiments &#8212; DiaBayes  documentation</title>
   
   
   
@@ -53,13 +53,11 @@
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/index';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/friction_experiments';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Rock friction experiments" href="friction_experiments.html" />
-    <link rel="prev" title="Getting started" href="../getting-started.html" />
+    <link rel="next" title="Forward modelling" href="forward/index.html" />
+    <link rel="prev" title="User Guide" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -146,7 +144,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="index.html">
     User Guide
   </a>
 </li>
@@ -201,6 +199,10 @@
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -235,7 +237,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="index.html">
     User Guide
   </a>
 </li>
@@ -274,8 +276,8 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="friction_experiments.html">Rock friction experiments</a></li>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Rock friction experiments</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="forward/index.html">Forward modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="forward/rate-and-state.html">Rate-and-state friction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="forward/chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
@@ -329,7 +331,10 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">User Guide</span></li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Rock friction experiments</span></li>
   </ul>
 </nav>
 </div>
@@ -346,12 +351,24 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="user-guide">
-<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">#</a></h1>
-<p>This guide aims to provide more theoretical background on the various methods that are used, as well as their implementation in DiaBayes. If you are considering to develop new features, or if you simply wish to understand how things work, this is a good place to start.</p>
-<p>The guide is not structured in a particular order, and so it is not necessarily meant to be read from top to bottom. The individual chapters will contain occasional cross-references to other chapters if prior knowledge is assumed.</p>
-<div class="toctree-wrapper compound">
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="rock-friction-experiments">
+<h1>Rock friction experiments<a class="headerlink" href="#rock-friction-experiments" title="Link to this heading">#</a></h1>
+<p>This section briefly summarises a few key concepts in rock friction experimentation, which are presumed to be well understood for the remainder of this User Guide.</p>
+<ul class="simple">
+<li><p>Effective friction coefficient (ignoring friction)</p></li>
+</ul>
+<section id="velocity-step-tests">
+<h2>Velocity-step tests<a class="headerlink" href="#velocity-step-tests" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Up and down steps</p></li>
+</ul>
+</section>
+<section id="stick-slip-instabilities">
+<h2>Stick-slip instabilities<a class="headerlink" href="#stick-slip-instabilities" title="Link to this heading">#</a></h2>
+</section>
+<section id="slide-hold-slide-tests">
+<h2>Slide-hold-slide tests<a class="headerlink" href="#slide-hold-slide-tests" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
 
@@ -365,20 +382,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../getting-started.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Getting started</p>
+        <p class="prev-next-title">User Guide</p>
       </div>
     </a>
     <a class="right-next"
-       href="friction_experiments.html"
+       href="forward/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Rock friction experiments</p>
+        <p class="prev-next-title">Forward modelling</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -388,6 +405,26 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#velocity-step-tests">Velocity-step tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stick-slip-instabilities">Stick-slip instabilities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#slide-hold-slide-tests">Slide-hold-slide tests</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

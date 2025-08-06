@@ -33,14 +33,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.bundle.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-shadow.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-punk.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-noir.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-light.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-borderless.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/micromodal.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -49,16 +41,11 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../_static/js/hoverxref.js"></script>
-    <script src="../../_static/js/tooltipster.bundle.min.js"></script>
-    <script src="../../_static/js/micromodal.min.js"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -288,6 +275,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../friction_experiments.html">Rock friction experiments</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../forward/index.html">Forward modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../forward/rate-and-state.html">Rate-and-state friction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../forward/chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
@@ -366,6 +354,22 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="maximum-likelihood-inversion">
 <h1>Maximum-likelihood inversion<a class="headerlink" href="#maximum-likelihood-inversion" title="Link to this heading">#</a></h1>
+<p>For a given measured friction curve (<span class="math notranslate nohighlight">\(\mu_{obs}\)</span>), it is likely that a single set of parameters <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> produces the best possible agreement between a forward simulation <span class="math notranslate nohighlight">\(\mu = \mathrm{Forward}[t, \mathcal{P}]\)</span> and the (noisy) measurements. This single optimal estimate of <span class="math notranslate nohighlight">\(\mathcal{P}\)</span> is called the <em>maximum-likelihood estimate</em>, and it can be obtained through standard inversion schemes.</p>
+<p>For the least-squares objective function discussed in <a class="reference internal" href="index.html"><span class="doc std std-doc">the previous section</span></a>, the <a class="reference external" href="https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm">Levenberg-Marquardt algorithm</a> is one of the fastest converging methods on the market. DiaBayes utilises the <a class="reference external" href="https://docs.kidger.site/optimistix/api/least_squares/#optimistix.LevenbergMarquardt"><code class="docutils literal notranslate"><span class="pre">LevenbergMarquardt</span></code></a> implementation of the <a class="reference external" href="https://docs.kidger.site/optimistix/">Optimistix</a> library, which interfaces directly with the <a class="reference external" href="https://docs.kidger.site/diffrax/api/diffeqsolve/"><code class="docutils literal notranslate"><span class="pre">diffrax.diffeqsolve</span></code></a> routine that is used to solve the forward problem.</p>
+<p>Concretely, performing a maximum-likelihood inversion in DiaBayes is fairly straightforward. Assuming that a solver has already been instantiated with an appropriate forward model (see the <a class="reference internal" href="../../getting-started.html"><span class="doc std std-doc">Getting Started guide</span></a>), and given some measured friction curve <code class="docutils literal notranslate"><span class="pre">mu_measured</span></code> and initial guess parameters <code class="docutils literal notranslate"><span class="pre">params_guess</span></code>, the inversion can be performed with a single function call:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inv_result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">max_likelihood_inversion</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">mu_measured</span><span class="p">,</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">params_guess</span><span class="p">,</span>
+    <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
+    <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">params_inverted</span> <span class="o">=</span> <span class="n">inv_result</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+<p>Depending on the number of data samples and the complexity of the forward model, this inversion should take anywhere from a few seconds to at most one minute.</p>
+<p>In many cases, the maximum-likelihood result is sufficient for the analysis of an experiment. However, this approach provides no information on the uncertainty in the inverted parameters, and the potential trade-offs between them. For a complete evaluation of the admissible range of parameters, consider performing a Bayesian inversion (hint: see next section).</p>
 </section>
 
 

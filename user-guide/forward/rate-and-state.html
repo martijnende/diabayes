@@ -33,14 +33,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster.bundle.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-shadow.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-punk.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-noir.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-light.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/tooltipster-sideTip-borderless.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/micromodal.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -49,16 +41,11 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../_static/js/hoverxref.js"></script>
-    <script src="../../_static/js/tooltipster.bundle.min.js"></script>
-    <script src="../../_static/js/micromodal.min.js"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -214,6 +201,10 @@
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -288,6 +279,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../friction_experiments.html">Rock friction experiments</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Forward modelling</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Rate-and-state friction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
@@ -366,7 +358,57 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="rate-and-state-friction">
 <h1>Rate-and-state friction<a class="headerlink" href="#rate-and-state-friction" title="Link to this heading">#</a></h1>
+<p>Rate-and-state friction (RSF) is a well-established formulation that describes a wide range of laboratory and natural phenomena. It is therefore commonly used to model laboratory friction experiments and natural earthquakes<a class="footnote-reference brackets" href="#footcite-marone1998" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The formulation itself is empirical, and the governing parameters have long been subject of debate over their physical interpretation. Nonetheless, there is sufficient consistency between the parameters for different types of experiments and conditions to warrant a comparison, and analysis of their various dependencies (most notably temperature, but also stress, slip rate, chemistry, etc.). The RSF formulation consists of a friction law with a characteristic exponential dependency, and is accompanied by a state evolution law that prescribes the time-evolution of a state parameter (usually denoted by <span class="math notranslate nohighlight">\(\theta\)</span>) that keeps track of the slip history.</p>
+<p>DiaBayes currently implements the two most common flavours of rate-and-state friction, as well as two state evolution laws.</p>
+<section id="classical-rate-and-state-friction">
+<h2>Classical rate-and-state friction<a class="headerlink" href="#classical-rate-and-state-friction" title="Link to this heading">#</a></h2>
+<p>The classical RSF law is often written as:</p>
+<div class="math notranslate nohighlight" id="equation-rsf">
+<span class="eqno">(1)<a class="headerlink" href="#equation-rsf" title="Link to this equation">#</a></span>\[\mu(v, \theta) = \mu_0 + a \ln \left( \frac{v}{v_0} \right) + b \ln \left( \frac{v_0 \theta}{D_c} \right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mu\)</span> the instantaneous friction coefficient, which is a function of the instantaneous slip rate <span class="math notranslate nohighlight">\(v\)</span> and “state” <span class="math notranslate nohighlight">\(\theta\)</span>. The governing parameters are the reference value of friction <span class="math notranslate nohighlight">\(\mu_0\)</span> at the reference slip rate <span class="math notranslate nohighlight">\(v_0\)</span>, the direct effect parameter <span class="math notranslate nohighlight">\(a\)</span>, the evolution effect parameter <span class="math notranslate nohighlight">\(b\)</span>, and the characteristic slip distance <span class="math notranslate nohighlight">\(D_c\)</span>. In a laboratory setting, <span class="math notranslate nohighlight">\(mu_0\)</span> and <span class="math notranslate nohighlight">\(v_0\)</span> are often taken directly from a steady-state measurement, leaving only <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, and <span class="math notranslate nohighlight">\(D_c\)</span> as the parameters of interest.</p>
+<p>In DiaBayes, Eq. <a class="reference internal" href="#equation-rsf">(1)</a> is re-written in terms of <span class="math notranslate nohighlight">\(v\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-rsf2">
+<span class="eqno">(2)<a class="headerlink" href="#equation-rsf2" title="Link to this equation">#</a></span>\[v = v_0 \exp \left( \frac{1}{a} \left[ \mu - \mu_0 - b \ln \left( \frac{v_0 \theta}{D_c} \right) \right] \right)\]</div>
+<p>The implementation of the classical RSF formulation is available through <code class="docutils literal notranslate"><span class="pre">diabayes.forward_models.rsf</span></code>.</p>
 </section>
+<section id="regularised-rate-and-state-friction">
+<h2>Regularised rate-and-state friction<a class="headerlink" href="#regularised-rate-and-state-friction" title="Link to this heading">#</a></h2>
+<p>Owing to the logarithms used in the classical RSF formulation, the slip rate <span class="math notranslate nohighlight">\(v\)</span> is required to be strictly positive. This requirement can be problematic in simulations where the shear stress (and corresonding slip rate) can change sign or become zero. To alleviate this, a regularised form<a class="footnote-reference brackets" href="#footcite-lapusta2000" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> can be adopted with the same asymptotic behaviour as Eq. <a class="reference internal" href="#equation-rsf2">(2)</a>:</p>
+<div class="math notranslate nohighlight" id="equation-rsf-reg">
+<span class="eqno">(3)<a class="headerlink" href="#equation-rsf-reg" title="Link to this equation">#</a></span>\[v = 2 v_0 \sinh \left\{ \frac{\mu}{a} \exp \left( - \frac{1}{a} \left[\mu_0 + b \ln \left( \frac{v_0 \theta}{D_c} \right) \right] \right) \right\}\]</div>
+<p>The implementation of the regularised RSF formulation is available through <code class="docutils literal notranslate"><span class="pre">diabayes.forward_models.rsf_regular</span></code>.</p>
+</section>
+<section id="ageing-law-state-evolution">
+<h2>Ageing law state evolution<a class="headerlink" href="#ageing-law-state-evolution" title="Link to this heading">#</a></h2>
+<p>The <em>ageing law</em> derives its name from the fact that the incremental growth of state is proportional to time (“age”), and decays with slip:</p>
+<div class="math notranslate nohighlight" id="equation-ageing-law">
+<span class="eqno">(4)<a class="headerlink" href="#equation-ageing-law" title="Link to this equation">#</a></span>\[\frac{\mathrm{d} \theta}{\mathrm{d} t} = 1 - \frac{v \theta}{D_c}\]</div>
+<p>At steady-state <span class="math notranslate nohighlight">\(\dot{\theta} = 0\)</span>, hence correspondingly <span class="math notranslate nohighlight">\(\theta_{ss} = D_c v^{-1}\)</span>. Since the state variable cannot be directly observed in laboratory experiment, it is often assumed that prior to a velocity-step, the initial value of state is <span class="math notranslate nohighlight">\(\theta(t=0) = \theta_{ss}\)</span>.</p>
+<p>The implementation of the ageing law is available through <code class="docutils literal notranslate"><span class="pre">diabayes.forward_models.ageing_law</span></code>.</p>
+</section>
+<section id="slip-law-state-evolution">
+<h2>Slip law state evolution<a class="headerlink" href="#slip-law-state-evolution" title="Link to this heading">#</a></h2>
+<p>An alternative formulation to the ageing law is the <em>slip law</em>, which derives its name from the fact that it exclusively evolves with slip:</p>
+<div class="math notranslate nohighlight" id="equation-slip-law">
+<span class="eqno">(5)<a class="headerlink" href="#equation-slip-law" title="Link to this equation">#</a></span>\[\frac{\mathrm{d} \theta}{\mathrm{d} t} = - \frac{v \theta}{D_c} \ln \left(\frac{v \theta}{D_c} \right)\]</div>
+<p>Like for the ageing law, the slip law is characterised by a steady-state value of <span class="math notranslate nohighlight">\(\theta_{ss} = D_c v^{-1}\)</span>.</p>
+<p>The implementation of the slip law is available through <code class="docutils literal notranslate"><span class="pre">diabayes.forward_models.slip_law</span></code>.</p>
+<p class="rubric">References</p>
+<div class="docutils container" id="id3">
+</div>
+</section>
+</section>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-marone1998" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Chris Marone. Laboratory-derived friction laws and their application to seismic faulting. <em>Annual Review of Earth and Planetary Sciences</em>, 1998. <a class="reference external" href="https://doi.org/10.1146/annurev.earth.26.1.643">doi:10.1146/annurev.earth.26.1.643</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-lapusta2000" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Nadia Lapusta, James R. Rice, Yehuda Ben‐Zion, and Gutuan Zheng. Elastodynamic analysis for slow tectonic loading with spontaneous rupture episodes on faults with rate‐ and state‐dependent friction. <em>Journal of Geophysical Research: Solid Earth</em>, 2000. <a class="reference external" href="https://doi.org/10.1029/2000jb900250">doi:10.1029/2000jb900250</a>.</p>
+</aside>
+</aside>
 
 
                 </article>
@@ -402,6 +444,27 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-rate-and-state-friction">Classical rate-and-state friction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regularised-rate-and-state-friction">Regularised rate-and-state friction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ageing-law-state-evolution">Ageing law state evolution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#slip-law-state-evolution">Slip law state evolution</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

@@ -8,6 +8,7 @@ The guide is not structured in a particular order, and so it is not necessarily 
 :hidden:
 :maxdepth: 1
 
+friction_experiments
 forward/index
 inversion/index
 advanced_usage
