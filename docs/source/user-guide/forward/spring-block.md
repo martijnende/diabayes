@@ -60,11 +60,13 @@ In order for a friction model to be compatible with an inertial spring-block, it
 The inertial spring-block model is available through `diabayes.forward_models.inertial_springblock`.
 
 ```{hint}
-To calculate $M$ for your experimental set-up, estimate the mass of the forcing block that is moving (i.e., driven by a shear piston), multiply this by the gravitational acceleration (9.8 m/s²) and divide this by the product of the interface contact area times applies normal stress:
+To calculate $M$ for your experimental set-up, estimate the mass of the forcing block that is moving (i.e., driven by a shear piston), multiply this by the gravitational acceleration (9.8 m/s²) and divide this by the product of the interface contact area times the interface normal stress:
 
 $$
 M = \frac{m g}{A \sigma_n}
 $$
+
+If only the weight of the block is pressing down on the interface (and no external normal load is applied), then $M = 1$.
 
 ```
 
