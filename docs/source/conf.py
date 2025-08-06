@@ -32,7 +32,6 @@ napoleon_numpy_docstring = True
 bibtex_default_style = "plain"  # or plain, alpha, unsrt, abbrv
 bibtex_reference_style = "label"
 bibtex_bibfiles = ["references.bib"]
-bibtex_cite_id_filter = "docname"
 
 templates_path = ["_templates"]
 exclude_patterns = []

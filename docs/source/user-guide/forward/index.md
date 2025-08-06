@@ -19,7 +19,7 @@ There exists a plethora of strategies to perform the integration as indicated ab
 
 ## Friction models
 
-A typical forward model describing a rock friction experiment comprises 3 components: a _friction law_ that describes the slip rate of the fault in response to a given state of stress (or "friction"), a _state evolution law_ that controls the time- and history-dependent internal state of the fault, and a model that describes how the externally imposed stress is transmitted to the fault (usually through elasticity). To make this more concrete, let's consider a classical spring-block model governed by rate-and-state friction{footcite}`marone1997`:
+A typical forward model describing a rock friction experiment comprises 3 components: a _friction law_ that describes the slip rate of the fault in response to a given state of stress (or "friction"), a _state evolution law_ that controls the time- and history-dependent internal state of the fault, and a model that describes how the externally imposed stress is transmitted to the fault (usually through elasticity). To make this more concrete, let's consider a classical spring-block model governed by rate-and-state friction{footcite}`marone1998`:
 
 ```{math}
 :label: RSF
