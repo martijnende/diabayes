@@ -30,7 +30,6 @@ docs = [
     "sphinx",
     "sphinx-copybutton",
     "sphinx-togglebutton",
-    "sphinx-hoverxref",
     "sphinx-design",
     "sphinxcontrib-bibtex",
 ]

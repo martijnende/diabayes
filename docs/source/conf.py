@@ -24,18 +24,15 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
     "sphinx_togglebutton",
-    "hoverxref.extension",
 ]
 
 pygments_style = "sphinx"
 napoleon_numpy_docstring = True
 
-bibtex_default_style = "unsrt"  # or plain, alpha, unsrt, abbrv
+bibtex_default_style = "plain"  # or plain, alpha, unsrt, abbrv
+bibtex_reference_style = "label"
 bibtex_bibfiles = ["references.bib"]
-hoverxref_role_types = {
-    "cite": "tooltip",  # Show tooltip for :cite: role
-    "numref": "tooltip",  # Show tooltip for :numref: role
-}
+bibtex_cite_id_filter = "docname"
 
 templates_path = ["_templates"]
 exclude_patterns = []
