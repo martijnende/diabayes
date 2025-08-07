@@ -16,7 +16,11 @@ A classical approach to finding $\mathcal{P}^*$ is performing gradient descent o
 ```{math}
 \mathcal{P}^{i+1} = \mathcal{P}^i - \eta \left.\frac{\mathrm{d} \mathcal{L}}{\mathrm{d} \mathcal{P}} \right\vert_{\mathcal{P}^i}
 ```
-There are more advanced gradient-descent algorithms, like ADAM{footcite}`kingma2014` (as used by DiaBayes), but they are all just different flavours of this general concept.
+There are more advanced gradient-descent algorithms, like Adam{footcite}`kingma2014` (as used by DiaBayes), but they are all just different flavours of this general concept.
+
+```{caution}
+When the number of invertible parameter exceeds 1, $\mathcal{P}$ becomes a vector. A more precise notation would be to use a vector arrow $\vec{\mathcal{P}}$ to distinguish it from a scalar, but for ease of reading (and writing...) I will drop the arrow everywhere in these sections.
+```
 
 The challenge now is to find the derivative term on the right-hand side. By virtue of the [Leibniz integral rule](https://en.wikipedia.org/wiki/Leibniz_integral_rule), the total derivative of $\mathcal{L}$ becomes a partial derivative of $\mathrm{Forward}[t, \mathcal{P}]$ with respect to $\mathcal{P}$ inside the integral. But how does one differentiate the solution of an ODE with respect to its parameters? The solution at any point $t_i$ depends on the entire history from $t = t_0$ up to $t_i$, and so the derivatives at time $t_i$ depend on the derivatives at $t_{i-1}, t_{i-2}, \dots$. Fortunately, there is an elegant approach to solve this recursive problem, which is called the [_adjoint state method_](https://en.wikipedia.org/wiki/Adjoint_state_method) (or simply "adjoint method").
 

@@ -363,12 +363,12 @@
 <section id="basic-spring-block">
 <h2>Basic spring-block<a class="headerlink" href="#basic-spring-block" title="Link to this heading">#</a></h2>
 <p>The force balance describing the most basic spring-block analogue reads as follows:</p>
-<div class="math notranslate nohighlight" id="equation-spring-block">
-<span class="eqno">(1)<a class="headerlink" href="#equation-spring-block" title="Link to this equation">#</a></span>\[\frac{\mathrm{d} \mu}{\mathrm{d} t} = k \left( v_{lp} - v \right)\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-spring-block">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-spring-block" title="Link to this equation">#</a></span>\[\frac{\mathrm{d} \mu}{\mathrm{d} t} = k \left( v_{lp} - v \right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(k\)</span> is the stiffness of the spring (with units of <span class="math notranslate nohighlight">\([m^{-1}]\)</span>), and <span class="math notranslate nohighlight">\(v_{lp}\)</span> is the rate of translation of the spring’s endpoint (the “load-point velocity”). The response of the fault to a given state of stress is given by the friction law, i.e. <span class="math notranslate nohighlight">\(v = f(\mu, \dots)\)</span>. The difference <span class="math notranslate nohighlight">\(v_{lp} - v\)</span> is the rate of stretching of the spring, which, combined with the stiffness <span class="math notranslate nohighlight">\(k\)</span>, gives the rate of stress increase on the interface.</p>
-<p>The force balance (Eq. <a class="reference internal" href="#equation-spring-block">(1)</a>) is then combined with the friction law <span class="math notranslate nohighlight">\(f\)</span> and the state evolution law <span class="math notranslate nohighlight">\(g\)</span> to furnish a complete description of the forward model, i.e.:</p>
-<div class="math notranslate nohighlight" id="equation-forward">
-<span class="eqno">(2)<a class="headerlink" href="#equation-forward" title="Link to this equation">#</a></span>\[\begin{split}\frac{\mathrm{d} \vec{X}}{\mathrm{d} t} = \begin{cases}
+<p>The force balance (Eq. <a class="reference internal" href="#equation-eq-spring-block">(1)</a>) is then combined with the friction law <span class="math notranslate nohighlight">\(f\)</span> and the state evolution law <span class="math notranslate nohighlight">\(g\)</span> to furnish a complete description of the forward model, i.e.:</p>
+<div class="math notranslate nohighlight" id="equation-eq-forward">
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-forward" title="Link to this equation">#</a></span>\[\begin{split}\frac{\mathrm{d} \vec{X}}{\mathrm{d} t} = \begin{cases}
 \dot{\mu} = k \left(v_{lp} - f(\mu, \dots) \right) \\
 \dot{\theta} = g(v, \theta, \dots)
 \end{cases}\end{split}\]</div>
@@ -381,12 +381,12 @@
 <section id="inertial-spring-block">
 <h2>Inertial spring-block<a class="headerlink" href="#inertial-spring-block" title="Link to this heading">#</a></h2>
 <p>For a basic spring-block analogue, a normal stress is imposed to the block to act as a certain “weight” pressing down on the frictional interface. However, the block itself is assumed to be massless (non-inertial), leading to a simplified force balance. For small accelerations, like one would encounter for small velocity-steps or slide-hold-slide experiments, this simplification is sufficiently accurate (i.e., the inertial effects are negligible). For more rapid accelerations, like one would encounter in stick-slip sequences, inertia becomes a significant contributor to the force balance. When accounting for a finite (and dimensionless) mass <span class="math notranslate nohighlight">\(M\)</span> of the block, the governing force balance becomes:</p>
-<div class="math notranslate nohighlight" id="equation-inertial-spring-block">
-<span class="eqno">(3)<a class="headerlink" href="#equation-inertial-spring-block" title="Link to this equation">#</a></span>\[M \frac{\mathrm{d} v}{\mathrm{d} t} = k \left(v_{lp}t - x \right) - \mu(\dots)\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-inertial-spring-block">
+<span class="eqno">(3)<a class="headerlink" href="#equation-eq-inertial-spring-block" title="Link to this equation">#</a></span>\[M \frac{\mathrm{d} v}{\mathrm{d} t} = k \left(v_{lp}t - x \right) - \mu(\dots)\]</div>
 <p>Since DiaBayes defines a friction law as <span class="math notranslate nohighlight">\(v = f(\mu, \dots)\)</span> and not <span class="math notranslate nohighlight">\(\mu = f'(v, \dots)\)</span>, the above expression is in principle incompatible with the DiaBayes modelling strategy. However, it is possible to rewrite it using the partial derivatives of <span class="math notranslate nohighlight">\(v\)</span> with respect to the variables of the friction law (usually friction <span class="math notranslate nohighlight">\(\mu\)</span> and state <span class="math notranslate nohighlight">\(\theta\)</span>):</p>
-<div class="math notranslate nohighlight" id="equation-inertial-spring-block-partials">
-<span class="eqno">(4)<a class="headerlink" href="#equation-inertial-spring-block-partials" title="Link to this equation">#</a></span>\[M \left( \frac{\partial v}{\partial \mu} \frac{\mathrm{d} \mu}{\mathrm{d} t} +  \frac{\partial v}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} t} + \dots \right) = k \left(v_{lp}t - x \right) - \mu\]</div>
-<p>The <span class="math notranslate nohighlight">\(\dots\)</span> denote any other variables that might be associated with a particular friction law (normal stress, temperature, …), though this would represent a much more <a class="reference internal" href="../advanced_usage.html"><span class="doc std std-doc">advanced physics scenario</span></a>. Rewriting Eq. <a class="reference internal" href="#equation-inertial-spring-block-partials">(4)</a> in terms of <span class="math notranslate nohighlight">\(\dot{\mu}\)</span> yields a more familiar form of the force balance:</p>
+<div class="math notranslate nohighlight" id="equation-eq-inertial-spring-block-partials">
+<span class="eqno">(4)<a class="headerlink" href="#equation-eq-inertial-spring-block-partials" title="Link to this equation">#</a></span>\[M \left( \frac{\partial v}{\partial \mu} \frac{\mathrm{d} \mu}{\mathrm{d} t} +  \frac{\partial v}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} t} + \dots \right) = k \left(v_{lp}t - x \right) - \mu\]</div>
+<p>The <span class="math notranslate nohighlight">\(\dots\)</span> denote any other variables that might be associated with a particular friction law (normal stress, temperature, …), though this would represent a much more <a class="reference internal" href="../advanced_usage.html"><span class="doc std std-doc">advanced physics scenario</span></a>. Rewriting Eq. <a class="reference internal" href="#equation-eq-inertial-spring-block-partials">(4)</a> in terms of <span class="math notranslate nohighlight">\(\dot{\mu}\)</span> yields a more familiar form of the force balance:</p>
 <div class="math notranslate nohighlight" id="equation-inertial-spring-block-partials2">
 <span class="eqno">(5)<a class="headerlink" href="#equation-inertial-spring-block-partials2" title="Link to this equation">#</a></span>\[\frac{\mathrm{d} \mu}{\mathrm{d} t} = \left[ \frac{\partial v}{\partial \mu} \right]^{-1} \left( \frac{1}{M} \left[ k \left( v_{lp} t - x \right) - \mu \right] - \frac{\partial v}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} t} - \dots \right)\]</div>
 <p>To the forward model is completed with the somewhat trivial expression for the position of the block, <span class="math notranslate nohighlight">\(\mathrm{d}x / \mathrm{d}t = v(\mu, \theta, \dots)\)</span>, which, all together, gives:</p>
@@ -401,12 +401,12 @@
 <p>The inertial spring-block model is available through <code class="docutils literal notranslate"><span class="pre">diabayes.forward_models.inertial_springblock</span></code>.</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
-<p>To calculate <span class="math notranslate nohighlight">\(M\)</span> for your experimental set-up, estimate the mass of the forcing block that is moving (i.e., driven by a shear piston), multiply this by the gravitational acceleration (9.8 m/s²) and divide this by the product of the interface contact area times the interface normal stress:</p>
+<p>To calculate <span class="math notranslate nohighlight">\(M\)</span> for your experimental set-up, estimate the mass of the forcing block that is moving (i.e., driven by a shear piston) and divide this by the product of the interface contact area times the interface normal stress:</p>
 <div class="math notranslate nohighlight">
 \[
-M = \frac{m g}{A \sigma_n}
+M = \frac{m}{A \sigma_n}
 \]</div>
-<p>If only the weight of the block is pressing down on the interface (and no external normal load is applied), then <span class="math notranslate nohighlight">\(M = 1\)</span>.</p>
+<p>If only the weight of the block is pressing down on the interface (and no external normal load is applied), then <span class="math notranslate nohighlight">\(M = 1 / g = 1 / 9.8 \approx 0.1\)</span>.</p>
 </div>
 <p class="rubric">References</p>
 <div class="docutils container" id="id2">
