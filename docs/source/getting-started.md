@@ -36,7 +36,7 @@ DiaBayes can accommodate several physical models that each come with their own s
 import diabayes as db
 y = db.Variables(mu=0.6, state=10.5)
 ```
-The container items can then be accessed through `y.mu` and `y.state`. If you'we used Python's `namedtuple` collection before then this should feel familiar. Invertible parameters and constants are declared in a similar way:
+The container items can then be accessed through `y.mu` and `y.state`. If you've used Python's `namedtuple` collection before then this should feel familiar. Invertible parameters and constants are declared in a similar way:
 ```python
 # RSF parameters
 params = db.RSFParams(a=a, b=b, Dc=Dc)
@@ -50,7 +50,7 @@ block_constants = db.SpringBlockConstants(k=k, v_lp=v1)
 
 The physics that underlies your experiment is encoded by a _forward model_. A DiaBayes `Forward` model is composed of three components:
 
-1. A friction law, which is an equation that takes the friction and "state" as an input, and returns the instanteneous slip rate as an output, i.e. $v(t) = f(\mu(t), \theta(t))$.
+1. A friction law, which is an equation that takes the friction and "state" as an input, and returns the instantaneous slip rate as an output, i.e. $v(t) = f(\mu(t), \theta(t))$.
 2. A state evolution law, which returns the time derivative of the "state" variable.
 3. A stress transfer model, which describes how the local slip rate results in a change in shear stress on the fault interface.
 
