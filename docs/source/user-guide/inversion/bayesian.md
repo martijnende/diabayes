@@ -61,11 +61,38 @@ where $||x||_2$ denotes the Euclidean norm of a vector, and $h$ is calculated fo
 ```
 However, DiaBayes employs the [Adam](https://optax.readthedocs.io/en/latest/api/optimizers.html#optax.adam){footcite}`kingma2014` implementation of the [Optax](https://optax.readthedocs.io/en/latest/index.html) library for improved convergence, which employs a slightly different formulation.
 
-After having converged over $T$ steps, the final positions of $\left\{ \mathcal{P} \right\}_{n=1}^N$ represent the posterior probability distribution over the parameters.
+After having converged over $T$ steps, the final positions of the set of particles $\left\{ \mathcal{P} \right\}_{n=1}^N$ represent the posterior probability distribution over the parameters.
 
-## Usage in DiaBayes
+## Bayesian analysis in DiaBayes
 
-...
+Concretely, if one wants to perform a Bayesian inversion of the forward model parameters, it only requires a single function call, e.g.:
+```python
+bayesian_result = solver.bayesian_inversion(
+    t=t, mu=mu_measured, noise_std=noise_std,
+    params=params_init, friction_constants=constants, 
+    block_constants=block_constants, 
+    Nparticles=1500, Nsteps=100, rng=42
+)
+```
+The function call signature is very similar to that of the `diabayes.ODEsolver.max_likelihood_solver` routine, with a few additional arguments specific to the SVI method. The `examples/simple_inversion.ipynb` example notebook describes these arguments in detail, which will not be repeated here. This notebook also demonstrates how to use the various analysis tools that accompany the `bayesian_inversion` method, such as convergence checking and uncertainty visualisation.
+
+What is important to clarify here, is that the prior distribution is currently not "properly" defined, at least not in the strict meaning of the term. In many (or even the majority) of Bayesian geophysics studies, the prior distribution is assumed to be uniform (also known as a "flat prior"). The corresponding gradients of this prior hence vanish ($\partial \ln p\left(\mathcal{P} \right) / \partial \mathcal{P} = 0$), causing the particles to settle around the likelihood distribution. This is not necessarily a bad strategy, because often there are no independent constraints on the parameters of the friction model, and a uniform prior accurately reflects this notion of "we don't know what to expect". On the other hand, we actually do know a bit more that: both empirically and theoretically, the rate-and-state friction parameters $a$ and $D_c$ are known to be strictly positive, and we expect them to exhibit a certain amplitude (e.g., $10^{-4} < a < 10^{-1}$). To somewhat account for this additional knowledge, DiaBayes opts to define a prior conditioned on the maximum-likelihood estimate $\mathcal{P}^*$, i.e.:
+```{math}
+p\left( \mathcal{P} \right) \approx q \left( \mathcal{P} | \mathcal{P}^* \right)
+```
+Because of this conditioning on $\mathcal{P}^*$, which itself in conditioned on the data $\mu_{obs}$, this choice of a prior cannot be considered a _true_ prior. Nonetheless, it is a convenient choice to somewhat restrict the posterior distribution to parameter values that one would consider reasonable (assuming that the maximum-likelihood inversion found reasonable parameter values).
+
+A second important clarification, is that currently DiaBayes solves the Bayesian problem in log-parameter space, i.e. $\mathcal{P} = \ln \mathcal{Q}$, with $\mathcal{Q}$ representing the forward model parameters like $a$, $b$, $D_c$ (in the case of rate-and-state friction). This strategy ensures that all the parameters $\mathcal{Q}$ are strictly positive, which greatly improves the stability of the inversion; forward simulations with $a < 0$ are not only non-physical, they are also highly unstable. And simulations with $D_c < 0$ are not defined at all (logarithm of a negative number). Moreover, some parameters can vary by orders of magnitude, and hence solving the problem in log-space is a sensible choice. The flip-side of this strategy, is that some parameters that are normally not restricted to be positive (like the rate-and-state $b$ parameter) cannot become negative, even if it is demanded by the observed data.
+
+```{warning}
+TL;DR of the above:
+- The DiaBayes prior distribution is conditioned on the maximum-likelihood solution.
+- The inversion is done on log-transformed parameters, hence the resulting values are strictly positive.
+```
+
+```{admonition} Future work
+Future versions of DiaBayes will address the above restrictions by allowing for user-defined prior distribution functions.
+```
 
 ```{rubric} References
 ```
