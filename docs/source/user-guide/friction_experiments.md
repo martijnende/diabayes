@@ -15,6 +15,7 @@ What is also not explicit in Eq. {eq}`eq:coulomb_friction`, but is well-known in
 
 One of the most straightfoward means of investigating the variation of the friction coefficient, is by deforming a laboratory fault until steady-state sliding is achieved. In this context, "steady-state" means no change in the sliding rate of the fault (zero time derivative) as well as no change in the measured shear stress. The resulting value of the (effective) friction coefficient is recorded, and the experiment is repeated under different conditions, e.g. a change in temperature, normal stress, or externally imposed sliding rate.
 
+---
 ```{image} ../_static/img/steady-state_niemeijer2006_dark.svg
 :class: only-dark
 :align: center
@@ -25,9 +26,13 @@ One of the most straightfoward means of investigating the variation of the frict
 ```
 (Steady-state friction data of a halite-muscovite gouge mixture, deformed at room temperature and a normal load of 5 MPa. Data from _Niemeijer & Spiers_{footcite}`niemeijer2006`)
 
+---
+
 One of the most significant observations (also shown in the figure above), is that the steady-state friction coefficient varies systematically with the fault slip rate. Under some conditions, the friction increases with increasing slip rate, a phenomenon that is called _velocity-strengthening_ (because the fault becomes "stronger" with increasing sliding velocity). The converse case is called _velocity-weakening_. It is widely thought that velocity-weakening is a prerequisite for earthquakes in nature.
 
 ## Velocity-step tests
+
+One remarkable feature of many frictional materials, is that they display a rather curious transient response to an instantaneous step in the external loading velocity. This is most clearly seen in experiments where a fault is driven at a constant rate until steady-state is reached, after which this rate is stepwise increased or decreased. This protocol is called a "velocity-step test". The study of the transient frictional response induced by a velocity-step has laid the foundation for much of our understanding of fault friction and earthquakes.
 
 ## Stick-slip instabilities
 
