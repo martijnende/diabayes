@@ -1,15 +1,18 @@
-from typing import Callable
+from dataclasses import make_dataclass
+from typing import Tuple, Union
 
 import equinox as eqx
 import jax.numpy as jnp
-from jaxtyping import Float
+from jaxtyping import Array, Float
 
 from diabayes.typedefs import (
     FrictionModel,
     RSFConstants,
     RSFParams,
     SpringBlockConstants,
+    StateDict,
     StateEvolution,
+    StressTransfer,
     Variables,
     _BlockConstants,
     _Constants,
@@ -40,7 +43,7 @@ def rsf(variables: Variables, params: RSFParams, constants: RSFConstants) -> Flo
     v : Float
         The instantaneous slip rate in the same units as `v0`
     """
-    Omega = params.b * jnp.log(variables.state * constants.v0 / params.Dc)
+    Omega = params.b * jnp.log(variables.theta * constants.v0 / params.Dc)
     return constants.v0 * jnp.exp((variables.mu - constants.mu0 - Omega) / params.a)
 
 
@@ -71,12 +74,17 @@ def ageing_law(
     dtheta : Float
         The rate of change of the state variable `theta` [s/s]
     """
-    return 1 - v * variables.state / params.Dc
+    return 1 - v * variables.theta / params.Dc
 
 
 @eqx.filter_jit
 def springblock(
-    v: Float, variables: Variables, constants: SpringBlockConstants
+    t: Float,
+    v: Float,
+    v_partials: Float[Array, "..."],
+    variables: Variables,
+    dstate: Variables,
+    constants: SpringBlockConstants,
 ) -> Float:
     r"""
     A conventional (non-inertial) spring-block loading formulation:
@@ -102,6 +110,26 @@ def springblock(
         The rate of change of the friction coefficient `mu` [1/s]
     """
     return constants.k * (constants.v_lp - v)
+
+
+@eqx.filter_jit
+def inertial_springblock(
+    t: Float,
+    v: Float,
+    v_partials: Variables,
+    variables: Variables,
+    dstate: Float[Array, "..."],
+    constants: SpringBlockConstants,
+) -> Float:
+    r"""
+    An inertial spring-block loading formulation:
+    """
+    mass_term = constants.k * (constants.v_lp * t - variables.slip) - variables.mu
+    # The partials_term contains the summation of the partial derivatives of
+    # v with respect to some variable y, times the time-derivative of y
+    # The first partial derivative is v with respect to mu, and is excluded.
+    partials_term = jnp.dot(v_partials.state.to_array(), dstate)
+    return (mass_term - partials_term) / v_partials.mu
 
 
 class Forward:
@@ -130,23 +158,84 @@ class Forward:
     def __init__(
         self,
         friction_model: FrictionModel,
-        state_evolution: StateEvolution,
-        block_type: Callable[[Float, Variables, _BlockConstants], Float],
+        state_evolution: Union[StateEvolution, Tuple[StateEvolution]],
+        stress_transfer: StressTransfer,
     ) -> None:
+        # Set the friction model and stress transfer model (easy...)
         self.friction_model = friction_model
-        self.state_evolution = state_evolution
-        self.stress_transfer = block_type
+        self.stress_transfer = stress_transfer
+        # If a StatEvolution function is passed directly, make it a tuple
+        if not isinstance(state_evolution, tuple):
+            state_evolution = (state_evolution,)
+
+        self.state_evolution_fns = state_evolution
+        # Do ast inspection of variables
+        # Validate number of state_evolution items vs. ast inspected state values
+        # Create Variables object for user to populate
+
+        # Compile a function that calls each provided StateEvolution and
+        # stacks the results in an array. This way, the "state" can host
+        # an arbitrary number of variables (porosity, temperature, slip, ...)
+        self.state_evolution = eqx.filter_jit(
+            lambda v, variables, params, constants: jnp.stack(
+                [fi(v, variables, params, constants) for fi in state_evolution]
+            )
+        )
         pass
+
+    def create_variables(self) -> Variables:
+
+        import ast
+        import inspect
+
+        accessed = set()
+
+        def get_accessed_attrs(func, arg_name):
+            tree = ast.parse(inspect.getsource(func))
+            accessed = set()
+
+            class Visitor(ast.NodeVisitor):
+                def visit_Attribute(self, node: ast.Attribute):
+                    if isinstance(node.value, ast.Name) and node.value.id == arg_name:
+                        accessed.add(node.attr)
+                    self.generic_visit(node)
+
+            Visitor().visit(tree)
+            return accessed
+
+        for func in (
+            self.friction_model,
+            self.stress_transfer,
+            *self.state_evolution_fns,
+        ):
+            accessed.update(get_accessed_attrs(func, "variables"))
+
+        assert "mu" in accessed
+        accessed.remove("mu")
+
+        assert len(accessed) == len(self.state_evolution_fns)
+
+        # state = dict(zip(accessed, -jnp.ones(len(accessed))))
+        state_obj = StateDict(keys=tuple(accessed), vals=-1.0 * jnp.ones(len(accessed)))
+        variables = Variables(
+            mu=jnp.asarray([-1.0], dtype=jnp.float64), state=state_obj
+        )
+        return variables
 
     @eqx.filter_jit
     def __call__(
         self,
+        t: Float,
         variables: Variables,
         params: _Params,
         friction_constants: _Constants,
         block_constants: _BlockConstants,
     ) -> Variables:
-        v = self.friction_model(variables, params, friction_constants)
+        v, v_derivs = eqx.filter_value_and_grad(self.friction_model)(
+            variables, params, friction_constants
+        )
+        print(v)
+        print(v_derivs)
         dstate = self.state_evolution(v, variables, params, friction_constants)
-        dmu = self.stress_transfer(v, variables, block_constants)
+        dmu = self.stress_transfer(t, v, v_derivs, variables, dstate, block_constants)
         return Variables(mu=dmu, state=dstate)

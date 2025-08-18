@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+import dataclasses as dcs
 from time import time_ns
-from typing import Any, Iterable, NamedTuple, Protocol, Tuple, TypeAlias, Union
+from typing import Any, Iterable, Mapping, NamedTuple, Protocol, Tuple, TypeAlias, Union
 
 import equinox as eqx
 import jax
@@ -17,83 +17,143 @@ Parameter containers
 """
 
 
-class Container:
+class StateDict(eqx.Module):
+    keys: tuple[str, ...] = eqx.field(static=True)
+    vals: Float[Array, "..."]
 
-    def __len__(self):
-        return len(self.tree_flatten()[0])
+    def __getitem__(self, k: str) -> Array:
+        i = self.keys.index(k)
+        return self.vals[i]
 
-    def __iter__(self):
-        return iter(self.tree_flatten()[0])
+    def __str__(self) -> str:
+        return "hi"
 
-    @classmethod
-    def tree_unflatten(cls, aux_data, children):
-        return cls(*children)
-
-    @classmethod
-    def from_array(cls, x: Iterable):
-        return cls.tree_unflatten(None, x)
-
-    def tree_flatten(self):
-        raise NotImplementedError
-
-    def to_array(self):
-        return jnp.array(self.tree_flatten()[0])
+    def replace_values(self, **kwargs) -> "StateDict":
+        mapping = dict(zip(self.keys, self.vals))
+        mapping.update(kwargs)
+        return StateDict(self.keys, jnp.array([mapping[k] for k in self.keys]))
 
 
-@tree_util.register_pytree_node_class
-@dataclass(frozen=True)
-class Variables(Container):
-    mu: Float
-    state: Float
+class Variables(eqx.Module):
+    mu: jax.Array
+    state: StateDict
 
-    def tree_flatten(self):
-        return (self.mu, self.state), None
+    def __getattr__(self, name: str):
+        # NOTE: __getattr__ is only called when __getattribute__,
+        # lookup fails, i.e, it looks for self.name before
+        # checking self.state.name
+        if name in self.state.keys:
+            return self.state[name]
+        raise AttributeError(f"{type(self).__name__} has no attribute {name!r}")
+
+    def set_values(self, **kwargs) -> "Variables":
+        mu = jnp.asarray(kwargs.pop("mu"))
+        return dcs.replace(self, mu=mu, state=self.state.replace_values(**kwargs))
+
+    def __repr__(self) -> str:
+        state_str = ", ".join(
+            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals)
+        )
+        return f"Variables(mu={self.mu}, {state_str})"
 
 
-@tree_util.register_pytree_node_class
-@dataclass(frozen=True)
-class RSFParams(Container):
+# class Container:
+
+#     def __len__(self):
+#         return len(self.tree_flatten()[0])
+
+#     def __iter__(self):
+#         return iter(self.tree_flatten()[0])
+
+#     @classmethod
+#     def tree_unflatten(cls, aux_data, children):
+#         return cls(*children)
+
+#     @classmethod
+#     def from_array(cls, x: Iterable, aux: Any = None):
+#         return cls.tree_unflatten(aux, x)
+
+#     def tree_flatten(self):
+#         raise NotImplementedError
+
+#     def to_array(self):
+#         return jnp.array(self.tree_flatten()[0])
+
+
+# # TODO: replace tree_util stuff with eqx.Module...
+# @tree_util.register_pytree_node_class
+# @dataclass(frozen=True)
+# class Variables(Container):
+#     mu: Float
+#     state: Union[Float, Container]
+
+#     def tree_flatten(self):
+#         # If the state is a scalar, return it directly
+#         if not isinstance(self.state, Container):
+#             return (self.mu, self.state), None
+#         # Else, tree_flatten the state first
+#         else:
+#             return (self.mu, *self.state.tree_flatten()[0]), type(self.state)
+
+#     @classmethod
+#     def tree_unflatten(cls, aux_data: Union[None, Container], children: Iterable):
+#         children = list(children)
+#         mu = children[0]
+#         if aux_data is None:
+#             state = children[1]
+#         else:
+#             state = aux_data.tree_unflatten(None, children[1:])
+#         return cls(mu=mu, state=state)
+
+#     def __getattr__(self, name: str) -> Any:
+#         if isinstance(self.state, Container):
+#             return getattr(self.state, name)
+#         if name in ("state", "theta"):
+#             return self.state
+#         raise AttributeError()
+
+
+class RSFParams(eqx.Module):
     a: Float
     b: Float
     Dc: Float
 
-    def tree_flatten(self):
-        return (self.a, self.b, self.Dc), None
 
-
-@dataclass(frozen=True)
+@dcs.dataclass(frozen=True)
 class RSFConstants:
     v0: Float
     mu0: Float
 
 
-@tree_util.register_pytree_node_class
-@dataclass(frozen=True)
-class CNSParams(Container):
+class CNSParams(eqx.Module):
     phi_c: Float
     Z: Float
 
-    def tree_flatten(self):
-        return (self.phi_c, self.Z), None
 
-
-@dataclass(frozen=True)
+@dcs.dataclass(frozen=True)
 class CNSConstants:
     phi_c: Float
     Z: Float
 
 
-@dataclass(frozen=True)
+@dcs.dataclass(frozen=True)
 class SpringBlockConstants:
     k: Float
     v_lp: Float
+
+
+@dcs.dataclass(frozen=True)
+class InertialSpringBlockConstants:
+    k: Float
+    v_lp: Float
+    M: Float
 
 
 # These typedefs should only be used for type checking,
 # and should not be instantiated.
 _Params = Union[RSFParams, CNSParams]
 _Constants = Union[RSFConstants]
-_BlockConstants = Union[SpringBlockConstants]
+_BlockConstants = Union[SpringBlockConstants, InertialSpringBlockConstants]
 
 
 """
@@ -113,6 +173,18 @@ class StateEvolution(Protocol):
     ) -> Float: ...
 
 
+class StressTransfer(Protocol):
+    def __call__(
+        self,
+        t: Float,
+        v: Float,
+        v_derivs: Variables,
+        variables: Variables,
+        dstate: Float[Array, "..."],
+        constants: Any,
+    ) -> Float: ...
+
+
 """
 --------------
 SVI containers
@@ -121,7 +193,7 @@ SVI containers
 
 
 @tree_util.register_pytree_node_class
-@dataclass(frozen=True)
+@dcs.dataclass(frozen=True)
 class Particles:
 
     _particles: Union[Tuple[RSFParams, ...], Tuple[CNSParams, ...]]
@@ -167,7 +239,7 @@ class Particles:
 
 
 @tree_util.register_pytree_node_class
-@dataclass(frozen=True)
+@dcs.dataclass(frozen=True)
 class RSFParticles(Particles):
 
     @classmethod
@@ -235,7 +307,7 @@ class CNSStatistics(ParamStatistics):
     Dc: Statistics
 
 
-@dataclass
+@dcs.dataclass
 class BayesianSolution:
 
     chains: Chains
