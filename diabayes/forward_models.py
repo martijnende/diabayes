@@ -128,7 +128,7 @@ def inertial_springblock(
     # The partials_term contains the summation of the partial derivatives of
     # v with respect to some variable y, times the time-derivative of y
     # The first partial derivative is v with respect to mu, and is excluded.
-    partials_term = jnp.dot(v_partials.state.to_array(), dstate)
+    partials_term = jnp.dot(v_partials.state.vals, dstate)
     return (mass_term - partials_term) / v_partials.mu
 
 
@@ -169,9 +169,6 @@ class Forward:
             state_evolution = (state_evolution,)
 
         self.state_evolution_fns = state_evolution
-        # Do ast inspection of variables
-        # Validate number of state_evolution items vs. ast inspected state values
-        # Create Variables object for user to populate
 
         # Compile a function that calls each provided StateEvolution and
         # stacks the results in an array. This way, the "state" can host
@@ -191,6 +188,7 @@ class Forward:
         accessed = set()
 
         def get_accessed_attrs(func, arg_name):
+            """Helper routine to automatically extract the variable names"""
             tree = ast.parse(inspect.getsource(func))
             accessed = set()
 
@@ -203,6 +201,8 @@ class Forward:
             Visitor().visit(tree)
             return accessed
 
+        # Loop over the forward model components and evaluate
+        # which variable names are accessed
         for func in (
             self.friction_model,
             self.stress_transfer,
@@ -210,12 +210,15 @@ class Forward:
         ):
             accessed.update(get_accessed_attrs(func, "variables"))
 
+        # Ensure that we have at least one function that touches mu
         assert "mu" in accessed
         accessed.remove("mu")
 
+        # Ensure that the number of state variables equals the number
+        # of state evolution functions
         assert len(accessed) == len(self.state_evolution_fns)
 
-        # state = dict(zip(accessed, -jnp.ones(len(accessed))))
+        # Initialise values to -1
         state_obj = StateDict(keys=tuple(accessed), vals=-1.0 * jnp.ones(len(accessed)))
         variables = Variables(
             mu=jnp.asarray([-1.0], dtype=jnp.float64), state=state_obj
@@ -231,11 +234,16 @@ class Forward:
         friction_constants: _Constants,
         block_constants: _BlockConstants,
     ) -> Variables:
+        # Calculate v and its partial derivatives with respect to
+        # the variables (mu, state1, state2, ...)
         v, v_derivs = eqx.filter_value_and_grad(self.friction_model)(
             variables, params, friction_constants
         )
-        print(v)
-        print(v_derivs)
+        # Rate of change of state variables
         dstate = self.state_evolution(v, variables, params, friction_constants)
+        # Rate of change of mu (stress transfer)
         dmu = self.stress_transfer(t, v, v_derivs, variables, dstate, block_constants)
-        return Variables(mu=dmu, state=dstate)
+        # Create a new state container for dstate
+        state_obj = StateDict(variables.state.keys, dstate)
+        # Create a new variables container
+        return Variables(mu=dmu, state=state_obj)
