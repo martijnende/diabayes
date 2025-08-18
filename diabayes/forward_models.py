@@ -7,6 +7,7 @@ from jaxtyping import Array, Float
 
 from diabayes.typedefs import (
     FrictionModel,
+    InertialSpringBlockConstants,
     RSFConstants,
     RSFParams,
     SpringBlockConstants,
@@ -78,6 +79,13 @@ def ageing_law(
 
 
 @eqx.filter_jit
+def slip_rate(
+    v: Float, variables: Variables, params: RSFParams, constants: RSFConstants
+) -> Float:
+    return v
+
+
+@eqx.filter_jit
 def springblock(
     t: Float,
     v: Float,
@@ -119,12 +127,14 @@ def inertial_springblock(
     v_partials: Variables,
     variables: Variables,
     dstate: Float[Array, "..."],
-    constants: SpringBlockConstants,
+    constants: InertialSpringBlockConstants,
 ) -> Float:
     r"""
     An inertial spring-block loading formulation:
     """
-    mass_term = constants.k * (constants.v_lp * t - variables.slip) - variables.mu
+    mass_term = (
+        constants.k * (constants.v_lp * t - variables.slip) - variables.mu
+    ) / constants.M
     # The partials_term contains the summation of the partial derivatives of
     # v with respect to some variable y, times the time-derivative of y
     # The first partial derivative is v with respect to mu, and is excluded.

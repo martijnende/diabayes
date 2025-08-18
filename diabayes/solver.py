@@ -57,6 +57,7 @@ class ODESolver:
         params: _Params,
         friction_constants: _Constants,
         block_constants: _BlockConstants,
+        method: str = "RK45",
     ) -> Any:
         """
         Solve a forward problem using SciPy's `solve_ivp` routine.
@@ -100,6 +101,7 @@ class ODESolver:
             args=(params, friction_constants, block_constants),
             rtol=self.rtol,
             atol=self.atol,
+            method=method,
         )
 
         assert result.y is not None
