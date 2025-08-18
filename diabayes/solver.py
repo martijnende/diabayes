@@ -86,8 +86,10 @@ class ODESolver:
             Solution time series of friction and state
         """
 
+        keys = y0.state.keys
+
         _forward = lambda t, y, *args: self.forward_model(
-            Variables.from_array(y), *args
+            t, Variables.from_array(y, keys), *args
         ).to_array()
 
         result = solve_ivp(
@@ -102,7 +104,7 @@ class ODESolver:
 
         assert result.y is not None
 
-        return Variables.from_array(result.y)
+        return Variables.from_array(result.y, keys)
 
     @eqx.filter_jit
     def _forward_wrapper(

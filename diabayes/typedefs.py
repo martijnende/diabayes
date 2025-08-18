@@ -56,6 +56,15 @@ class Variables(eqx.Module):
         )
         return f"Variables(mu={self.mu}, {state_str})"
 
+    def to_array(self) -> Float[Array, "..."]:
+        return jnp.hstack([self.mu, self.state.vals])
+
+    @classmethod
+    def from_array(cls, x: Float[Array, "..."], keys: tuple[str, ...]) -> "Variables":
+        mu = jnp.asarray(x[0])
+        state_obj = StateDict(keys=keys, vals=x[1:])
+        return cls(mu=mu, state=state_obj)
+
 
 # class Container:
 
