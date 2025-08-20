@@ -66,62 +66,6 @@ class Variables(eqx.Module):
         return cls(mu=mu, state=state_obj)
 
 
-# class Container:
-
-#     def __len__(self):
-#         return len(self.tree_flatten()[0])
-
-#     def __iter__(self):
-#         return iter(self.tree_flatten()[0])
-
-#     @classmethod
-#     def tree_unflatten(cls, aux_data, children):
-#         return cls(*children)
-
-#     @classmethod
-#     def from_array(cls, x: Iterable, aux: Any = None):
-#         return cls.tree_unflatten(aux, x)
-
-#     def tree_flatten(self):
-#         raise NotImplementedError
-
-#     def to_array(self):
-#         return jnp.array(self.tree_flatten()[0])
-
-
-# # TODO: replace tree_util stuff with eqx.Module...
-# @tree_util.register_pytree_node_class
-# @dataclass(frozen=True)
-# class Variables(Container):
-#     mu: Float
-#     state: Union[Float, Container]
-
-#     def tree_flatten(self):
-#         # If the state is a scalar, return it directly
-#         if not isinstance(self.state, Container):
-#             return (self.mu, self.state), None
-#         # Else, tree_flatten the state first
-#         else:
-#             return (self.mu, *self.state.tree_flatten()[0]), type(self.state)
-
-#     @classmethod
-#     def tree_unflatten(cls, aux_data: Union[None, Container], children: Iterable):
-#         children = list(children)
-#         mu = children[0]
-#         if aux_data is None:
-#             state = children[1]
-#         else:
-#             state = aux_data.tree_unflatten(None, children[1:])
-#         return cls(mu=mu, state=state)
-
-#     def __getattr__(self, name: str) -> Any:
-#         if isinstance(self.state, Container):
-#             return getattr(self.state, name)
-#         if name in ("state", "theta"):
-#             return self.state
-#         raise AttributeError()
-
-
 class RSFParams(eqx.Module):
     a: Float
     b: Float
@@ -187,10 +131,10 @@ class StressTransfer(Protocol):
         self,
         t: Float,
         v: Float,
-        v_derivs: Variables,
+        v_partials: Variables,
         variables: Variables,
         dstate: Float[Array, "..."],
-        constants: Any,
+        constants: _BlockConstants,
     ) -> Float: ...
 
 

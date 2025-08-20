@@ -1,5 +1,5 @@
 from dataclasses import make_dataclass
-from typing import Tuple, Union
+from typing import Callable, Dict, Iterable, Tuple, Union
 
 import equinox as eqx
 import jax.numpy as jnp
@@ -168,34 +168,40 @@ class Forward:
     def __init__(
         self,
         friction_model: FrictionModel,
-        state_evolution: Union[StateEvolution, Tuple[StateEvolution]],
+        state_evolution: Dict[str, Callable],
         stress_transfer: StressTransfer,
     ) -> None:
         # Set the friction model and stress transfer model (easy...)
         self.friction_model = friction_model
         self.stress_transfer = stress_transfer
-        # If a StatEvolution function is passed directly, make it a tuple
-        if not isinstance(state_evolution, tuple):
-            state_evolution = (state_evolution,)
 
-        self.state_evolution_fns = state_evolution
+        state_obj = StateDict(
+            keys=tuple(state_evolution.keys()),
+            vals=-1.0 * jnp.ones(len(state_evolution)),
+        )
+        variables = Variables(
+            mu=jnp.asarray([-1.0], dtype=jnp.float64), state=state_obj
+        )
+        self.variables = variables
 
-        # Compile a function that calls each provided StateEvolution and
+        # Compile a function that calls each provided state_evolution item and
         # stacks the results in an array. This way, the "state" can host
         # an arbitrary number of variables (porosity, temperature, slip, ...)
         self.state_evolution = eqx.filter_jit(
             lambda v, variables, params, constants: jnp.stack(
-                [fi(v, variables, params, constants) for fi in state_evolution]
+                [
+                    fi(v, variables, params, constants)
+                    for _, fi in state_evolution.items()
+                ]
             )
         )
         pass
 
-    def create_variables(self) -> Variables:
+    @staticmethod
+    def inspect(fn: Union[Callable, Tuple[Callable, ...]]) -> None:
 
         import ast
         import inspect
-
-        accessed = set()
 
         def get_accessed_attrs(func, arg_name):
             """Helper routine to automatically extract the variable names"""
@@ -211,29 +217,22 @@ class Forward:
             Visitor().visit(tree)
             return accessed
 
-        # Loop over the forward model components and evaluate
-        # which variable names are accessed
-        for func in (
-            self.friction_model,
-            self.stress_transfer,
-            *self.state_evolution_fns,
-        ):
-            accessed.update(get_accessed_attrs(func, "variables"))
+        if not isinstance(fn, Iterable):
+            fn = (fn,)
 
-        # Ensure that we have at least one function that touches mu
-        assert "mu" in accessed
-        accessed.remove("mu")
+        accessed = set()
 
-        # Ensure that the number of state variables equals the number
-        # of state evolution functions
-        assert len(accessed) == len(self.state_evolution_fns)
+        for fn_i in fn:
+            accessed.update(get_accessed_attrs(fn_i, "variables"))
 
-        # Initialise values to -1
-        state_obj = StateDict(keys=tuple(accessed), vals=-1.0 * jnp.ones(len(accessed)))
-        variables = Variables(
-            mu=jnp.asarray([-1.0], dtype=jnp.float64), state=state_obj
-        )
-        return variables
+        if "mu" in accessed:
+            accessed.remove("mu")
+
+        print("Auto-detected the following state variable names:")
+        print(accessed)
+
+    def set_initial_values(self, **kwargs) -> None:
+        self.variables = self.variables.set_values(**kwargs)
 
     @eqx.filter_jit
     def __call__(
