@@ -40,7 +40,7 @@ class ODESolver:
     def __init__(
         self,
         forward_model: Forward,
-        rtol: float = 1e-10,
+        rtol: float = 1e-8,
         atol: float = 1e-12,
         checkpoints: int = 100,
     ) -> None:
@@ -117,6 +117,7 @@ class ODESolver:
     ) -> Variables:
         params, friction_constants, block_constants = args
         return self.forward_model(
+            t=t,
             variables=variables,
             params=params,
             friction_constants=friction_constants,
@@ -126,16 +127,18 @@ class ODESolver:
     @eqx.filter_jit
     def _forward_wrapper_SVI(
         self,
-        y0: Float[Array, "2"],
-        params: Float[Array, "..."],
+        y0: Variables,
+        params: _Params,
         t: Float[Array, "Nt"],
         friction_constants: _Constants,
         block_constants: _BlockConstants,
     ) -> Variables:
+        # TODO: previously y0 and params were arrays, not
+        # PyTrees. Does this logic still work?
         result = self._solve_forward(
             t=t,
-            y0=Variables.from_array(y0),
-            params=RSFParams.from_array(params),
+            y0=y0,
+            params=params,
             friction_constants=friction_constants,
             block_constants=block_constants,
         )
@@ -197,6 +200,8 @@ class ODESolver:
         adjoint = dfx.ForwardMode()
         # TODO: replace this with something like `get_steadystate()`
         # because this is different for e.g. CNS
+        # TODO: y0 needs to be defined consistent with the new
+        # "state" variable structure...
         theta0 = params.Dc / friction_constants.v0  # type:ignore
         y0 = Variables(mu=mu[0], state=theta0)
         result = self._solve_forward(

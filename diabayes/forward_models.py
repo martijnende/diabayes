@@ -1,5 +1,4 @@
-from dataclasses import make_dataclass
-from typing import Callable, Dict, Iterable, Tuple, Union
+from typing import Callable, Dict, Generic, Iterable, Tuple, TypeVar, Union
 
 import equinox as eqx
 import jax.numpy as jnp
@@ -12,13 +11,14 @@ from diabayes.typedefs import (
     RSFParams,
     SpringBlockConstants,
     StateDict,
-    StateEvolution,
     StressTransfer,
     Variables,
     _BlockConstants,
     _Constants,
     _Params,
 )
+
+BC = TypeVar("BC", bound=_BlockConstants)
 
 
 @eqx.filter_jit
@@ -45,7 +45,8 @@ def rsf(variables: Variables, params: RSFParams, constants: RSFConstants) -> Flo
         The instantaneous slip rate in the same units as `v0`
     """
     Omega = params.b * jnp.log(variables.theta * constants.v0 / params.Dc)
-    return constants.v0 * jnp.exp((variables.mu - constants.mu0 - Omega) / params.a)
+    v = constants.v0 * jnp.exp((variables.mu - constants.mu0 - Omega) / params.a)
+    return jnp.squeeze(v)
 
 
 @eqx.filter_jit
@@ -89,9 +90,9 @@ def slip_rate(
 def springblock(
     t: Float,
     v: Float,
-    v_partials: Float[Array, "..."],
+    v_partials: Variables,
     variables: Variables,
-    dstate: Variables,
+    dstate: Float[Array, "..."],
     constants: SpringBlockConstants,
 ) -> Float:
     r"""
@@ -142,7 +143,7 @@ def inertial_springblock(
     return (mass_term - partials_term) / v_partials.mu
 
 
-class Forward:
+class Forward(Generic[BC]):
     r"""
     The `Forward` class assembles the various components that comprise
     a forward model, such that `Forward.__call__` takes some variables
@@ -169,7 +170,7 @@ class Forward:
         self,
         friction_model: FrictionModel,
         state_evolution: Dict[str, Callable],
-        stress_transfer: StressTransfer,
+        stress_transfer: StressTransfer[BC],
     ) -> None:
         # Set the friction model and stress transfer model (easy...)
         self.friction_model = friction_model
@@ -241,7 +242,7 @@ class Forward:
         variables: Variables,
         params: _Params,
         friction_constants: _Constants,
-        block_constants: _BlockConstants,
+        block_constants: BC,
     ) -> Variables:
         # Calculate v and its partial derivatives with respect to
         # the variables (mu, state1, state2, ...)

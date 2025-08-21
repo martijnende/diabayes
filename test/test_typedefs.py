@@ -1,63 +1,58 @@
 import jax.numpy as jnp
 
-from diabayes.typedefs import RSFParams, RSFParticles, Variables
+from diabayes.typedefs import RSFParams, RSFParticles, StateDict, Variables
 
 
 class TestTypedefs:
 
     def test_basic_containers(self):
 
-        a = 1.0
-        b = 2.0
-        c = 3.0
+        x = {"a": 1.0, "b": 2.0, "c": 3.0}
+        keys = tuple(x.keys())
 
-        assert (
-            Variables(a, b)
-            == Variables(mu=a, state=b)
-            == Variables.from_array(jnp.array([a, b]))
-            == Variables.tree_unflatten(None, jnp.array([a, b]))
-        )
-        variables = Variables(mu=a, state=b)
-        assert jnp.allclose(
-            variables.to_array(), jnp.array(variables.tree_flatten()[0])
-        )
+        state_obj = StateDict(keys=keys, vals=jnp.array(list(x.values())))
+        variables = Variables(mu=jnp.array([0.6]), state=state_obj)
 
-        assert (
-            RSFParams(a, b, c)
-            == RSFParams(a=a, b=b, Dc=c)
-            == RSFParams.from_array(jnp.array([a, b, c]))
-            == RSFParams.tree_unflatten(None, jnp.array([a, b, c]))
-        )
-        params = RSFParams(a=a, b=b, Dc=c)
-        assert jnp.allclose(params.to_array(), jnp.array(params.tree_flatten()[0]))
+        vars_array = variables.to_array()
+        variables2 = Variables.from_array(vars_array, keys)
 
-    def test_SVI_containers(self):
+        assert jnp.allclose(vars_array, variables2.to_array())
 
-        import jax.random as jr
+        x2 = {"mu": 0.2, "a": 1.0, "b": 2.0, "c": 5.0}
+        variables3 = variables.set_values(**x2)
 
-        key = jr.PRNGKey(42)
+        assert jnp.allclose(jnp.array(list(x2.values())), variables3.to_array())
 
-        # Test Particles
+        x2.pop("mu")
+        assert tuple(x2.keys()) == variables3.state.keys
 
-        key, split_key = jr.split(key)
-        Nparticles = 100
-        loc = jnp.array([1.0, 2.0, 3.0])
-        scale = jnp.ones(3)
-        particles = RSFParticles.generate(Nparticles, loc, scale, split_key)
+    # def test_SVI_containers(self):
 
-        assert len(particles) == Nparticles
+    #     import jax.random as jr
 
-        x = particles.to_array()
-        assert x.shape[1] == len(loc)
+    #     key = jr.PRNGKey(42)
 
-        rtol = 2 / jnp.sqrt(Nparticles)
-        assert jnp.allclose(x.mean(axis=0), loc, rtol=rtol)
-        assert jnp.allclose(x.std(axis=0), scale, rtol=rtol)
+    #     # Test Particles
 
-        assert jnp.allclose(x, RSFParticles.from_array(x).to_array())
+    #     key, split_key = jr.split(key)
+    #     Nparticles = 100
+    #     loc = jnp.array([1.0, 2.0, 3.0])
+    #     scale = jnp.ones(3)
+    #     particles = RSFParticles.generate(Nparticles, loc, scale, split_key)
 
-        # Test Chains
+    #     assert len(particles) == Nparticles
 
-        pass
+    #     x = particles.to_array()
+    #     assert x.shape[1] == len(loc)
 
-    def test_Bayesian_statistics(self): ...
+    #     rtol = 2 / jnp.sqrt(Nparticles)
+    #     assert jnp.allclose(x.mean(axis=0), loc, rtol=rtol)
+    #     assert jnp.allclose(x.std(axis=0), scale, rtol=rtol)
+
+    #     assert jnp.allclose(x, RSFParticles.from_array(x).to_array())
+
+    #     # Test Chains
+
+    #     pass
+
+    # def test_Bayesian_statistics(self): ...

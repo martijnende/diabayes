@@ -1,6 +1,16 @@
 import dataclasses as dcs
 from time import time_ns
-from typing import Any, Iterable, Mapping, NamedTuple, Protocol, Tuple, TypeAlias, Union
+from typing import (
+    Any,
+    Iterable,
+    Mapping,
+    NamedTuple,
+    Protocol,
+    Tuple,
+    TypeAlias,
+    TypeVar,
+    Union,
+)
 
 import equinox as eqx
 import jax
@@ -19,14 +29,11 @@ Parameter containers
 
 class StateDict(eqx.Module):
     keys: tuple[str, ...] = eqx.field(static=True)
-    vals: Float[Array, "..."]
+    vals: jax.Array
 
     def __getitem__(self, k: str) -> Array:
         i = self.keys.index(k)
         return self.vals[i]
-
-    def __str__(self) -> str:
-        return "hi"
 
     def replace_values(self, **kwargs) -> "StateDict":
         mapping = dict(zip(self.keys, self.vals))
@@ -57,12 +64,38 @@ class Variables(eqx.Module):
         return f"Variables(mu={self.mu}, {state_str})"
 
     def to_array(self) -> Float[Array, "..."]:
-        return jnp.hstack([self.mu, self.state.vals])
+        mu = jnp.asarray(jnp.squeeze(self.mu))
+        state = jnp.asarray(jnp.squeeze(self.state.vals))
+
+        # First case: mu and state are scalars
+        # Result shape (2,)
+        if mu.ndim == state.ndim == 0:
+            return jnp.hstack([mu, state])
+        # Second case: mu is scalar, state is vector
+        # Result shape (1+n,)
+        elif mu.ndim == 0 and state.ndim == 1:
+            return jnp.hstack([mu, *state])
+        # Third case: mu and state are time series of scalars
+        # Result shape: (2, t)
+        elif mu.ndim == state.ndim == 1:
+            return jnp.vstack([mu[None, :], state[None, :]])
+        # Fourth case: mu is time series of scalars,
+        # state is time series of vectors (t, n)
+        # Result shape: (1+n, t)
+        elif mu.ndim == 1 and state.ndim == 2:
+            return jnp.vstack([mu[None, :], state])
+        # Other combinations of shapes should not exist
+        else:
+            raise ValueError(f"Unsupported shapes: mu={mu.shape}, state={state.shape}")
 
     @classmethod
     def from_array(cls, x: Float[Array, "..."], keys: tuple[str, ...]) -> "Variables":
-        mu = jnp.asarray(x[0])
-        state_obj = StateDict(keys=keys, vals=x[1:])
+        mu = jnp.atleast_1d(x[0])
+        if x.ndim == 2:
+            state = jnp.atleast_2d(x[1:])
+        else:
+            state = jnp.atleast_1d(x[1:])
+        state_obj = StateDict(keys=keys, vals=state)
         return cls(mu=mu, state=state_obj)
 
 
@@ -107,7 +140,7 @@ class InertialSpringBlockConstants:
 _Params = Union[RSFParams, CNSParams]
 _Constants = Union[RSFConstants]
 _BlockConstants = Union[SpringBlockConstants, InertialSpringBlockConstants]
-
+BC = TypeVar("BC", bound=_BlockConstants, contravariant=True)
 
 """
 -------------------
@@ -126,7 +159,7 @@ class StateEvolution(Protocol):
     ) -> Float: ...
 
 
-class StressTransfer(Protocol):
+class StressTransfer(Protocol[BC]):
     def __call__(
         self,
         t: Float,
@@ -134,7 +167,7 @@ class StressTransfer(Protocol):
         v_partials: Variables,
         variables: Variables,
         dstate: Float[Array, "..."],
-        constants: _BlockConstants,
+        constants: BC,
     ) -> Float: ...
 
 
