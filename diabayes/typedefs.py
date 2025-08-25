@@ -36,6 +36,8 @@ class StateDict(eqx.Module):
         return self.vals[i]
 
     def replace_values(self, **kwargs) -> "StateDict":
+        # Why is it so fucking problematic to set a JAX array?
+        # How many dozens of hours do I need to spend to set a fucking array?
         mapping = dict(zip(self.keys, self.vals))
         mapping.update(kwargs)
         return StateDict(self.keys, jnp.array([mapping[k] for k in self.keys]))
@@ -54,7 +56,7 @@ class Variables(eqx.Module):
         raise AttributeError(f"{type(self).__name__} has no attribute {name!r}")
 
     def set_values(self, **kwargs) -> "Variables":
-        mu = jnp.asarray(kwargs.pop("mu"))
+        mu = jnp.atleast_1d(kwargs.pop("mu"))
         return dcs.replace(self, mu=mu, state=self.state.replace_values(**kwargs))
 
     def __repr__(self) -> str:
@@ -72,6 +74,7 @@ class Variables(eqx.Module):
         if mu.ndim == state.ndim == 0:
             return jnp.hstack([mu, state])
         # Second case: mu is scalar, state is vector
+        # (i.e., multiple state variables)
         # Result shape (1+n,)
         elif mu.ndim == 0 and state.ndim == 1:
             return jnp.hstack([mu, *state])
@@ -90,11 +93,22 @@ class Variables(eqx.Module):
 
     @classmethod
     def from_array(cls, x: Float[Array, "..."], keys: tuple[str, ...]) -> "Variables":
+        """
+        Import a JAX array to instantiate the class. The array `x` can either be an
+        array of scalars (size n for n variables), or an array of time series of
+        shape `(n, t)`. The first element in the array (i.e., `x[0]`) is assumed to
+        be the friction coefficient `mu`. The remaining elements are the state
+        variables, matching the number and order of the `keys` tuple.
+        """
+        # The first element is assumed to be mu
         mu = jnp.atleast_1d(x[0])
+        # If x is 2D: time series
         if x.ndim == 2:
             state = jnp.atleast_2d(x[1:])
+        # Else: scalars
         else:
             state = jnp.atleast_1d(x[1:])
+        # Map `state` to `keys`
         state_obj = StateDict(keys=keys, vals=state)
         return cls(mu=mu, state=state_obj)
 

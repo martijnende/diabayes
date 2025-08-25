@@ -194,26 +194,22 @@ class ODESolver:
         params: _Params,
         t: Float[Array, "N"],
         mu: Float[Array, "N"],
+        y0: Variables,
         friction_constants: _Constants,
         block_constants: _BlockConstants,
     ) -> Float[Array, "N"]:
         adjoint = dfx.ForwardMode()
-        # TODO: replace this with something like `get_steadystate()`
-        # because this is different for e.g. CNS
-        # TODO: y0 needs to be defined consistent with the new
-        # "state" variable structure...
-        theta0 = params.Dc / friction_constants.v0  # type:ignore
-        y0 = Variables(mu=mu[0], state=theta0)
         result = self._solve_forward(
             t, y0, params, friction_constants, block_constants, adjoint
         )
-        mu_hat = result.ys.mu  # type:ignore
+        mu_hat = jnp.squeeze(result.ys.mu)  # type:ignore
         return mu - mu_hat
 
     def max_likelihood_inversion(
         self,
         t: Float[Array, "Nt"],
         mu: Float[Array, "Nt"],
+        y0: Variables,
         params: _Params,
         friction_constants: _Constants,
         block_constants: _BlockConstants,
@@ -228,7 +224,7 @@ class ODESolver:
         options = {"autodiff_mode": "fwd"}
 
         _residuals = lambda params, mu: self._residuals(
-            params, t, mu, friction_constants, block_constants
+            params, t, mu, y0, friction_constants, block_constants
         )
 
         lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose_opts)

@@ -233,7 +233,9 @@ class Forward(Generic[BC]):
         print(accessed)
 
     def set_initial_values(self, **kwargs) -> None:
-        self.variables = self.variables.set_values(**kwargs)
+        # Change this shit back it doesn't work and breaks everything
+        scalars = {k: float(jnp.asarray(v).item()) for k, v in kwargs.items()}
+        self.variables = self.variables.set_values(**scalars)
 
     @eqx.filter_jit
     def __call__(

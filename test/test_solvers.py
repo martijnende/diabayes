@@ -46,43 +46,48 @@ class TestSolvers:
         state_pred = params.Dc / block_constants.v_lp
         assert jnp.allclose(state_final, state_pred)
 
-    # def test_levenberg_marquardt(self):
-    #     """
-    #     Test for the Levenberg-Marquardt maximum-likelihood
-    #     inversion solver. A forward simulation generates the
-    #     friction "observation" for a given set of parameters.
-    #     Then the true parameters are pertubed and an inversion
-    #     is performed. The test checks whether the inverted
-    #     parameters are identical to the initial ones, and
-    #     whether the friction curves are identical.
-    #     """
+    def test_levenberg_marquardt(self):
+        """
+        Test for the Levenberg-Marquardt maximum-likelihood
+        inversion solver. A forward simulation generates the
+        friction "observation" for a given set of parameters.
+        Then the true parameters are pertubed and an inversion
+        is performed. The test checks whether the inverted
+        parameters are identical to the initial ones, and
+        whether the friction curves are identical.
+        """
 
-    #     variables, params, constants, block_constants = init_params()
-    #     forward = Forward(rsf, {"theta": ageing_law}, springblock)
-    #     solver = ODESolver(forward)
+        variables, params, constants, block_constants = init_params()
+        forward = Forward(rsf, {"theta": ageing_law}, springblock)
+        forward.set_initial_values(mu=variables.mu, theta=variables.theta)
 
-    #     # Forward simulation to generate "observations"
-    #     t = jnp.linspace(0.0, 20.0, 1000)
-    #     result = solver.solve_forward(t, variables, params, constants, block_constants)
+        solver = ODESolver(forward)
 
-    #     # Perturb parameters (initial guess parameters)
-    #     params2 = db.RSFParams(a=params.a * 1.1, b=params.b * 0.9, Dc=params.Dc * 5)
-    #     mu = result.mu
+        y0 = forward.variables
 
-    #     # Invert parameters
-    #     result_inv = solver.max_likelihood_inversion(
-    #         t, mu, params2, constants, block_constants, verbose=False
-    #     )
-    #     params_inv = result_inv.value
+        # Forward simulation to generate "observations"
+        t = jnp.linspace(0.0, 10.0, 1000)
+        result = solver.solve_forward(t, y0, params, constants, block_constants)
+        mu = result.mu
 
-    #     # Reproduce friction curve
-    #     result2 = solver.solve_forward(
-    #         t, variables, params_inv, constants, block_constants
-    #     )
+        # Perturb parameters (initial guess parameters)
+        params2 = db.RSFParams(a=params.a * 1.1, b=params.b * 1.2, Dc=params.Dc * 0.9)
 
-    #     assert result2 is not None
+        # Invert parameters
+        result_inv = solver.max_likelihood_inversion(
+            t, mu, y0, params2, constants, block_constants, verbose=True
+        )
+        params_inv = result_inv.value
 
-    #     # Check that inverted parameters and resulting friction
-    #     # curves are identical to the original ones
-    #     assert jnp.allclose(params.to_array(), params_inv.to_array())
-    #     assert jnp.allclose(result.to_array(), result2.to_array())
+        # Reproduce friction curve
+        result2 = solver.solve_forward(t, y0, params_inv, constants, block_constants)
+
+        assert result2 is not None
+
+        params_array = jax.flatten_util.ravel_pytree(params)[0]  # type:ignore
+        params_inv_array = jax.flatten_util.ravel_pytree(params_inv)[0]  # type:ignore
+
+        # Check that inverted parameters and resulting friction
+        # curves are identical to the original ones
+        assert jnp.allclose(params_array, params_inv_array)
+        assert jnp.allclose(result.mu, result2.mu)
