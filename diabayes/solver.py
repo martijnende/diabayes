@@ -229,7 +229,11 @@ class ODESolver:
 
         lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose_opts)
         sol = optx.least_squares(
-            _residuals, lm_solver, params, args=mu, options=options
+            _residuals,
+            lm_solver,
+            params,
+            args=mu,
+            options=options,
         )
 
         return sol
