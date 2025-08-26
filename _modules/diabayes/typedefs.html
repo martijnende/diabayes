@@ -322,9 +322,19 @@
                 <article class="bd-article">
                   
   <h1>Source code for diabayes.typedefs</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dcs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">time_ns</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">NamedTuple</span><span class="p">,</span>
+    <span class="n">Protocol</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">,</span>
+    <span class="n">TypeAlias</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">equinox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eqx</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
@@ -341,80 +351,172 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="Container">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Container">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Container</span><span class="p">:</span>
+<div class="viewcode-block" id="StateDict">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.StateDict">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateDict</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">keys</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vals</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-
-<div class="viewcode-block" id="Container.tree_unflatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Container.tree_unflatten">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_unflatten</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">aux_data</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">children</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Container.from_array">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Container.from_array">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tree_unflatten</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Container.tree_flatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Container.tree_flatten">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-
-
-<div class="viewcode-block" id="Container.to_array">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Container.to_array">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
+<div class="viewcode-block" id="StateDict.replace_values">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.StateDict.replace_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">replace_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;StateDict&quot;</span><span class="p">:</span>
+        <span class="c1"># Why is it so fucking problematic to set a JAX array?</span>
+        <span class="c1"># How many dozens of hours do I need to spend to set a fucking array?</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span>
+        <span class="n">mapping</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">StateDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mapping</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">]))</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="Variables">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables">[docs]</a>
-<span class="nd">@tree_util</span><span class="o">.</span><span class="n">register_pytree_node_class</span>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Variables</span><span class="p">(</span><span class="n">Container</span><span class="p">):</span>
-    <span class="n">mu</span><span class="p">:</span> <span class="n">Float</span>
-    <span class="n">state</span><span class="p">:</span> <span class="n">Float</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Variables</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">mu</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span>
 
-<div class="viewcode-block" id="Variables.tree_flatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables.tree_flatten">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">),</span> <span class="kc">None</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># NOTE: __getattr__ is only called when __getattribute__,</span>
+        <span class="c1"># lookup fails, i.e, it looks for self.name before</span>
+        <span class="c1"># checking self.state.name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Variables.set_values">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables.set_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Variables&quot;</span><span class="p">:</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dcs</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">replace_values</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">state_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Variables(mu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">state_str</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="Variables.to_array">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables.to_array">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]:</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span>
+
+        <span class="c1"># First case: mu and state are scalars</span>
+        <span class="c1"># Result shape (2,)</span>
+        <span class="k">if</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="p">])</span>
+        <span class="c1"># Second case: mu is scalar, state is vector</span>
+        <span class="c1"># (i.e., multiple state variables)</span>
+        <span class="c1"># Result shape (1+n,)</span>
+        <span class="k">elif</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">mu</span><span class="p">,</span> <span class="o">*</span><span class="n">state</span><span class="p">])</span>
+        <span class="c1"># Third case: mu and state are time series of scalars</span>
+        <span class="c1"># Result shape: (2, t)</span>
+        <span class="k">elif</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mu</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">state</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]])</span>
+        <span class="c1"># Fourth case: mu is time series of scalars,</span>
+        <span class="c1"># state is time series of vectors (t, n)</span>
+        <span class="c1"># Result shape: (1+n, t)</span>
+        <span class="k">elif</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mu</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">state</span><span class="p">])</span>
+        <span class="c1"># Other combinations of shapes should not exist</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported shapes: mu=</span><span class="si">{</span><span class="n">mu</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, state=</span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Variables.from_array">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables.from_array">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">],</span> <span class="n">keys</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Variables&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Import a JAX array to instantiate the class. The array `x` can either be an</span>
+<span class="sd">        array of scalars (size n for n variables), or an array of time series of</span>
+<span class="sd">        shape `(n, t)`. The first element in the array (i.e., `x[0]`) is assumed to</span>
+<span class="sd">        be the friction coefficient `mu`. The remaining elements are the state</span>
+<span class="sd">        variables, matching the number and order of the `keys` tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The first element is assumed to be mu</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># If x is 2D: time series</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="c1"># Else: scalars</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="c1"># Map `state` to `keys`</span>
+        <span class="n">state_obj</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state_obj</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Params">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Params">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Params</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">dcs</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">field_names</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="n">idx</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dcs</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">dcs</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Params.to_array">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Params.to_array">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="Params.from_array">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Params.from_array">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Params.generate">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Params.generate">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">],</span> <span class="n">scale</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)))</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">loc</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="RSFParams">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.RSFParams">[docs]</a>
-<span class="nd">@tree_util</span><span class="o">.</span><span class="n">register_pytree_node_class</span>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">RSFParams</span><span class="p">(</span><span class="n">Container</span><span class="p">):</span>
-    <span class="n">a</span><span class="p">:</span> <span class="n">Float</span>
-    <span class="n">b</span><span class="p">:</span> <span class="n">Float</span>
-    <span class="n">Dc</span><span class="p">:</span> <span class="n">Float</span>
-
-<div class="viewcode-block" id="RSFParams.tree_flatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.RSFParams.tree_flatten">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dc</span><span class="p">),</span> <span class="kc">None</span></div>
-</div>
+<span class="k">class</span><span class="w"> </span><span class="nc">RSFParams</span><span class="p">(</span><span class="n">Params</span><span class="p">):</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]</span>
+    <span class="n">Dc</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="RSFConstants">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.RSFConstants">[docs]</a>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@dcs</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RSFConstants</span><span class="p">:</span>
     <span class="n">v0</span><span class="p">:</span> <span class="n">Float</span>
     <span class="n">mu0</span><span class="p">:</span> <span class="n">Float</span></div>
@@ -423,23 +525,15 @@
 
 <div class="viewcode-block" id="CNSParams">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.CNSParams">[docs]</a>
-<span class="nd">@tree_util</span><span class="o">.</span><span class="n">register_pytree_node_class</span>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">CNSParams</span><span class="p">(</span><span class="n">Container</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CNSParams</span><span class="p">(</span><span class="n">Params</span><span class="p">):</span>
     <span class="n">phi_c</span><span class="p">:</span> <span class="n">Float</span>
-    <span class="n">Z</span><span class="p">:</span> <span class="n">Float</span>
-
-<div class="viewcode-block" id="CNSParams.tree_flatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.CNSParams.tree_flatten">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">),</span> <span class="kc">None</span></div>
-</div>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">Float</span></div>
 
 
 
 <div class="viewcode-block" id="CNSConstants">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.CNSConstants">[docs]</a>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@dcs</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CNSConstants</span><span class="p">:</span>
     <span class="n">phi_c</span><span class="p">:</span> <span class="n">Float</span>
     <span class="n">Z</span><span class="p">:</span> <span class="n">Float</span></div>
@@ -448,10 +542,20 @@
 
 <div class="viewcode-block" id="SpringBlockConstants">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.SpringBlockConstants">[docs]</a>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@dcs</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpringBlockConstants</span><span class="p">:</span>
     <span class="n">k</span><span class="p">:</span> <span class="n">Float</span>
     <span class="n">v_lp</span><span class="p">:</span> <span class="n">Float</span></div>
+
+
+
+<div class="viewcode-block" id="InertialSpringBlockConstants">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.InertialSpringBlockConstants">[docs]</a>
+<span class="nd">@dcs</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InertialSpringBlockConstants</span><span class="p">:</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">Float</span>
+    <span class="n">v_lp</span><span class="p">:</span> <span class="n">Float</span>
+    <span class="n">M</span><span class="p">:</span> <span class="n">Float</span></div>
 
 
 
@@ -459,8 +563,8 @@
 <span class="c1"># and should not be instantiated.</span>
 <span class="n">_Params</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFParams</span><span class="p">,</span> <span class="n">CNSParams</span><span class="p">]</span>
 <span class="n">_Constants</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFConstants</span><span class="p">]</span>
-<span class="n">_BlockConstants</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpringBlockConstants</span><span class="p">]</span>
-
+<span class="n">_BlockConstants</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpringBlockConstants</span><span class="p">,</span> <span class="n">InertialSpringBlockConstants</span><span class="p">]</span>
+<span class="n">BC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;BC&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_BlockConstants</span><span class="p">,</span> <span class="n">contravariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">-------------------</span>
@@ -485,95 +589,20 @@
 
 
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">--------------</span>
-<span class="sd">SVI containers</span>
-<span class="sd">--------------</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StressTransfer">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.StressTransfer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StressTransfer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">BC</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+        <span class="n">v</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+        <span class="n">v_partials</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
+        <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
+        <span class="n">dstate</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">],</span>
+        <span class="n">constants</span><span class="p">:</span> <span class="n">BC</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span> <span class="o">...</span></div>
 
 
-<div class="viewcode-block" id="Particles">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Particles">[docs]</a>
-<span class="nd">@tree_util</span><span class="o">.</span><span class="n">register_pytree_node_class</span>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Particles</span><span class="p">:</span>
-
-    <span class="n">_particles</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">RSFParams</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">CNSParams</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-        <span class="c1"># Check if the requested selection is of the kind `x[1, 3]`</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-            <span class="p">),</span> <span class="s2">&quot;Particles do not support item selection with more than 2 indices&quot;</span>
-            <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">idx</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to_array</span><span class="p">()[</span><span class="n">j</span><span class="p">]</span>
-        <span class="c1"># Else the selection is of the kind `x[4]`</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_particles</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_particles</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_particles</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Particles.tree_unflatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Particles.tree_unflatten">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_unflatten</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">aux_data</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-
-
-<div class="viewcode-block" id="Particles.from_array">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Particles.from_array">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tree_unflatten</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Particles.tree_flatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Particles.tree_flatten">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_particles</span><span class="p">,</span> <span class="kc">None</span></div>
-
-
-<div class="viewcode-block" id="Particles.to_array">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Particles.to_array">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">tree_flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_particles</span><span class="p">])</span></div>
-
-
-<div class="viewcode-block" id="Particles.generate">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Particles.generate">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">],</span> <span class="n">scale</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
-    <span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)))</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">loc</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
-</div>
-
-
-
-<div class="viewcode-block" id="RSFParticles">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.RSFParticles">[docs]</a>
-<span class="nd">@tree_util</span><span class="o">.</span><span class="n">register_pytree_node_class</span>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">RSFParticles</span><span class="p">(</span><span class="n">Particles</span><span class="p">):</span>
-
-<div class="viewcode-block" id="RSFParticles.tree_unflatten">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.RSFParticles.tree_unflatten">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tree_unflatten</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">aux_data</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">RSFParams</span><span class="p">(</span><span class="o">*</span><span class="n">child</span><span class="p">)</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
-</div>
-
-
-
-<span class="c1"># Alias gradients for semantic clarity</span>
-<span class="n">Gradients</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Particles</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">-----------------</span>
@@ -660,9 +689,10 @@
 
 <div class="viewcode-block" id="BayesianSolution">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution">[docs]</a>
-<span class="nd">@dataclass</span>
+<span class="nd">@dcs</span><span class="o">.</span><span class="n">dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BayesianSolution</span><span class="p">:</span>
 
+    <span class="n">log_params</span><span class="p">:</span> <span class="n">_Params</span>
     <span class="n">chains</span><span class="p">:</span> <span class="n">Chains</span>
     <span class="n">log_likelihood</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">]</span>
     <span class="n">nan_count</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">]</span>
@@ -670,14 +700,17 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">chains</span><span class="p">:</span> <span class="n">Chains</span><span class="p">,</span>
+        <span class="n">log_params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
         <span class="n">log_likelihood</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">],</span>
         <span class="n">nan_count</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">],</span>
     <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_params</span> <span class="o">=</span> <span class="n">log_params</span>
+        <span class="n">chains</span> <span class="o">=</span> <span class="n">log_params</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">final_state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_likelihood</span> <span class="o">=</span> <span class="n">log_likelihood</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nan_count</span> <span class="o">=</span> <span class="n">nan_count</span>
+        <span class="c1"># TODO: need to generalise this...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">RSFStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BayesianSolution.plot_convergence">
@@ -809,11 +842,13 @@
             <span class="n">key</span> <span class="o">=</span> <span class="n">rng</span>
 
         <span class="n">key</span><span class="p">,</span> <span class="n">split_key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="n">samples</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">split_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nsamples</span><span class="p">,),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">split_key</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nsamples</span><span class="p">,))</span>
+        <span class="n">log_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_params</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">log_samples</span><span class="p">)(</span><span class="o">*</span><span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_samples</span><span class="o">.</span><span class="n">to_array</span><span class="p">()))</span>
 
         <span class="n">sample_results</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
-            <span class="n">solver</span><span class="o">.</span><span class="n">_forward_wrapper_SVI</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">out_axes</span><span class="o">=</span><span class="mi">0</span>
-        <span class="p">)(</span><span class="n">y0</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span> <span class="n">samples</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span><span class="p">)</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">_forward_wrapper_SVI</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">out_axes</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)(</span><span class="n">samples</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">sample_results</span></div>
 </div>
 

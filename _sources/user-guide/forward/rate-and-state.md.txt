@@ -23,7 +23,7 @@ The implementation of the classical RSF formulation is available through `diabay
 
 ## Regularised rate-and-state friction
 
-Owing to the logarithms used in the classical RSF formulation, the slip rate $v$ is required to be strictly positive. This requirement can be problematic in simulations where the shear stress (and corresonding slip rate) can change sign or become zero. To alleviate this, a regularised form{footcite}`lapusta2000` can be adopted with the same asymptotic behaviour as Eq. {eq}`RSF2`:
+Owing to the logarithms used in the classical RSF formulation, the slip rate $v$ is required to be strictly positive. This requirement can be problematic in simulations where the shear stress (and corresponding slip rate) can change sign or become zero. To alleviate this, a regularised form{footcite}`lapusta2000` can be adopted with the same asymptotic behaviour as Eq. {eq}`RSF2`:
 ```{math}
 :label: RSF_reg
 v = 2 v_0 \sinh \left\{ \frac{\mu}{a} \exp \left( - \frac{1}{a} \left[\mu_0 + b \ln \left( \frac{v_0 \theta}{D_c} \right) \right] \right) \right\}

@@ -343,7 +343,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.typedefs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BayesianSolution</span><span class="p">,</span>
     <span class="n">RSFParams</span><span class="p">,</span>
-    <span class="n">RSFParticles</span><span class="p">,</span>
     <span class="n">Variables</span><span class="p">,</span>
     <span class="n">_BlockConstants</span><span class="p">,</span>
     <span class="n">_Constants</span><span class="p">,</span>
@@ -366,7 +365,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">forward_model</span><span class="p">:</span> <span class="n">Forward</span><span class="p">,</span>
-        <span class="n">rtol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
+        <span class="n">rtol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
         <span class="n">atol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
         <span class="n">checkpoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -385,6 +384,7 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
         <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
         <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;RK45&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solve a forward problem using SciPy&#39;s `solve_ivp` routine.</span>
@@ -414,8 +414,10 @@
 <span class="sd">            Solution time series of friction and state</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">y0</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span>
+
         <span class="n">_forward</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_model</span><span class="p">(</span>
-            <span class="n">Variables</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span>
+            <span class="n">t</span><span class="p">,</span> <span class="n">Variables</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">keys</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span>
@@ -426,11 +428,12 @@
             <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span><span class="p">),</span>
             <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span>
             <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="k">return</span> <span class="n">Variables</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Variables</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span></div>
 
 
     <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
@@ -442,6 +445,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variables</span><span class="p">:</span>
         <span class="n">params</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span> <span class="o">=</span> <span class="n">args</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_model</span><span class="p">(</span>
+            <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
             <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span>
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
             <span class="n">friction_constants</span><span class="o">=</span><span class="n">friction_constants</span><span class="p">,</span>
@@ -451,16 +455,16 @@
     <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_forward_wrapper_SVI</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">y0</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">],</span>
-        <span class="n">params</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">],</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
+        <span class="n">y0</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
         <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nt&quot;</span><span class="p">],</span>
         <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
         <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variables</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_forward</span><span class="p">(</span>
             <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
-            <span class="n">y0</span><span class="o">=</span><span class="n">Variables</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">y0</span><span class="p">),</span>
-            <span class="n">params</span><span class="o">=</span><span class="n">RSFParams</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
+            <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
             <span class="n">friction_constants</span><span class="o">=</span><span class="n">friction_constants</span><span class="p">,</span>
             <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span>
         <span class="p">)</span>
@@ -516,18 +520,15 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
         <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">],</span>
         <span class="n">mu</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">],</span>
+        <span class="n">y0</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
         <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
         <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">]:</span>
         <span class="n">adjoint</span> <span class="o">=</span> <span class="n">dfx</span><span class="o">.</span><span class="n">ForwardMode</span><span class="p">()</span>
-        <span class="c1"># TODO: replace this with something like `get_steadystate()`</span>
-        <span class="c1"># because this is different for e.g. CNS</span>
-        <span class="n">theta0</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">Dc</span> <span class="o">/</span> <span class="n">friction_constants</span><span class="o">.</span><span class="n">v0</span>  <span class="c1"># type:ignore</span>
-        <span class="n">y0</span> <span class="o">=</span> <span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">state</span><span class="o">=</span><span class="n">theta0</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_forward</span><span class="p">(</span>
             <span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span><span class="p">,</span> <span class="n">adjoint</span>
         <span class="p">)</span>
-        <span class="n">mu_hat</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">ys</span><span class="o">.</span><span class="n">mu</span>  <span class="c1"># type:ignore</span>
+        <span class="n">mu_hat</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">ys</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
         <span class="k">return</span> <span class="n">mu</span> <span class="o">-</span> <span class="n">mu_hat</span>
 
 <div class="viewcode-block" id="ODESolver.max_likelihood_inversion">
@@ -536,6 +537,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nt&quot;</span><span class="p">],</span>
         <span class="n">mu</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nt&quot;</span><span class="p">],</span>
+        <span class="n">y0</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
         <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
         <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
@@ -550,12 +552,16 @@
         <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;autodiff_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;fwd&quot;</span><span class="p">}</span>
 
         <span class="n">_residuals</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span><span class="p">(</span>
-            <span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span>
+            <span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">,</span> <span class="n">block_constants</span>
         <span class="p">)</span>
 
         <span class="n">lm_solver</span> <span class="o">=</span> <span class="n">optx</span><span class="o">.</span><span class="n">LevenbergMarquardt</span><span class="p">(</span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose_opts</span><span class="p">)</span>
         <span class="n">sol</span> <span class="o">=</span> <span class="n">optx</span><span class="o">.</span><span class="n">least_squares</span><span class="p">(</span>
-            <span class="n">_residuals</span><span class="p">,</span> <span class="n">lm_solver</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span>
+            <span class="n">_residuals</span><span class="p">,</span>
+            <span class="n">lm_solver</span><span class="p">,</span>
+            <span class="n">params</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sol</span></div>
@@ -568,6 +574,7 @@
         <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nt&quot;</span><span class="p">],</span>
         <span class="n">mu</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nt&quot;</span><span class="p">],</span>
         <span class="n">noise_std</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+        <span class="n">y0</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
         <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
         <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
@@ -589,21 +596,24 @@
 
         <span class="n">key</span><span class="p">,</span> <span class="n">split_key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
-        <span class="n">scale</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">))</span> <span class="o">*</span> <span class="mf">0.1</span>
+        <span class="n">Nparams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Nparams</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span>
         <span class="n">inv_scale</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>
         <span class="n">log_params</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">to_array</span><span class="p">())</span>
 
         <span class="c1"># Sample particles from a log-normal distribution</span>
-        <span class="n">log_particles</span> <span class="o">=</span> <span class="n">RSFParticles</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">log_particles</span> <span class="o">=</span> <span class="n">RSFParams</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
             <span class="n">N</span><span class="o">=</span><span class="n">Nparticles</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">log_params</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">split_key</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span>
+        <span class="p">)</span>
 
         <span class="c1"># Instantiate optimiser</span>
         <span class="n">opt</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
-        <span class="n">opt_state</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">log_particles</span><span class="p">)</span>
+        <span class="n">opt_state</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">log_particles</span><span class="p">)</span>  <span class="c1"># type:ignore</span>
 
         <span class="n">forward_fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_forward_wrapper_SVI</span><span class="p">,</span>
+            <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span>
             <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
             <span class="n">friction_constants</span><span class="o">=</span><span class="n">friction_constants</span><span class="p">,</span>
             <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span>
@@ -612,9 +622,7 @@
         <span class="nd">@scan_tqdm</span><span class="p">(</span><span class="n">Nsteps</span><span class="p">)</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">body_fun</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
             <span class="n">params</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">carry</span>
-            <span class="n">loss</span><span class="p">,</span> <span class="n">gradp</span> <span class="o">=</span> <span class="n">mapped_log_likelihood</span><span class="p">(</span>
-                <span class="n">params</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">noise_std</span><span class="p">,</span> <span class="n">friction_constants</span><span class="o">.</span><span class="n">v0</span><span class="p">,</span> <span class="n">forward_fn</span>
-            <span class="p">)</span>
+            <span class="n">loss</span><span class="p">,</span> <span class="n">gradp</span> <span class="o">=</span> <span class="n">mapped_log_likelihood</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">noise_std</span><span class="p">,</span> <span class="n">forward_fn</span><span class="p">)</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Sometimes the adjoint back-propagation becomes unstable, </span>
 <span class="sd">            producing NaNs in the gradients. By setting the NaN-gradients</span>
@@ -623,10 +631,14 @@
 <span class="sd">            likely be stable again and the particle will continue</span>
 <span class="sd">            to be attracted by the maximum likelihood</span>
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="n">nan_count</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">gradp</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">gradp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">gradp</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">gradp</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">gradp</span><span class="p">))</span>
-            <span class="n">gradq</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">params</span> <span class="o">-</span> <span class="n">log_params</span><span class="p">)</span> <span class="o">*</span> <span class="n">inv_scale</span>
-            <span class="n">phi</span> <span class="o">=</span> <span class="n">compute_phi</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">gradp</span><span class="p">,</span> <span class="n">gradq</span><span class="p">)</span>
+            <span class="n">params_array</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">gradp_array</span> <span class="o">=</span> <span class="n">gradp</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">nans</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">gradp_array</span><span class="p">)</span>
+            <span class="n">nan_count</span> <span class="o">=</span> <span class="n">nans</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">nans</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">gradp_array</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">nans</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">gradp_array</span><span class="p">))</span>
+            <span class="n">gradq_array</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">params_array</span> <span class="o">-</span> <span class="n">log_params</span><span class="p">)</span> <span class="o">*</span> <span class="n">inv_scale</span>
+            <span class="n">phi_array</span> <span class="o">=</span> <span class="n">compute_phi</span><span class="p">(</span><span class="n">params_array</span><span class="p">,</span> <span class="n">gradp_array</span><span class="p">,</span> <span class="n">gradq_array</span><span class="p">)</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">phi_array</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
             <span class="n">updates</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">apply_updates</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">updates</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">),</span> <span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">nan_count</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>

@@ -322,23 +322,27 @@
                 <article class="bd-article">
                   
   <h1>Source code for diabayes.forward_models</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">equinox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eqx</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">jaxtyping</span><span class="w"> </span><span class="kn">import</span> <span class="n">Float</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jaxtyping</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.typedefs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FrictionModel</span><span class="p">,</span>
+    <span class="n">InertialSpringBlockConstants</span><span class="p">,</span>
     <span class="n">RSFConstants</span><span class="p">,</span>
     <span class="n">RSFParams</span><span class="p">,</span>
     <span class="n">SpringBlockConstants</span><span class="p">,</span>
-    <span class="n">StateEvolution</span><span class="p">,</span>
+    <span class="n">StateDict</span><span class="p">,</span>
+    <span class="n">StressTransfer</span><span class="p">,</span>
     <span class="n">Variables</span><span class="p">,</span>
     <span class="n">_BlockConstants</span><span class="p">,</span>
     <span class="n">_Constants</span><span class="p">,</span>
     <span class="n">_Params</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="n">BC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;BC&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_BlockConstants</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="rsf">
@@ -366,8 +370,9 @@
 <span class="sd">    v : Float</span>
 <span class="sd">        The instantaneous slip rate in the same units as `v0`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">Omega</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">b</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">state</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">v0</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">Dc</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">constants</span><span class="o">.</span><span class="n">v0</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">mu</span> <span class="o">-</span> <span class="n">constants</span><span class="o">.</span><span class="n">mu0</span> <span class="o">-</span> <span class="n">Omega</span><span class="p">)</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">a</span><span class="p">)</span></div>
+    <span class="n">Omega</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">b</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">theta</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">v0</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">Dc</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">v0</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">mu</span> <span class="o">-</span> <span class="n">constants</span><span class="o">.</span><span class="n">mu0</span> <span class="o">-</span> <span class="n">Omega</span><span class="p">)</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
 
 
 
@@ -400,7 +405,17 @@
 <span class="sd">    dtheta : Float</span>
 <span class="sd">        The rate of change of the state variable `theta` [s/s]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">variables</span><span class="o">.</span><span class="n">state</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">Dc</span></div>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">variables</span><span class="o">.</span><span class="n">theta</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">Dc</span></div>
+
+
+
+<div class="viewcode-block" id="slip_rate">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.slip_rate">[docs]</a>
+<span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slip_rate</span><span class="p">(</span>
+    <span class="n">v</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">RSFParams</span><span class="p">,</span> <span class="n">constants</span><span class="p">:</span> <span class="n">RSFConstants</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">v</span></div>
 
 
 
@@ -408,7 +423,12 @@
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.springblock">[docs]</a>
 <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">springblock</span><span class="p">(</span>
-    <span class="n">v</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span> <span class="n">constants</span><span class="p">:</span> <span class="n">SpringBlockConstants</span>
+    <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+    <span class="n">v</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+    <span class="n">v_partials</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
+    <span class="n">dstate</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">],</span>
+    <span class="n">constants</span><span class="p">:</span> <span class="n">SpringBlockConstants</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A conventional (non-inertial) spring-block loading formulation:</span>
@@ -437,9 +457,34 @@
 
 
 
+<div class="viewcode-block" id="inertial_springblock">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.inertial_springblock">[docs]</a>
+<span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inertial_springblock</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+    <span class="n">v</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
+    <span class="n">v_partials</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
+    <span class="n">dstate</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">],</span>
+    <span class="n">constants</span><span class="p">:</span> <span class="n">InertialSpringBlockConstants</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An inertial spring-block loading formulation:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mass_term</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">constants</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">v_lp</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">variables</span><span class="o">.</span><span class="n">slip</span><span class="p">)</span> <span class="o">-</span> <span class="n">variables</span><span class="o">.</span><span class="n">mu</span>
+    <span class="p">)</span> <span class="o">/</span> <span class="n">constants</span><span class="o">.</span><span class="n">M</span>
+    <span class="c1"># The partials_term contains the summation of the partial derivatives of</span>
+    <span class="c1"># v with respect to some variable y, times the time-derivative of y</span>
+    <span class="c1"># The first partial derivative is v with respect to mu, and is excluded.</span>
+    <span class="n">partials_term</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v_partials</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">dstate</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">mass_term</span> <span class="o">-</span> <span class="n">partials_term</span><span class="p">)</span> <span class="o">/</span> <span class="n">v_partials</span><span class="o">.</span><span class="n">mu</span></div>
+
+
+
 <div class="viewcode-block" id="Forward">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.Forward">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Forward</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Forward</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">BC</span><span class="p">]):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The `Forward` class assembles the various components that comprise</span>
 <span class="sd">    a forward model, such that `Forward.__call__` takes some variables</span>
@@ -465,26 +510,102 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">friction_model</span><span class="p">:</span> <span class="n">FrictionModel</span><span class="p">,</span>
-        <span class="n">state_evolution</span><span class="p">:</span> <span class="n">StateEvolution</span><span class="p">,</span>
-        <span class="n">block_type</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">,</span> <span class="n">Variables</span><span class="p">,</span> <span class="n">_BlockConstants</span><span class="p">],</span> <span class="n">Float</span><span class="p">],</span>
+        <span class="n">state_evolution</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">],</span>
+        <span class="n">stress_transfer</span><span class="p">:</span> <span class="n">StressTransfer</span><span class="p">[</span><span class="n">BC</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Set the friction model and stress transfer model (easy...)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">friction_model</span> <span class="o">=</span> <span class="n">friction_model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">state_evolution</span> <span class="o">=</span> <span class="n">state_evolution</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stress_transfer</span> <span class="o">=</span> <span class="n">block_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stress_transfer</span> <span class="o">=</span> <span class="n">stress_transfer</span>
+
+        <span class="n">state_obj</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span>
+            <span class="n">keys</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">state_evolution</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+            <span class="n">vals</span><span class="o">=-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state_evolution</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">Variables</span><span class="p">(</span>
+            <span class="n">mu</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">state</span><span class="o">=</span><span class="n">state_obj</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">variables</span>
+
+        <span class="c1"># Compile a function that calls each provided state_evolution item and</span>
+        <span class="c1"># stacks the results in an array. This way, the &quot;state&quot; can host</span>
+        <span class="c1"># an arbitrary number of variables (porosity, temperature, slip, ...)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_evolution</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_jit</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">v</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">constants</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">fi</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">constants</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">fi</span> <span class="ow">in</span> <span class="n">state_evolution</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">pass</span>
+
+<div class="viewcode-block" id="Forward.inspect">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.Forward.inspect">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inspect</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="o">...</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_accessed_attrs</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Helper routine to automatically extract the variable names&quot;&quot;&quot;</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">func</span><span class="p">))</span>
+            <span class="n">accessed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="k">class</span><span class="w"> </span><span class="nc">Visitor</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">NodeVisitor</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">visit_Attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">arg_name</span><span class="p">:</span>
+                        <span class="n">accessed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+            <span class="n">Visitor</span><span class="p">()</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">accessed</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="p">(</span><span class="n">fn</span><span class="p">,)</span>
+
+        <span class="n">accessed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">fn_i</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">:</span>
+            <span class="n">accessed</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_accessed_attrs</span><span class="p">(</span><span class="n">fn_i</span><span class="p">,</span> <span class="s2">&quot;variables&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="s2">&quot;mu&quot;</span> <span class="ow">in</span> <span class="n">accessed</span><span class="p">:</span>
+            <span class="n">accessed</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Auto-detected the following state variable names:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">accessed</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Forward.set_initial_values">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.Forward.set_initial_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Change this shit back it doesn&#39;t work and breaks everything</span>
+        <span class="n">scalars</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">set_values</span><span class="p">(</span><span class="o">**</span><span class="n">scalars</span><span class="p">)</span></div>
+
 
     <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">t</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span>
         <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
         <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
-        <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
+        <span class="n">block_constants</span><span class="p">:</span> <span class="n">BC</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variables</span><span class="p">:</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">friction_model</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">)</span>
+        <span class="c1"># Calculate v and its partial derivatives with respect to</span>
+        <span class="c1"># the variables (mu, state1, state2, ...)</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">v_derivs</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_value_and_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">friction_model</span><span class="p">)(</span>
+            <span class="n">variables</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">friction_constants</span>
+        <span class="p">)</span>
+        <span class="c1"># Rate of change of state variables</span>
         <span class="n">dstate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_evolution</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">friction_constants</span><span class="p">)</span>
-        <span class="n">dmu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_transfer</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">block_constants</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">dmu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">dstate</span><span class="p">)</span></div>
+        <span class="c1"># Rate of change of mu (stress transfer)</span>
+        <span class="n">dmu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_transfer</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">v_derivs</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">dstate</span><span class="p">,</span> <span class="n">block_constants</span><span class="p">)</span>
+        <span class="c1"># Create a new state container for dstate</span>
+        <span class="n">state_obj</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">dstate</span><span class="p">)</span>
+        <span class="c1"># Create a new variables container</span>
+        <span class="k">return</span> <span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">dmu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state_obj</span><span class="p">)</span></div>
 
 </pre></div>
 

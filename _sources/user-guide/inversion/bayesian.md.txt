@@ -9,7 +9,7 @@ For those new to Bayesian statistics: $p\left(a|b \right)$ is read as "the proba
 
 ## Gradients of the posterior
 
-In practice, most Bayesian inversion methods sample the logaritm of $p$, hence Eq. {eq}`eq:Bayes` becomes:
+In practice, most Bayesian inversion methods sample the logarithm of $p$, hence Eq. {eq}`eq:Bayes` becomes:
 ```{math}
 :label: eq:logBayes
 \ln p\left(\mathcal{P} | \mu_{obs} \right) \propto \ln p\left(\mu_{obs} | \mathcal{P} \right) + \ln p\left(\mathcal{P}\right)
@@ -36,7 +36,7 @@ By doing gradient descent on $-\partial \ln p\left(\mu_{obs} | \mathcal{P} \righ
 
 ## Stein Variational Inference
 
-Stein Variational Inference (SVI) through _Stein Variational Gradient Descent_{footcite}`liu2016` is a particle-swarm optimisation method in which each particle represents one sample from the posterior distribution. The particles can move around in a space with the same number of dimensions as the number of invertible parameters. They are attracted towards the maximum in the likelihood and the prior propabilities (through gradient descent on the negative log-likelihood and log-prior, see Eq. {eq}`eq:grad_log_Gaussian`), and they repel one another based on their mutual distance. Eventually the particle swarm will find an equilibrium, after which the particle positions are fixed. This final distribution of the particles approximates the posterior distribution.
+Stein Variational Inference (SVI) through _Stein Variational Gradient Descent_{footcite}`liu2016` is a particle-swarm optimisation method in which each particle represents one sample from the posterior distribution. The particles can move around in a space with the same number of dimensions as the number of invertible parameters. They are attracted towards the maximum in the likelihood and the prior probabilities (through gradient descent on the negative log-likelihood and log-prior, see Eq. {eq}`eq:grad_log_Gaussian`), and they repel one another based on their mutual distance. Eventually the particle swarm will find an equilibrium, after which the particle positions are fixed. This final distribution of the particles approximates the posterior distribution.
 
 To get a statistically significant sample of the posterior distribution, we need $N \gg 1$ particles, which scales with the number of invertible parameters. For an inversion of a classical rate-and-state friction model with 3 parameters, a sample size of $N = 1000$ is a good starting point. And thanks to the `jax.vmap` functionality we can run $N$ forward simulations in parallel on a GPU, so that doing the inversion with $N=100$ is not necessarily much faster than with $N=1000$.
 

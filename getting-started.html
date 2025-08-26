@@ -363,7 +363,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <span class="n">y</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="mf">10.5</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The container items can then be accessed through <code class="docutils literal notranslate"><span class="pre">y.mu</span></code> and <code class="docutils literal notranslate"><span class="pre">y.state</span></code>. If you’we used Python’s <code class="docutils literal notranslate"><span class="pre">namedtuple</span></code> collection before then this should feel familiar. Invertible parameters and constants are declared in a similar way:</p>
+<p>The container items can then be accessed through <code class="docutils literal notranslate"><span class="pre">y.mu</span></code> and <code class="docutils literal notranslate"><span class="pre">y.state</span></code>. If you’ve used Python’s <code class="docutils literal notranslate"><span class="pre">namedtuple</span></code> collection before then this should feel familiar. Invertible parameters and constants are declared in a similar way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># RSF parameters</span>
 <span class="n">params</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">RSFParams</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">Dc</span><span class="o">=</span><span class="n">Dc</span><span class="p">)</span>
 <span class="c1"># RSF constants</span>
@@ -377,7 +377,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <h3>Forward models<a class="headerlink" href="#forward-models" title="Link to this heading">#</a></h3>
 <p>The physics that underlies your experiment is encoded by a <em>forward model</em>. A DiaBayes <code class="docutils literal notranslate"><span class="pre">Forward</span></code> model is composed of three components:</p>
 <ol class="arabic simple">
-<li><p>A friction law, which is an equation that takes the friction and “state” as an input, and returns the instanteneous slip rate as an output, i.e. <span class="math notranslate nohighlight">\(v(t) = f(\mu(t), \theta(t))\)</span>.</p></li>
+<li><p>A friction law, which is an equation that takes the friction and “state” as an input, and returns the instantaneous slip rate as an output, i.e. <span class="math notranslate nohighlight">\(v(t) = f(\mu(t), \theta(t))\)</span>.</p></li>
 <li><p>A state evolution law, which returns the time derivative of the “state” variable.</p></li>
 <li><p>A stress transfer model, which describes how the local slip rate results in a change in shear stress on the fault interface.</p></li>
 </ol>
