@@ -5,7 +5,7 @@ import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
-from diabayes.typedefs import Variables
+from diabayes.typedefs import Variables, _Params
 
 ParticleArray = Float[Array, "N M"]
 GradientArray: TypeAlias = ParticleArray
@@ -83,19 +83,15 @@ def compute_phi(
 
 @eqx.filter_value_and_grad
 def _log_likelihood(
-    log_params: Float[Array, "..."],
+    log_params: _Params,
     mu_obs: Float[Array, "Nt"],
     noise_std: Float,
-    v0: Float,
-    forward_fn: Callable[[Float[Array, "2"], Float[Array, "..."]], Variables],
+    forward_fn: Callable[[_Params], Variables],
 ) -> Float:
     # Transform the log_params by taking exponential
-    params = jnp.exp(log_params)
-    # Get initial values
-    # TODO: replace with `get_steady_state` or something
-    y0 = jnp.array([mu_obs[0], params[2] / v0])
+    params = type(log_params).from_array(jnp.exp(log_params.to_array()))
     # Forward pass to get friction curve
-    mu_hat = forward_fn(y0, params).mu
+    mu_hat = forward_fn(params).mu
     # Log-likelihood of residuals
     p = -(jnp.square(mu_obs - mu_hat).mean() / (2 * noise_std**2))
     return p
@@ -107,5 +103,5 @@ decorated with eqx.filter_value_and_grad, it returns the log-
 likelihood and its gradient (hence it needs 2 values for the out_axes).
 """
 mapped_log_likelihood = jax.vmap(
-    _log_likelihood, in_axes=(0, None, None, None, None), out_axes=(0, 0)
+    _log_likelihood, in_axes=(0, None, None, None), out_axes=(0, 0)
 )

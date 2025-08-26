@@ -19,7 +19,6 @@ from diabayes.SVI import compute_phi, mapped_log_likelihood
 from diabayes.typedefs import (
     BayesianSolution,
     RSFParams,
-    RSFParticles,
     Variables,
     _BlockConstants,
     _Constants,
@@ -127,8 +126,8 @@ class ODESolver:
     @eqx.filter_jit
     def _forward_wrapper_SVI(
         self,
-        y0: Variables,
         params: _Params,
+        y0: Variables,
         t: Float[Array, "Nt"],
         friction_constants: _Constants,
         block_constants: _BlockConstants,
@@ -243,6 +242,7 @@ class ODESolver:
         t: Float[Array, "Nt"],
         mu: Float[Array, "Nt"],
         noise_std: Float,
+        y0: Variables,
         params: _Params,
         friction_constants: _Constants,
         block_constants: _BlockConstants,
@@ -264,14 +264,16 @@ class ODESolver:
 
         key, split_key = jr.split(key)
 
-        scale = jnp.ones(len(params)) * 0.1
+        Nparams = len(params.__dict__.keys())
+
+        scale = jnp.ones(Nparams) * 0.1
         inv_scale = 1 / (jnp.sqrt(2) * scale)
         log_params = jnp.log(params.to_array())
 
         # Sample particles from a log-normal distribution
-        log_particles = RSFParticles.generate(
+        log_particles = RSFParams.generate(
             N=Nparticles, loc=log_params, scale=scale, key=split_key
-        ).to_array()
+        )
 
         # Instantiate optimiser
         opt = optax.adam(learning_rate=self.learning_rate)
@@ -279,6 +281,7 @@ class ODESolver:
 
         forward_fn = partial(
             self._forward_wrapper_SVI,
+            y0=y0,
             t=t,
             friction_constants=friction_constants,
             block_constants=block_constants,
@@ -287,9 +290,7 @@ class ODESolver:
         @scan_tqdm(Nsteps)
         def body_fun(carry, i):
             params, state = carry
-            loss, gradp = mapped_log_likelihood(
-                params, mu, noise_std, friction_constants.v0, forward_fn
-            )
+            loss, gradp = mapped_log_likelihood(params, mu, noise_std, forward_fn)
             """
             Sometimes the adjoint back-propagation becomes unstable, 
             producing NaNs in the gradients. By setting the NaN-gradients
@@ -298,10 +299,14 @@ class ODESolver:
             likely be stable again and the particle will continue
             to be attracted by the maximum likelihood
             """
-            nan_count = jnp.isnan(gradp).sum() / gradp.shape[1]
-            gradp = jnp.asarray(jnp.where(jnp.isnan(gradp), 0.0, gradp))
-            gradq = -2 * (params - log_params) * inv_scale
-            phi = compute_phi(params, gradp, gradq)
+            params_array = params.to_array().T
+            gradp_array = gradp.to_array().T
+            nans = jnp.isnan(gradp_array)
+            nan_count = nans.sum() / nans.shape[1]
+            gradp_array = jnp.asarray(jnp.where(nans, 0.0, gradp_array))
+            gradq_array = -2 * (params_array - log_params) * inv_scale
+            phi_array = compute_phi(params_array, gradp_array, gradq_array)
+            phi = type(params).from_array(phi_array.T)
             updates, state = opt.update(phi, state, params)
             params = optax.apply_updates(params, updates)
             return (params, state), (loss.mean(), nan_count, params)

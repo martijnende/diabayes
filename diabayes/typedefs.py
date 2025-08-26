@@ -113,10 +113,48 @@ class Variables(eqx.Module):
         return cls(mu=mu, state=state_obj)
 
 
-class RSFParams(eqx.Module):
-    a: Float
-    b: Float
-    Dc: Float
+class Params(eqx.Module):
+
+    def __init__(self, *args, **kwargs):
+        field_names = [f.name for f in dcs.fields(self)]
+        for key, val in zip(field_names, args):
+            kwargs[key] = val
+
+        for key, val in kwargs.items():
+            object.__setattr__(self, key, jnp.asarray(val))
+
+        for name in field_names:
+            if not hasattr(self, name):
+                object.__setattr__(self, name, jnp.asarray(-1.0))
+
+    def __getitem__(self, idx):
+        x = dict((key.name, getattr(self, key.name)[idx]) for key in dcs.fields(self))
+        return type(self)(**x)
+
+    def __len__(self):
+        key = dcs.fields(self)[0].name
+        return len(getattr(self, key))
+
+    def to_array(self):
+        return jnp.squeeze(jnp.array(jax.tree_util.tree_flatten(self)[0]))
+
+    @classmethod
+    def from_array(cls, x):
+        return cls(*x)
+
+    @classmethod
+    def generate(
+        cls, N: int, loc: Float[Array, "M"], scale: Float[Array, "M"], key: jax.Array
+    ):
+        assert len(loc) == len(scale)
+        x = jr.normal(key, shape=(N, len(loc))) * scale + loc
+        return cls.from_array(x.T)
+
+
+class RSFParams(Params):
+    a: Float[Array, "..."]
+    b: Float[Array, "..."]
+    Dc: Float[Array, "..."]
 
 
 @dcs.dataclass(frozen=True)
@@ -125,7 +163,7 @@ class RSFConstants:
     mu0: Float
 
 
-class CNSParams(eqx.Module):
+class CNSParams(Params):
     phi_c: Float
     Z: Float
 
@@ -184,72 +222,6 @@ class StressTransfer(Protocol[BC]):
         constants: BC,
     ) -> Float: ...
 
-
-"""
---------------
-SVI containers
---------------
-"""
-
-
-@tree_util.register_pytree_node_class
-@dcs.dataclass(frozen=True)
-class Particles:
-
-    _particles: Union[Tuple[RSFParams, ...], Tuple[CNSParams, ...]]
-
-    def __getitem__(self, idx):
-        # Check if the requested selection is of the kind `x[1, 3]`
-        if isinstance(idx, tuple):
-            assert (
-                len(idx) == 2
-            ), "Particles do not support item selection with more than 2 indices"
-            i, j = idx
-            return self._particles[i].to_array()[j]
-        # Else the selection is of the kind `x[4]`
-        return self._particles[idx]
-
-    def __iter__(self):
-        return iter(self._particles)
-
-    def __len__(self):
-        return len(self._particles)
-
-    @classmethod
-    def tree_unflatten(cls, aux_data, children):
-        raise NotImplementedError
-
-    @classmethod
-    def from_array(cls, x: Iterable):
-        return cls.tree_unflatten(None, x)
-
-    def tree_flatten(self):
-        return self._particles, None
-
-    def to_array(self):
-        return jnp.array([p.tree_flatten()[0] for p in self._particles])
-
-    @classmethod
-    def generate(
-        cls, N: int, loc: Float[Array, "M"], scale: Float[Array, "M"], key: jax.Array
-    ):
-        assert len(loc) == len(scale)
-        x = jr.normal(key, shape=(N, len(loc))) * scale[None] + loc[None]
-        return cls.from_array(x)
-
-
-@tree_util.register_pytree_node_class
-@dcs.dataclass(frozen=True)
-class RSFParticles(Particles):
-
-    @classmethod
-    def tree_unflatten(cls, aux_data, children):
-        x = tuple(RSFParams(*child) for child in children)
-        return cls(x)
-
-
-# Alias gradients for semantic clarity
-Gradients: TypeAlias = Particles
 
 """
 -----------------
@@ -317,10 +289,11 @@ class BayesianSolution:
 
     def __init__(
         self,
-        chains: Chains,
+        x: Params,
         log_likelihood: Float[Array, "Nsteps"],
         nan_count: Float[Array, "Nsteps"],
     ):
+        chains = x.to_array().transpose(1, 2, 0)
         self.chains = jnp.exp(chains)
         self.final_state = jnp.exp(chains[-1])
         self.log_likelihood = log_likelihood
