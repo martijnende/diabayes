@@ -132,8 +132,6 @@ class ODESolver:
         friction_constants: _Constants,
         block_constants: _BlockConstants,
     ) -> Variables:
-        # TODO: previously y0 and params were arrays, not
-        # PyTrees. Does this logic still work?
         result = self._solve_forward(
             t=t,
             y0=y0,
@@ -277,7 +275,7 @@ class ODESolver:
 
         # Instantiate optimiser
         opt = optax.adam(learning_rate=self.learning_rate)
-        opt_state = opt.init(log_particles)
+        opt_state = opt.init(log_particles)  # type:ignore
 
         forward_fn = partial(
             self._forward_wrapper_SVI,

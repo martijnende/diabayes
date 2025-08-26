@@ -1,6 +1,6 @@
 import jax.numpy as jnp
 
-from diabayes.typedefs import RSFParams, RSFParticles, StateDict, Variables
+from diabayes.typedefs import RSFParams, StateDict, Variables
 
 
 class TestTypedefs:

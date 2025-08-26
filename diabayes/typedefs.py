@@ -282,6 +282,7 @@ class CNSStatistics(ParamStatistics):
 @dcs.dataclass
 class BayesianSolution:
 
+    log_params: _Params
     chains: Chains
     log_likelihood: Float[Array, "Nsteps"]
     nan_count: Float[Array, "Nsteps"]
@@ -289,15 +290,17 @@ class BayesianSolution:
 
     def __init__(
         self,
-        x: Params,
+        log_params: _Params,
         log_likelihood: Float[Array, "Nsteps"],
         nan_count: Float[Array, "Nsteps"],
     ):
-        chains = x.to_array().transpose(1, 2, 0)
+        self.log_params = log_params
+        chains = log_params.to_array().transpose(1, 2, 0)
         self.chains = jnp.exp(chains)
         self.final_state = jnp.exp(chains[-1])
         self.log_likelihood = log_likelihood
         self.nan_count = nan_count
+        # TODO: need to generalise this...
         self.statistics = RSFStatistics.from_state(self.final_state)
 
     def plot_convergence(self):
@@ -421,9 +424,11 @@ class BayesianSolution:
             key = rng
 
         key, split_key = jr.split(key)
-        samples = jr.choice(split_key, self.final_state, shape=(nsamples,), axis=0)
+        inds = jr.choice(split_key, jnp.arange(self.chains.shape[1]), shape=(nsamples,))
+        log_samples = self.log_params[-1][inds]
+        samples = type(log_samples)(*jnp.exp(log_samples.to_array()))
 
         sample_results = jax.vmap(
-            solver._forward_wrapper_SVI, in_axes=(None, 0, None, None, None), out_axes=0
-        )(y0.to_array(), samples, t, friction_constants, block_constants)
+            solver._forward_wrapper_SVI, in_axes=(0, None, None, None, None), out_axes=0
+        )(samples, y0, t, friction_constants, block_constants)
         return samples, sample_results

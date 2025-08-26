@@ -91,7 +91,7 @@ def _log_likelihood(
     # Transform the log_params by taking exponential
     params = type(log_params).from_array(jnp.exp(log_params.to_array()))
     # Forward pass to get friction curve
-    mu_hat = forward_fn(params).mu
+    mu_hat = jnp.squeeze(forward_fn(params).mu)
     # Log-likelihood of residuals
     p = -(jnp.square(mu_obs - mu_hat).mean() / (2 * noise_std**2))
     return p

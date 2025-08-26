@@ -20,7 +20,7 @@ def init_params():
     state_obj = StateDict(keys=("theta",), vals=jnp.atleast_1d(theta0))
 
     variables = db.Variables(mu=jnp.atleast_1d(mu0), state=state_obj)
-    params = db.RSFParams(*jnp.array([a, b, Dc])[:, None])
+    params = db.RSFParams(a=a, b=b, Dc=Dc)
     constants = db.RSFConstants(v0=v0, mu0=mu0)
     block_constants = db.SpringBlockConstants(k=k, v_lp=v1)
 
