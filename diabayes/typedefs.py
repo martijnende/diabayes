@@ -152,9 +152,9 @@ class Params(eqx.Module):
 
 
 class RSFParams(Params):
-    a: Float[Array, "..."]
-    b: Float[Array, "..."]
-    Dc: Float[Array, "..."]
+    a: Union[Float, Float[Array, "..."]]
+    b: Union[Float, Float[Array, "..."]]
+    Dc: Union[Float, Float[Array, "..."]]
 
 
 @dcs.dataclass(frozen=True)

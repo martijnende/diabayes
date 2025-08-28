@@ -69,7 +69,7 @@ Concretely, if one wants to perform a Bayesian inversion of the forward model pa
 ```python
 bayesian_result = solver.bayesian_inversion(
     t=t, mu=mu_measured, noise_std=noise_std,
-    params=params_init, friction_constants=constants, 
+    y0, params=params_init, friction_constants=constants, 
     block_constants=block_constants, 
     Nparticles=1500, Nsteps=100, rng=42
 )

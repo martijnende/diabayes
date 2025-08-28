@@ -53,9 +53,7 @@ To the forward model is completed with the somewhat trivial expression for the p
 \dot{x} = v(\mu, \theta, \dots) \quad \text{(friction law)}
 \end{cases}
 ```
-Correspondingly, the solution vector gains an extra component, $\vec{X}(t) = \left[ \mu(t), \theta(t), x(t) \right]^\intercal$.
-
-In order for a friction model to be compatible with an inertial spring-block, it must implement a `_partials` method to compute the partial derivatives of $v$ with respect to the relevant variables. This method takes as an argument the vector $\vec{X}$ and returns $\partial v / \partial \mu$ and the sum of the remaining partial derivative terms ($(\partial v / \partial \theta) \dot{\theta} + \dots$). If a `_partials` method is absent, a `NotImplementedError` exception will be raised upon instantiating `diabayes.forward_models.Forward`.
+Correspondingly, the solution vector gains an extra component, $\vec{X}(t) = \left[ \mu(t), \theta(t), x(t) \right]^\intercal$. Also notice that the invertial spring-block requires the partial derivatives of $\partial v$ with respect to $\mu$ and the various state variables. These are computed automatically through the JAX's automatic differentiation routines, and so they do not need to be implemented in analytical form by the user. This is especially helpful if the friction law does not have a convenient explicit derivative (e.g. a Neural Network, or a conditional switch).
 
 The inertial spring-block model is available through `diabayes.forward_models.inertial_springblock`.
 
