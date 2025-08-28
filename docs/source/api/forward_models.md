@@ -11,6 +11,7 @@
    Forward
 ```
 
+
 ## Friction laws
 
 ```{eval-rst}
@@ -27,6 +28,7 @@
    :toctree: ../_autosummary
 
    ageing_law
+   aging_law
    slip_rate
 ```
 
@@ -37,5 +39,5 @@
    :toctree: ../_autosummary
 
    springblock
-   intertial_springblock
+   inertial_springblock
 ```

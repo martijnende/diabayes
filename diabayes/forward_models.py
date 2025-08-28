@@ -24,7 +24,7 @@ BC = TypeVar("BC", bound=_BlockConstants)
 @eqx.filter_jit
 def rsf(variables: Variables, params: RSFParams, constants: RSFConstants) -> Float:
     r"""
-    The classical rate-and-state friction law, given by:
+    The classical rate-and-state friction law
 
     .. math::
 
@@ -33,16 +33,16 @@ def rsf(variables: Variables, params: RSFParams, constants: RSFConstants) -> Flo
     Parameters
     ----------
     variables : Variables
-        The friction coefficient `mu` and state parameter `theta`
+        The friction coefficient ``mu`` and state parameter ``theta``
     params : RSFParams
-        The rate-and-state parameters `a`, `b`, and `D_c`
+        The rate-and-state parameters ``a``, ``b``, and ``D_c``
     constants : RSFConstants
-        The constant parameters `mu0` and `v0`
+        The constant parameters ``mu0`` and ``v0``
 
     Returns
     -------
     v : Float
-        The instantaneous slip rate in the same units as `v0`
+        The instantaneous slip rate in the same units as ``v0``
     """
     Omega = params.b * jnp.log(variables.theta * constants.v0 / params.Dc)
     v = constants.v0 * jnp.exp((variables.mu - constants.mu0 - Omega) / params.a)
@@ -54,7 +54,7 @@ def ageing_law(
     v: Float, variables: Variables, params: RSFParams, constants: RSFConstants
 ) -> Float:
     r"""
-    The conventional ageing law state evolution formulation:
+    The conventional ageing law state evolution formulation
 
     .. math::
 
@@ -65,18 +65,26 @@ def ageing_law(
     v : Float
         Instantaneous fault slip rate [m/s].
     variables : Variables
-        The friction coefficient `mu` and state parameter `theta`
+        The friction coefficient ``mu`` and state parameter ``theta``
     params : RSFParams
-        The rate-and-state parameters `a`, `b`, and `D_c`
+        The rate-and-state parameters, including ``D_c``
     constants : RSFConstants
-        The constant parameters `mu0` and `v0`
+        The constant parameters ``mu0`` and ``v0`` (not used)
 
     Returns
     -------
     dtheta : Float
-        The rate of change of the state variable `theta` [s/s]
+        The rate of change of the state variable [s/s]
     """
     return 1 - v * variables.theta / params.Dc
+
+
+@eqx.filter_jit
+def aging_law(*args, **kwargs):
+    """
+    Alias for the ``ageing_law`` function
+    """
+    return ageing_law(*args, **kwargs)
 
 
 @eqx.filter_jit
@@ -85,6 +93,26 @@ def slip_rate(
 ) -> Float:
     r"""
     Evolve slip from slip rate
+
+    .. math::
+
+        \frac{\mathrm{d} x}{\mathrm{d} t} = v
+
+    Parameters
+    ----------
+    v : Float
+        Instantaneous fault slip rate [m/s]
+    variables : Variables
+        The friction coefficient ``mu`` and state parameter ``theta`` (not used)
+    params : RSFParams
+        The rate-and-state parameters (not used)
+    constants : RSFConstants
+        The constant parameters ``mu0`` and ``v0`` (not used)
+
+    Returns
+    -------
+    v : Float
+        The rate of change of slip [m/s]
     """
     return v
 
@@ -99,7 +127,7 @@ def springblock(
     constants: SpringBlockConstants,
 ) -> Float:
     r"""
-    A conventional (non-inertial) spring-block loading formulation:
+    A conventional (non-inertial) spring-block loading formulation
 
     .. math::
 
@@ -110,16 +138,16 @@ def springblock(
     v : Float
         Instantaneous fault slip rate [m/s].
     variables : Variables
-        The friction coefficient `mu` and state parameter `theta`. This argument
-        is not used, but included for call signature consistency.
+        The instantaneous variables. This argument is not used,
+        but included for call signature consistency.
     constants : SpringBlockConstants
-        The constant parameters stiffness `k` (units of "friction per metre")
-        and load-point velocity `v_lp` (same units as `v`).
+        The constant parameters stiffness ``k`` (units of "friction per metre")
+        and load-point velocity ``v_lp`` (same units as ``v``).
 
     Returns
     -------
     dmu : Float
-        The rate of change of the friction coefficient `mu` [1/s]
+        The rate of change of the friction coefficient [1/s]
     """
     return constants.k * (constants.v_lp - v)
 
@@ -134,7 +162,48 @@ def inertial_springblock(
     constants: InertialSpringBlockConstants,
 ) -> Float:
     r"""
-    An inertial spring-block loading formulation:
+    An inertial spring-block loading formulation
+
+    .. math::
+        \frac{\mathrm{d} \mu}{\mathrm{d} t} = \left[ \frac{\partial v}{\partial \mu} \right]^{-1} \left( \frac{1}{M} \left[ k \left( v_{lp} t - x \right) - \mu \right] - \frac{\partial v}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} t} - \dots \right)
+
+    The acceleration term in the classical inertial spring-block formulation
+    is decomposed into its partial derivatives, avoiding the need for solving
+    a second-order ODE. These partial derivatives (``v_partials``) are computed
+    using the JAX autodiff framework.
+
+    Notes
+    -----
+    This formulation is rather stiff, and for certain parameter values could
+    lead to extremely small time steps necessary to maintain numerical
+    accuracy. It is recommended to use a conventional (non-inenrtial)
+    ``springblock`` formulation for basic velocity-steps and slide-hold-slide
+    simuilations. Inertia is only really needed for stick-slip simulations.
+
+    Parameters
+    ----------
+    t : Float
+        Current value of time [s]
+    v : Float
+        Instantaneous fault slip rate [m/s]
+    v_partials : Variables
+        The partial derivatives of slip rate to the relevant variables
+        (friction and state variables)
+    variables: Variables
+        The instantaneous values of the variables: friction (``mu``),
+        slip (``slip``), and other state variables (not used)
+    dstate : Array
+        The time derivatives of the state variables. The radiation term
+        is ``v_partials @ dstate`` (excluding ``mu``)
+    constants : InertialSpringBlockConstants
+        The spring-block constants containing the mass term ``M``, the
+        stiffness ``k``, and the load-point velocity ``v_lp``
+
+    Returns
+    -------
+    dmu : Float
+        The rate of change of the friction coefficient [1/s]
+
     """
     mass_term = (
         constants.k * (constants.v_lp * t - variables.slip) - variables.mu
@@ -148,9 +217,9 @@ def inertial_springblock(
 
 class Forward(Generic[BC]):
     r"""
-    The `Forward` class assembles the various components that comprise
-    a forward model, such that `Forward.__call__` takes some variables
-    and returns the rate of change of these variables, i.e.:
+    The ``Forward`` class assembles the various components that comprise
+    a forward model, such that ``Forward.__call__`` takes some variables
+    and returns the rate of change of these variables
 
     .. math::
 
@@ -158,14 +227,13 @@ class Forward(Generic[BC]):
 
     This forward ODE can then be solved by any ODE solver.
 
-    The `Forward` class is instantiated by providing a friction model
-    (of type `FrictionModel`), a "state" evolution law (of type `StateEvolution`),
-    and a stress transfer model.
+    The ``Forward`` class is instantiated by providing a friction model,
+    a "state" evolution law, and a stress transfer model.
 
     Examples
     --------
     >>> from diabayes.forward_models import ageing_law, rsf, springblock, Forward
-    >>> foward_model = Forward(rsf, ageing_law, springblock)
+    >>> foward_model = Forward(rsf, {"theta": ageing_law}, springblock)
     >>> X_dot = forward_model(variables=..., params=..., friction_constants=..., block_constants=...)
     """
 
@@ -201,42 +269,17 @@ class Forward(Generic[BC]):
         )
         pass
 
-    @staticmethod
-    def inspect(fn: Union[Callable, Tuple[Callable, ...]]) -> None:
-
-        import ast
-        import inspect
-
-        def get_accessed_attrs(func, arg_name):
-            """Helper routine to automatically extract the variable names"""
-            tree = ast.parse(inspect.getsource(func))
-            accessed = set()
-
-            class Visitor(ast.NodeVisitor):
-                def visit_Attribute(self, node: ast.Attribute):
-                    if isinstance(node.value, ast.Name) and node.value.id == arg_name:
-                        accessed.add(node.attr)
-                    self.generic_visit(node)
-
-            Visitor().visit(tree)
-            return accessed
-
-        if not isinstance(fn, Iterable):
-            fn = (fn,)
-
-        accessed = set()
-
-        for fn_i in fn:
-            accessed.update(get_accessed_attrs(fn_i, "variables"))
-
-        if "mu" in accessed:
-            accessed.remove("mu")
-
-        print("Auto-detected the following state variable names:")
-        print(accessed)
-
     def set_initial_values(self, **kwargs) -> None:
-        # Change this shit back it doesn't work and breaks everything
+        """
+        Set the initial values of the ``variables``. This sets the
+        values as ``self.variables``, which is a ``Variables`` object.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Key-value pairs of variable names and corresponding values
+
+        """
         scalars = {k: float(jnp.asarray(v).item()) for k, v in kwargs.items()}
         self.variables = self.variables.set_values(**scalars)
 
@@ -249,6 +292,29 @@ class Forward(Generic[BC]):
         friction_constants: _Constants,
         block_constants: BC,
     ) -> Variables:
+        """
+        Calculate the rate of change of the variables, defining the ODE
+        to be solved.
+
+        Parameters
+        ----------
+        t : Float
+            Current value of time [s]
+        variables : diabayes.Variables
+            The instantaneous values of the variables for which the time
+            derivative will be computed
+        params : _Params
+            The forward model (invertible) parameters
+        friction_constants : _Constants
+            The forward model constants
+        block_constants : _BlockConstants
+            The constants associated with the stress transfer
+
+        Returns
+        -------
+        dvars : Variables
+            The instantaneous rate of change of the ``variables``
+        """
         # Calculate v and its partial derivatives with respect to
         # the variables (mu, state1, state2, ...)
         v, v_derivs = eqx.filter_value_and_grad(self.friction_model)(
@@ -262,3 +328,6 @@ class Forward(Generic[BC]):
         state_obj = StateDict(variables.state.keys, dstate)
         # Create a new variables container
         return Variables(mu=dmu, state=state_obj)
+
+    # Alias for documentation
+    call = __call__
