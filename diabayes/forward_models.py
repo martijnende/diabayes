@@ -83,6 +83,9 @@ def ageing_law(
 def slip_rate(
     v: Float, variables: Variables, params: RSFParams, constants: RSFConstants
 ) -> Float:
+    r"""
+    Evolve slip from slip rate
+    """
     return v
 
 
