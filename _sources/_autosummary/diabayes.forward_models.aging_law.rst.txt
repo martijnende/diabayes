@@ -1,0 +1,6 @@
+﻿diabayes.forward\_models.aging\_law
+===================================
+
+.. currentmodule:: diabayes.forward_models
+
+.. autofunction:: aging_law

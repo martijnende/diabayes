@@ -151,6 +151,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../community.html">
     DiaBayes Community
   </a>
@@ -239,6 +246,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../user-guide/index.html">
     User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
   </a>
 </li>
 
@@ -382,50 +396,76 @@ shape as <cite>x</cite> and <cite>gradp, gradq</cite>.</p>
 <dt class="sig sig-object py" id="diabayes.forward_models.Forward">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">Forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">friction_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.FrictionModel" title="diabayes.typedefs.FrictionModel"><span class="pre">FrictionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_evolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress_transfer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.StressTransfer" title="diabayes.typedefs.StressTransfer"><span class="pre">StressTransfer</span></a><span class="p"><span class="pre">[</span></span><span class="pre">BC</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/forward_models.html#Forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.Forward" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">BC</span></code>]</p>
-<p>The <cite>Forward</cite> class assembles the various components that comprise
-a forward model, such that <cite>Forward.__call__</cite> takes some variables
-and returns the rate of change of these variables, i.e.:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Forward</span></code> class assembles the various components that comprise
+a forward model, such that <code class="docutils literal notranslate"><span class="pre">Forward.__call__</span></code> takes some variables
+and returns the rate of change of these variables</p>
 <div class="math notranslate nohighlight">
 \[\frac{\mathrm{d} \vec{X}}{\mathrm{d}t} = f \left( \vec{X} \right)\]</div>
 <p>This forward ODE can then be solved by any ODE solver.</p>
-<p>The <cite>Forward</cite> class is instantiated by providing a friction model
-(of type <cite>FrictionModel</cite>), a “state” evolution law (of type <cite>StateEvolution</cite>),
-and a stress transfer model.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Forward</span></code> class is instantiated by providing a friction model,
+a “state” evolution law, and a stress transfer model.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.forward_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ageing_law</span><span class="p">,</span> <span class="n">rsf</span><span class="p">,</span> <span class="n">springblock</span><span class="p">,</span> <span class="n">Forward</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">foward_model</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">(</span><span class="n">rsf</span><span class="p">,</span> <span class="n">ageing_law</span><span class="p">,</span> <span class="n">springblock</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">foward_model</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">(</span><span class="n">rsf</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="n">ageing_law</span><span class="p">},</span> <span class="n">springblock</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X_dot</span> <span class="o">=</span> <span class="n">forward_model</span><span class="p">(</span><span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">params</span><span class="o">=...</span><span class="p">,</span> <span class="n">friction_constants</span><span class="o">=...</span><span class="p">,</span> <span class="n">block_constants</span><span class="o">=...</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="diabayes.forward_models.Forward.inspect">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inspect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#Forward.inspect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.Forward.inspect" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="diabayes.forward_models.Forward.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BC</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></span><a class="headerlink" href="#diabayes.forward_models.Forward.call" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the rate of change of the variables, defining the ODE
+to be solved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Float</em>) – Current value of time [s]</p></li>
+<li><p><strong>variables</strong> (<em>diabayes.Variables</em>) – The instantaneous values of the variables for which the time
+derivative will be computed</p></li>
+<li><p><strong>params</strong> (<em>_Params</em>) – The forward model (invertible) parameters</p></li>
+<li><p><strong>friction_constants</strong> (<em>_Constants</em>) – The forward model constants</p></li>
+<li><p><strong>block_constants</strong> (<em>_BlockConstants</em>) – The constants associated with the stress transfer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dvars</strong> – The instantaneous rate of change of the <code class="docutils literal notranslate"><span class="pre">variables</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables">Variables</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.forward_models.Forward.set_initial_values">
 <span class="sig-name descname"><span class="pre">set_initial_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#Forward.set_initial_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.Forward.set_initial_values" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Set the initial values of the <code class="docutils literal notranslate"><span class="pre">variables</span></code>. This sets the
+values as <code class="docutils literal notranslate"><span class="pre">self.variables</span></code>, which is a <code class="docutils literal notranslate"><span class="pre">Variables</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Key-value pairs of variable names and corresponding values</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="diabayes.forward_models.ageing_law">
 <span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">ageing_law</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#ageing_law"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.ageing_law" title="Link to this definition">#</a></dt>
-<dd><p>The conventional ageing law state evolution formulation:</p>
+<dd><p>The conventional ageing law state evolution formulation</p>
 <div class="math notranslate nohighlight">
 \[\frac{\mathrm{d}\theta}{\mathrm{d}t} = 1 - \frac{v \theta}{D_c}\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>v</strong> (<em>Float</em>) – Instantaneous fault slip rate [m/s].</p></li>
-<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <cite>mu</cite> and state parameter <cite>theta</cite></p></li>
-<li><p><strong>params</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><em>RSFParams</em></a>) – The rate-and-state parameters <cite>a</cite>, <cite>b</cite>, and <cite>D_c</cite></p></li>
-<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><em>RSFConstants</em></a>) – The constant parameters <cite>mu0</cite> and <cite>v0</cite></p></li>
+<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <code class="docutils literal notranslate"><span class="pre">mu</span></code> and state parameter <code class="docutils literal notranslate"><span class="pre">theta</span></code></p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><em>RSFParams</em></a>) – The rate-and-state parameters, including <code class="docutils literal notranslate"><span class="pre">D_c</span></code></p></li>
+<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><em>RSFConstants</em></a>) – The constant parameters <code class="docutils literal notranslate"><span class="pre">mu0</span></code> and <code class="docutils literal notranslate"><span class="pre">v0</span></code> (not used)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>dtheta</strong> – The rate of change of the state variable <cite>theta</cite> [s/s]</p>
+<dd class="field-even"><p><strong>dtheta</strong> – The rate of change of the state variable [s/s]</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Float</p>
@@ -434,27 +474,67 @@ and a stress transfer model.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="diabayes.forward_models.aging_law">
+<span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">aging_law</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/forward_models.html#aging_law"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.aging_law" title="Link to this definition">#</a></dt>
+<dd><p>Alias for the <code class="docutils literal notranslate"><span class="pre">ageing_law</span></code> function</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="diabayes.forward_models.inertial_springblock">
 <span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">inertial_springblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_partials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#inertial_springblock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.inertial_springblock" title="Link to this definition">#</a></dt>
-<dd><p>An inertial spring-block loading formulation:</p>
+<dd><p>An inertial spring-block loading formulation</p>
+<div class="math notranslate nohighlight">
+\[\frac{\mathrm{d} \mu}{\mathrm{d} t} = \left[ \frac{\partial v}{\partial \mu} \right]^{-1} \left( \frac{1}{M} \left[ k \left( v_{lp} t - x \right) - \mu \right] - \frac{\partial v}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} t} - \dots \right)\]</div>
+<p>The acceleration term in the classical inertial spring-block formulation
+is decomposed into its partial derivatives, avoiding the need for solving
+a second-order ODE. These partial derivatives (<code class="docutils literal notranslate"><span class="pre">v_partials</span></code>) are computed
+using the JAX autodiff framework.</p>
+<p class="rubric">Notes</p>
+<p>This formulation is rather stiff, and for certain parameter values could
+lead to extremely small time steps necessary to maintain numerical
+accuracy. It is recommended to use a conventional (non-inenrtial)
+<code class="docutils literal notranslate"><span class="pre">springblock</span></code> formulation for basic velocity-steps and slide-hold-slide
+simuilations. Inertia is only really needed for stick-slip simulations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Float</em>) – Current value of time [s]</p></li>
+<li><p><strong>v</strong> (<em>Float</em>) – Instantaneous fault slip rate [m/s]</p></li>
+<li><p><strong>v_partials</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The partial derivatives of slip rate to the relevant variables
+(friction and state variables)</p></li>
+<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The instantaneous values of the variables: friction (<code class="docutils literal notranslate"><span class="pre">mu</span></code>),
+slip (<code class="docutils literal notranslate"><span class="pre">slip</span></code>), and other state variables (not used)</p></li>
+<li><p><strong>dstate</strong> (<em>Array</em>) – The time derivatives of the state variables. The radiation term
+is <code class="docutils literal notranslate"><span class="pre">v_partials</span> <span class="pre">&#64;</span> <span class="pre">dstate</span></code> (excluding <code class="docutils literal notranslate"><span class="pre">mu</span></code>)</p></li>
+<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><em>InertialSpringBlockConstants</em></a>) – The spring-block constants containing the mass term <code class="docutils literal notranslate"><span class="pre">M</span></code>, the
+stiffness <code class="docutils literal notranslate"><span class="pre">k</span></code>, and the load-point velocity <code class="docutils literal notranslate"><span class="pre">v_lp</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dmu</strong> – The rate of change of the friction coefficient [1/s]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="diabayes.forward_models.rsf">
 <span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">rsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#rsf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.rsf" title="Link to this definition">#</a></dt>
-<dd><p>The classical rate-and-state friction law, given by:</p>
+<dd><p>The classical rate-and-state friction law</p>
 <div class="math notranslate nohighlight">
 \[v(\mu, \theta) = v_0 \exp \left( \frac{1}{a} \left[ \mu - \mu_0 - b \log \left( \frac{v_0 \theta}{D_c} \right) \right] \right)\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <cite>mu</cite> and state parameter <cite>theta</cite></p></li>
-<li><p><strong>params</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><em>RSFParams</em></a>) – The rate-and-state parameters <cite>a</cite>, <cite>b</cite>, and <cite>D_c</cite></p></li>
-<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><em>RSFConstants</em></a>) – The constant parameters <cite>mu0</cite> and <cite>v0</cite></p></li>
+<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <code class="docutils literal notranslate"><span class="pre">mu</span></code> and state parameter <code class="docutils literal notranslate"><span class="pre">theta</span></code></p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><em>RSFParams</em></a>) – The rate-and-state parameters <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, and <code class="docutils literal notranslate"><span class="pre">D_c</span></code></p></li>
+<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><em>RSFConstants</em></a>) – The constant parameters <code class="docutils literal notranslate"><span class="pre">mu0</span></code> and <code class="docutils literal notranslate"><span class="pre">v0</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>v</strong> – The instantaneous slip rate in the same units as <cite>v0</cite></p>
+<dd class="field-even"><p><strong>v</strong> – The instantaneous slip rate in the same units as <code class="docutils literal notranslate"><span class="pre">v0</span></code></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Float</p>
@@ -465,26 +545,45 @@ and a stress transfer model.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="diabayes.forward_models.slip_rate">
 <span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">slip_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#slip_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.slip_rate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Evolve slip from slip rate</p>
+<div class="math notranslate nohighlight">
+\[\frac{\mathrm{d} x}{\mathrm{d} t} = v\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>Float</em>) – Instantaneous fault slip rate [m/s]</p></li>
+<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <code class="docutils literal notranslate"><span class="pre">mu</span></code> and state parameter <code class="docutils literal notranslate"><span class="pre">theta</span></code> (not used)</p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><em>RSFParams</em></a>) – The rate-and-state parameters (not used)</p></li>
+<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><em>RSFConstants</em></a>) – The constant parameters <code class="docutils literal notranslate"><span class="pre">mu0</span></code> and <code class="docutils literal notranslate"><span class="pre">v0</span></code> (not used)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>v</strong> – The rate of change of slip [m/s]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="diabayes.forward_models.springblock">
 <span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">springblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_partials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#springblock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.springblock" title="Link to this definition">#</a></dt>
-<dd><p>A conventional (non-inertial) spring-block loading formulation:</p>
+<dd><p>A conventional (non-inertial) spring-block loading formulation</p>
 <div class="math notranslate nohighlight">
 \[\frac{\mathrm{d} \mu}{\mathrm{d} t} = k \left ( v_{lp} - v(t) \right)\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>v</strong> (<em>Float</em>) – Instantaneous fault slip rate [m/s].</p></li>
-<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <cite>mu</cite> and state parameter <cite>theta</cite>. This argument
-is not used, but included for call signature consistency.</p></li>
-<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><em>SpringBlockConstants</em></a>) – The constant parameters stiffness <cite>k</cite> (units of “friction per metre”)
-and load-point velocity <cite>v_lp</cite> (same units as <cite>v</cite>).</p></li>
+<li><p><strong>variables</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The instantaneous variables. This argument is not used,
+but included for call signature consistency.</p></li>
+<li><p><strong>constants</strong> (<a class="reference internal" href="#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><em>SpringBlockConstants</em></a>) – The constant parameters stiffness <code class="docutils literal notranslate"><span class="pre">k</span></code> (units of “friction per metre”)
+and load-point velocity <code class="docutils literal notranslate"><span class="pre">v_lp</span></code> (same units as <code class="docutils literal notranslate"><span class="pre">v</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>dmu</strong> – The rate of change of the friction coefficient <cite>mu</cite> [1/s]</p>
+<dd class="field-even"><p><strong>dmu</strong> – The rate of change of the friction coefficient [1/s]</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Float</p>
@@ -767,17 +866,17 @@ wrapped in a <cite>Params</cite> container.</p></li>
 <dd><p>Bases: <a class="reference internal" href="#diabayes.typedefs.Params" title="diabayes.typedefs.Params"><code class="xref py py-class docutils literal notranslate"><span class="pre">Params</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.RSFParams.Dc">
-<span class="sig-name descname"><span class="pre">Dc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.RSFParams.Dc" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Dc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.RSFParams.Dc" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.RSFParams.a">
-<span class="sig-name descname"><span class="pre">a</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.RSFParams.a" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">a</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.RSFParams.a" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.RSFParams.b">
-<span class="sig-name descname"><span class="pre">b</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.RSFParams.b" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">b</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.RSFParams.b" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -982,11 +1081,12 @@ variables, matching the number and order of the <cite>keys</cite> tuple.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-diabayes.forward_models">diabayes.forward_models module</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward"><code class="docutils literal notranslate"><span class="pre">Forward</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward.inspect"><code class="docutils literal notranslate"><span class="pre">Forward.inspect()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward.call"><code class="docutils literal notranslate"><span class="pre">Forward.call()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward.set_initial_values"><code class="docutils literal notranslate"><span class="pre">Forward.set_initial_values()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.ageing_law"><code class="docutils literal notranslate"><span class="pre">ageing_law()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.aging_law"><code class="docutils literal notranslate"><span class="pre">aging_law()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.inertial_springblock"><code class="docutils literal notranslate"><span class="pre">inertial_springblock()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.rsf"><code class="docutils literal notranslate"><span class="pre">rsf()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.slip_rate"><code class="docutils literal notranslate"><span class="pre">slip_rate()</span></code></a></li>

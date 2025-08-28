@@ -8,7 +8,7 @@ Concretely, performing a maximum-likelihood inversion in DiaBayes is fairly stra
 ```python
 inv_result = solver.max_likelihood_inversion(
     t, mu_measured,
-    params=params_guess,
+    y0=y0, params=params_guess,
     friction_constants=constants,
     block_constants=block_constants,
     verbose=True

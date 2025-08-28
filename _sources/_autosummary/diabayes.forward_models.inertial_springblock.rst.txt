@@ -1,0 +1,6 @@
+﻿diabayes.forward\_models.inertial\_springblock
+==============================================
+
+.. currentmodule:: diabayes.forward_models
+
+.. autofunction:: inertial_springblock

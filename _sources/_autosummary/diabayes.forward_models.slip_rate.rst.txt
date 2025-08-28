@@ -1,0 +1,6 @@
+﻿diabayes.forward\_models.slip\_rate
+===================================
+
+.. currentmodule:: diabayes.forward_models
+
+.. autofunction:: slip_rate

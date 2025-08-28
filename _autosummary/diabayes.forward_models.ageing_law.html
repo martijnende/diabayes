@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Rock friction experiments &#8212; DiaBayes  documentation</title>
+    <title>diabayes.forward_models.ageing_law &#8212; DiaBayes  documentation</title>
   
   
   
@@ -55,11 +55,11 @@
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/friction_experiments';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/diabayes.forward_models.ageing_law';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Forward modelling" href="forward/index.html" />
-    <link rel="prev" title="User Guide" href="index.html" />
+    <link rel="next" title="diabayes.forward_models.aging_law" href="diabayes.forward_models.aging_law.html" />
+    <link rel="prev" title="diabayes.forward_models.rsf" href="diabayes.forward_models.rsf.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -145,14 +145,14 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../api/index.html">
     API Reference
   </a>
@@ -245,14 +245,14 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../api/index.html">
     API Reference
   </a>
@@ -293,20 +293,16 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Rock friction experiments</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="forward/index.html">Forward modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="forward/rate-and-state.html">Rate-and-state friction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forward/chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forward/spring-block.html">Spring-blocks</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api/forward_models.html">Forward models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.Forward.html">diabayes.forward_models.Forward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">diabayes.forward_models.ageing_law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.aging_law.html">diabayes.forward_models.aging_law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.slip_rate.html">diabayes.forward_models.slip_rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.springblock.html">diabayes.forward_models.springblock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.inertial_springblock.html">diabayes.forward_models.inertial_springblock</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="inversion/index.html">Inverse modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="inversion/max-likelihood.html">Maximum-likelihood inversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inversion/bayesian.html">Bayesian inversion</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced use cases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="adding_features.html">Adding custom physics</a></li>
 </ul>
 </div>
 </nav></div>
@@ -348,9 +344,12 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    <li class="breadcrumb-item"><a href="../api/index.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Rock friction experiments</span></li>
+    
+    <li class="breadcrumb-item"><a href="../api/forward_models.html" class="nav-link">Forward models</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">diabayes.forward_models.ageing_law</span></li>
   </ul>
 </nav>
 </div>
@@ -367,49 +366,33 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="rock-friction-experiments">
-<h1>Rock friction experiments<a class="headerlink" href="#rock-friction-experiments" title="Link to this heading">#</a></h1>
-<p>This section briefly summarises a few key concepts in rock friction experimentation, which are presumed to be well understood for the remainder of this User Guide.</p>
-<p>First of all, “friction” is a term that is used rather loosely to refer to the shear resistance of a fault interface. While this term suggests purely brittle deformation, it is not necessarily implied that non-brittle processes do not contribute to the observed behaviour. In fact, detailed analyses of microstructure samples and theoretical modelling suggests that “non-brittle” processes (like fluid-rock chemical reactions, or crystal plasticity) play a dominant role in controlling the shear resistance of faults, even at room ambient conditions (see e.g. the <a class="reference internal" href="forward/chen-niemeijer-spiers.html"><span class="doc std std-doc">Chen-Niemeijer-Spiers model</span></a>). Hence, while remaining entirely agnostic to the underlying processes, “friction” in most cases simply refers to the ratio of the shear stress to normal stress. When interpreted in terms of <a class="reference external" href="https://en.wikipedia.org/wiki/Charles-Augustin_de_Coulomb#Contributions_to_earth_pressure_theory">Coulomb mechanics</a>, this informal definition also implies that cohesion is negligible. In other words, assuming the following criterion for fault failure:</p>
-<div class="math notranslate nohighlight" id="equation-eq-coulomb-friction">
-<span class="eqno">(1)<a class="headerlink" href="#equation-eq-coulomb-friction" title="Link to this equation">#</a></span>\[\tau = \mu \sigma_n + C\]</div>
-<p>it is often assumed that the cohesion <span class="math notranslate nohighlight">\(C=0\)</span>, such that the friction coefficient <span class="math notranslate nohighlight">\(\mu = \tau / \sigma_n\)</span>. This is sometimes more precisely referred to as an <em>effective friction coefficient</em> (typically denoted <span class="math notranslate nohighlight">\(\mu'\)</span>). Whether the assumption of <span class="math notranslate nohighlight">\(C=0\)</span> holds true in practice remains to be tested, especially when longer time-scales are considered<a class="footnote-reference brackets" href="#footcite-vandenende2019" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
-<p>What is also not explicit in Eq. <a class="reference internal" href="#equation-eq-coulomb-friction">(1)</a>, but is well-known in the community, is that the friction coefficient <span class="math notranslate nohighlight">\(\mu\)</span> is not a constant; it depends notably on the rate of deformation (sliding) of the fault, temperature, time, fault material, and many other factors. There are several models that predict some of these dependencies (see <a class="reference internal" href="forward/index.html"><span class="doc std std-doc">Forward models</span></a>), known as “friction models”. The friction models are parameterised, and it is the purpose of many friction studies to systematically measure/infer these parameters across a range of experimental conditions. Below, I describe common experimental techniques to study fault “friction”.</p>
-<section id="steady-state-tests">
-<h2>Steady-state tests<a class="headerlink" href="#steady-state-tests" title="Link to this heading">#</a></h2>
-<p>One of the most straightfoward means of investigating the variation of the friction coefficient, is by deforming a laboratory fault until steady-state sliding is achieved. In this context, “steady-state” means no change in the sliding rate of the fault (zero time derivative) as well as no change in the measured shear stress. The resulting value of the (effective) friction coefficient is recorded, and the experiment is repeated under different conditions, e.g. a change in temperature, normal stress, or externally imposed sliding rate.</p>
-<hr class="docutils" />
-<img alt="../_images/steady-state_niemeijer2006_dark.svg" class="only-dark align-center" src="../_images/steady-state_niemeijer2006_dark.svg" />
-<img alt="../_images/steady-state_niemeijer2006_light.svg" class="only-light align-center" src="../_images/steady-state_niemeijer2006_light.svg" />
-<p>(Steady-state friction data of a halite-muscovite gouge mixture, deformed at room temperature and a normal load of 5 MPa. Data from <em>Niemeijer &amp; Spiers</em><a class="footnote-reference brackets" href="#footcite-niemeijer2006" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>)</p>
-<hr class="docutils" />
-<p>One of the most significant observations (also shown in the figure above), is that the steady-state friction coefficient varies systematically with the fault slip rate. Under some conditions, the friction increases with increasing slip rate, a phenomenon that is called <em>velocity-strengthening</em> (because the fault becomes “stronger” with increasing sliding velocity). The converse case is called <em>velocity-weakening</em>. It is widely thought that velocity-weakening is a prerequisite for earthquakes in nature.</p>
+  <section id="diabayes-forward-models-ageing-law">
+<h1>diabayes.forward_models.ageing_law<a class="headerlink" href="#diabayes-forward-models-ageing-law" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="diabayes.forward_models.ageing_law">
+<span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">ageing_law</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#ageing_law"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.ageing_law" title="Link to this definition">#</a></dt>
+<dd><p>The conventional ageing law state evolution formulation</p>
+<div class="math notranslate nohighlight">
+\[\frac{\mathrm{d}\theta}{\mathrm{d}t} = 1 - \frac{v \theta}{D_c}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>Float</em>) – Instantaneous fault slip rate [m/s].</p></li>
+<li><p><strong>variables</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <code class="docutils literal notranslate"><span class="pre">mu</span></code> and state parameter <code class="docutils literal notranslate"><span class="pre">theta</span></code></p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><em>RSFParams</em></a>) – The rate-and-state parameters, including <code class="docutils literal notranslate"><span class="pre">D_c</span></code></p></li>
+<li><p><strong>constants</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><em>RSFConstants</em></a>) – The constant parameters <code class="docutils literal notranslate"><span class="pre">mu0</span></code> and <code class="docutils literal notranslate"><span class="pre">v0</span></code> (not used)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dtheta</strong> – The rate of change of the state variable [s/s]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="velocity-step-tests">
-<h2>Velocity-step tests<a class="headerlink" href="#velocity-step-tests" title="Link to this heading">#</a></h2>
-<p>One remarkable feature of many frictional materials, is that they display a rather curious transient response to an instantaneous step in the external loading velocity. This is most clearly seen in experiments where a fault is driven at a constant rate until steady-state is reached, after which this rate is stepwise increased or decreased. This protocol is called a “velocity-step test”. The study of the transient frictional response induced by a velocity-step has laid the foundation for much of our understanding of fault friction and earthquakes.</p>
-</section>
-<section id="stick-slip-instabilities">
-<h2>Stick-slip instabilities<a class="headerlink" href="#stick-slip-instabilities" title="Link to this heading">#</a></h2>
-</section>
-<section id="slide-hold-slide-tests">
-<h2>Slide-hold-slide tests<a class="headerlink" href="#slide-hold-slide-tests" title="Link to this heading">#</a></h2>
-<p class="rubric">References</p>
-<div class="docutils container" id="id3">
-</div>
-</section>
-</section>
-<hr class="footnotes docutils" />
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="footcite-vandenende2019" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>M. P. A. van den Ende and A. R. Niemeijer. An investigation into the role of time-dependent cohesion in interseismic fault restrengthening. <em>Scientific Reports</em>, 2019. <a class="reference external" href="https://doi.org/10.1038/s41598-019-46241-5">doi:10.1038/s41598-019-46241-5</a>.</p>
-</aside>
-<aside class="footnote brackets" id="footcite-niemeijer2006" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
-<p>A.R. Niemeijer and C.J. Spiers. Velocity dependence of strength and healing behaviour in simulated phyllosilicate-bearing fault gouge. <em>Tectonophysics</em>, 2006. <a class="reference external" href="https://doi.org/10.1016/j.tecto.2006.03.048">doi:10.1016/j.tecto.2006.03.048</a>.</p>
-</aside>
-</aside>
 
 
                 </article>
@@ -422,20 +405,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="diabayes.forward_models.rsf.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">User Guide</p>
+        <p class="prev-next-title">diabayes.forward_models.rsf</p>
       </div>
     </a>
     <a class="right-next"
-       href="forward/index.html"
+       href="diabayes.forward_models.aging_law.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Forward modelling</p>
+        <p class="prev-next-title">diabayes.forward_models.aging_law</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -458,10 +441,7 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#steady-state-tests">Steady-state tests</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#velocity-step-tests">Velocity-step tests</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stick-slip-instabilities">Stick-slip instabilities</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#slide-hold-slide-tests">Slide-hold-slide tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.ageing_law"><code class="docutils literal notranslate"><span class="pre">ageing_law()</span></code></a></li>
 </ul>
   </nav></div>
 

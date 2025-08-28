@@ -1,0 +1,6 @@
+﻿diabayes.forward\_models.rsf
+============================
+
+.. currentmodule:: diabayes.forward_models
+
+.. autofunction:: rsf

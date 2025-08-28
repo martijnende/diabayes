@@ -148,6 +148,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../community.html">
     DiaBayes Community
   </a>
@@ -234,6 +241,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../user-guide/index.html">
     User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
   </a>
 </li>
 
@@ -350,7 +364,7 @@
 <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">rsf</span><span class="p">(</span><span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">RSFParams</span><span class="p">,</span> <span class="n">constants</span><span class="p">:</span> <span class="n">RSFConstants</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The classical rate-and-state friction law, given by:</span>
+<span class="sd">    The classical rate-and-state friction law</span>
 
 <span class="sd">    .. math::</span>
 
@@ -359,16 +373,16 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    variables : Variables</span>
-<span class="sd">        The friction coefficient `mu` and state parameter `theta`</span>
+<span class="sd">        The friction coefficient ``mu`` and state parameter ``theta``</span>
 <span class="sd">    params : RSFParams</span>
-<span class="sd">        The rate-and-state parameters `a`, `b`, and `D_c`</span>
+<span class="sd">        The rate-and-state parameters ``a``, ``b``, and ``D_c``</span>
 <span class="sd">    constants : RSFConstants</span>
-<span class="sd">        The constant parameters `mu0` and `v0`</span>
+<span class="sd">        The constant parameters ``mu0`` and ``v0``</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    v : Float</span>
-<span class="sd">        The instantaneous slip rate in the same units as `v0`</span>
+<span class="sd">        The instantaneous slip rate in the same units as ``v0``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Omega</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">b</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">theta</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">v0</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">Dc</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">v0</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">mu</span> <span class="o">-</span> <span class="n">constants</span><span class="o">.</span><span class="n">mu0</span> <span class="o">-</span> <span class="n">Omega</span><span class="p">)</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
@@ -383,7 +397,7 @@
     <span class="n">v</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">RSFParams</span><span class="p">,</span> <span class="n">constants</span><span class="p">:</span> <span class="n">RSFConstants</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The conventional ageing law state evolution formulation:</span>
+<span class="sd">    The conventional ageing law state evolution formulation</span>
 
 <span class="sd">    .. math::</span>
 
@@ -394,18 +408,29 @@
 <span class="sd">    v : Float</span>
 <span class="sd">        Instantaneous fault slip rate [m/s].</span>
 <span class="sd">    variables : Variables</span>
-<span class="sd">        The friction coefficient `mu` and state parameter `theta`</span>
+<span class="sd">        The friction coefficient ``mu`` and state parameter ``theta``</span>
 <span class="sd">    params : RSFParams</span>
-<span class="sd">        The rate-and-state parameters `a`, `b`, and `D_c`</span>
+<span class="sd">        The rate-and-state parameters, including ``D_c``</span>
 <span class="sd">    constants : RSFConstants</span>
-<span class="sd">        The constant parameters `mu0` and `v0`</span>
+<span class="sd">        The constant parameters ``mu0`` and ``v0`` (not used)</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dtheta : Float</span>
-<span class="sd">        The rate of change of the state variable `theta` [s/s]</span>
+<span class="sd">        The rate of change of the state variable [s/s]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">variables</span><span class="o">.</span><span class="n">theta</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">Dc</span></div>
+
+
+
+<div class="viewcode-block" id="aging_law">
+<a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.aging_law">[docs]</a>
+<span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">aging_law</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Alias for the ``ageing_law`` function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ageing_law</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 
@@ -415,6 +440,29 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">slip_rate</span><span class="p">(</span>
     <span class="n">v</span><span class="p">:</span> <span class="n">Float</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Variables</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">RSFParams</span><span class="p">,</span> <span class="n">constants</span><span class="p">:</span> <span class="n">RSFConstants</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evolve slip from slip rate</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \frac{\mathrm{d} x}{\mathrm{d} t} = v</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v : Float</span>
+<span class="sd">        Instantaneous fault slip rate [m/s]</span>
+<span class="sd">    variables : Variables</span>
+<span class="sd">        The friction coefficient ``mu`` and state parameter ``theta`` (not used)</span>
+<span class="sd">    params : RSFParams</span>
+<span class="sd">        The rate-and-state parameters (not used)</span>
+<span class="sd">    constants : RSFConstants</span>
+<span class="sd">        The constant parameters ``mu0`` and ``v0`` (not used)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    v : Float</span>
+<span class="sd">        The rate of change of slip [m/s]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">v</span></div>
 
 
@@ -431,7 +479,7 @@
     <span class="n">constants</span><span class="p">:</span> <span class="n">SpringBlockConstants</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A conventional (non-inertial) spring-block loading formulation:</span>
+<span class="sd">    A conventional (non-inertial) spring-block loading formulation</span>
 
 <span class="sd">    .. math::</span>
 
@@ -442,16 +490,16 @@
 <span class="sd">    v : Float</span>
 <span class="sd">        Instantaneous fault slip rate [m/s].</span>
 <span class="sd">    variables : Variables</span>
-<span class="sd">        The friction coefficient `mu` and state parameter `theta`. This argument</span>
-<span class="sd">        is not used, but included for call signature consistency.</span>
+<span class="sd">        The instantaneous variables. This argument is not used,</span>
+<span class="sd">        but included for call signature consistency.</span>
 <span class="sd">    constants : SpringBlockConstants</span>
-<span class="sd">        The constant parameters stiffness `k` (units of &quot;friction per metre&quot;)</span>
-<span class="sd">        and load-point velocity `v_lp` (same units as `v`).</span>
+<span class="sd">        The constant parameters stiffness ``k`` (units of &quot;friction per metre&quot;)</span>
+<span class="sd">        and load-point velocity ``v_lp`` (same units as ``v``).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dmu : Float</span>
-<span class="sd">        The rate of change of the friction coefficient `mu` [1/s]</span>
+<span class="sd">        The rate of change of the friction coefficient [1/s]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">constants</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">v_lp</span> <span class="o">-</span> <span class="n">v</span><span class="p">)</span></div>
 
@@ -469,7 +517,48 @@
     <span class="n">constants</span><span class="p">:</span> <span class="n">InertialSpringBlockConstants</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An inertial spring-block loading formulation:</span>
+<span class="sd">    An inertial spring-block loading formulation</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\mathrm{d} \mu}{\mathrm{d} t} = \left[ \frac{\partial v}{\partial \mu} \right]^{-1} \left( \frac{1}{M} \left[ k \left( v_{lp} t - x \right) - \mu \right] - \frac{\partial v}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} t} - \dots \right)</span>
+
+<span class="sd">    The acceleration term in the classical inertial spring-block formulation</span>
+<span class="sd">    is decomposed into its partial derivatives, avoiding the need for solving</span>
+<span class="sd">    a second-order ODE. These partial derivatives (``v_partials``) are computed</span>
+<span class="sd">    using the JAX autodiff framework.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This formulation is rather stiff, and for certain parameter values could</span>
+<span class="sd">    lead to extremely small time steps necessary to maintain numerical</span>
+<span class="sd">    accuracy. It is recommended to use a conventional (non-inenrtial)</span>
+<span class="sd">    ``springblock`` formulation for basic velocity-steps and slide-hold-slide</span>
+<span class="sd">    simuilations. Inertia is only really needed for stick-slip simulations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : Float</span>
+<span class="sd">        Current value of time [s]</span>
+<span class="sd">    v : Float</span>
+<span class="sd">        Instantaneous fault slip rate [m/s]</span>
+<span class="sd">    v_partials : Variables</span>
+<span class="sd">        The partial derivatives of slip rate to the relevant variables</span>
+<span class="sd">        (friction and state variables)</span>
+<span class="sd">    variables: Variables</span>
+<span class="sd">        The instantaneous values of the variables: friction (``mu``),</span>
+<span class="sd">        slip (``slip``), and other state variables (not used)</span>
+<span class="sd">    dstate : Array</span>
+<span class="sd">        The time derivatives of the state variables. The radiation term</span>
+<span class="sd">        is ``v_partials @ dstate`` (excluding ``mu``)</span>
+<span class="sd">    constants : InertialSpringBlockConstants</span>
+<span class="sd">        The spring-block constants containing the mass term ``M``, the</span>
+<span class="sd">        stiffness ``k``, and the load-point velocity ``v_lp``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dmu : Float</span>
+<span class="sd">        The rate of change of the friction coefficient [1/s]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mass_term</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">constants</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">v_lp</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">variables</span><span class="o">.</span><span class="n">slip</span><span class="p">)</span> <span class="o">-</span> <span class="n">variables</span><span class="o">.</span><span class="n">mu</span>
@@ -486,9 +575,9 @@
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.Forward">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Forward</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">BC</span><span class="p">]):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The `Forward` class assembles the various components that comprise</span>
-<span class="sd">    a forward model, such that `Forward.__call__` takes some variables</span>
-<span class="sd">    and returns the rate of change of these variables, i.e.:</span>
+<span class="sd">    The ``Forward`` class assembles the various components that comprise</span>
+<span class="sd">    a forward model, such that ``Forward.__call__`` takes some variables</span>
+<span class="sd">    and returns the rate of change of these variables</span>
 
 <span class="sd">    .. math::</span>
 
@@ -496,17 +585,18 @@
 
 <span class="sd">    This forward ODE can then be solved by any ODE solver.</span>
 
-<span class="sd">    The `Forward` class is instantiated by providing a friction model</span>
-<span class="sd">    (of type `FrictionModel`), a &quot;state&quot; evolution law (of type `StateEvolution`),</span>
-<span class="sd">    and a stress transfer model.</span>
+<span class="sd">    The ``Forward`` class is instantiated by providing a friction model,</span>
+<span class="sd">    a &quot;state&quot; evolution law, and a stress transfer model.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from diabayes.forward_models import ageing_law, rsf, springblock, Forward</span>
-<span class="sd">    &gt;&gt;&gt; foward_model = Forward(rsf, ageing_law, springblock)</span>
+<span class="sd">    &gt;&gt;&gt; foward_model = Forward(rsf, {&quot;theta&quot;: ageing_law}, springblock)</span>
 <span class="sd">    &gt;&gt;&gt; X_dot = forward_model(variables=..., params=..., friction_constants=..., block_constants=...)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="Forward.__init__">
+<a class="viewcode-back" href="../../_autosummary/diabayes.forward_models.Forward.html#diabayes.forward_models.Forward.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">friction_model</span><span class="p">:</span> <span class="n">FrictionModel</span><span class="p">,</span>
@@ -537,49 +627,22 @@
                 <span class="p">]</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="k">pass</span>
-
-<div class="viewcode-block" id="Forward.inspect">
-<a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.Forward.inspect">[docs]</a>
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">inspect</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="o">...</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-
-        <span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
-
-        <span class="k">def</span><span class="w"> </span><span class="nf">get_accessed_attrs</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Helper routine to automatically extract the variable names&quot;&quot;&quot;</span>
-            <span class="n">tree</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">func</span><span class="p">))</span>
-            <span class="n">accessed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-            <span class="k">class</span><span class="w"> </span><span class="nc">Visitor</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">NodeVisitor</span><span class="p">):</span>
-                <span class="k">def</span><span class="w"> </span><span class="nf">visit_Attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">arg_name</span><span class="p">:</span>
-                        <span class="n">accessed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-
-            <span class="n">Visitor</span><span class="p">()</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">accessed</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
-            <span class="n">fn</span> <span class="o">=</span> <span class="p">(</span><span class="n">fn</span><span class="p">,)</span>
-
-        <span class="n">accessed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-        <span class="k">for</span> <span class="n">fn_i</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">:</span>
-            <span class="n">accessed</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_accessed_attrs</span><span class="p">(</span><span class="n">fn_i</span><span class="p">,</span> <span class="s2">&quot;variables&quot;</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="s2">&quot;mu&quot;</span> <span class="ow">in</span> <span class="n">accessed</span><span class="p">:</span>
-            <span class="n">accessed</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">)</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Auto-detected the following state variable names:&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">accessed</span><span class="p">)</span></div>
+        <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="Forward.set_initial_values">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.forward_models.Forward.set_initial_values">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Change this shit back it doesn&#39;t work and breaks everything</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the initial values of the ``variables``. This sets the</span>
+<span class="sd">        values as ``self.variables``, which is a ``Variables`` object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Key-value pairs of variable names and corresponding values</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">scalars</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">set_values</span><span class="p">(</span><span class="o">**</span><span class="n">scalars</span><span class="p">)</span></div>
 
@@ -593,6 +656,29 @@
         <span class="n">friction_constants</span><span class="p">:</span> <span class="n">_Constants</span><span class="p">,</span>
         <span class="n">block_constants</span><span class="p">:</span> <span class="n">BC</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variables</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the rate of change of the variables, defining the ODE</span>
+<span class="sd">        to be solved.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : Float</span>
+<span class="sd">            Current value of time [s]</span>
+<span class="sd">        variables : diabayes.Variables</span>
+<span class="sd">            The instantaneous values of the variables for which the time</span>
+<span class="sd">            derivative will be computed</span>
+<span class="sd">        params : _Params</span>
+<span class="sd">            The forward model (invertible) parameters</span>
+<span class="sd">        friction_constants : _Constants</span>
+<span class="sd">            The forward model constants</span>
+<span class="sd">        block_constants : _BlockConstants</span>
+<span class="sd">            The constants associated with the stress transfer</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dvars : Variables</span>
+<span class="sd">            The instantaneous rate of change of the ``variables``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Calculate v and its partial derivatives with respect to</span>
         <span class="c1"># the variables (mu, state1, state2, ...)</span>
         <span class="n">v</span><span class="p">,</span> <span class="n">v_derivs</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_value_and_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">friction_model</span><span class="p">)(</span>
@@ -605,7 +691,10 @@
         <span class="c1"># Create a new state container for dstate</span>
         <span class="n">state_obj</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">dstate</span><span class="p">)</span>
         <span class="c1"># Create a new variables container</span>
-        <span class="k">return</span> <span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">dmu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state_obj</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">dmu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state_obj</span><span class="p">)</span>
+
+    <span class="c1"># Alias for documentation</span>
+    <span class="n">call</span> <span class="o">=</span> <span class="fm">__call__</span></div>
 
 </pre></div>
 

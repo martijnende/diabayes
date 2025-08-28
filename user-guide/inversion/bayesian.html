@@ -153,6 +153,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../community.html">
     DiaBayes Community
   </a>
@@ -241,6 +248,13 @@
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../index.html">
     User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
   </a>
 </li>
 
@@ -404,7 +418,7 @@
 <p>Concretely, if one wants to perform a Bayesian inversion of the forward model parameters, it only requires a single function call, e.g.:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bayesian_result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">bayesian_inversion</span><span class="p">(</span>
     <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_measured</span><span class="p">,</span> <span class="n">noise_std</span><span class="o">=</span><span class="n">noise_std</span><span class="p">,</span>
-    <span class="n">params</span><span class="o">=</span><span class="n">params_init</span><span class="p">,</span> <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span> 
+    <span class="n">y0</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params_init</span><span class="p">,</span> <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span> 
     <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span> 
     <span class="n">Nparticles</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">Nsteps</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>

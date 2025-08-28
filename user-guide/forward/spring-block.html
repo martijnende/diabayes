@@ -153,6 +153,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../community.html">
     DiaBayes Community
   </a>
@@ -241,6 +248,13 @@
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../index.html">
     User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
   </a>
 </li>
 
@@ -396,8 +410,7 @@
 \dot{\theta} = g(v, \theta, \dots) \quad \text{(state evolution)} \\
 \dot{x} = v(\mu, \theta, \dots) \quad \text{(friction law)}
 \end{cases}\end{split}\]</div>
-<p>Correspondingly, the solution vector gains an extra component, <span class="math notranslate nohighlight">\(\vec{X}(t) = \left[ \mu(t), \theta(t), x(t) \right]^\intercal\)</span>.</p>
-<p>In order for a friction model to be compatible with an inertial spring-block, it must implement a <code class="docutils literal notranslate"><span class="pre">_partials</span></code> method to compute the partial derivatives of <span class="math notranslate nohighlight">\(v\)</span> with respect to the relevant variables. This method takes as an argument the vector <span class="math notranslate nohighlight">\(\vec{X}\)</span> and returns <span class="math notranslate nohighlight">\(\partial v / \partial \mu\)</span> and the sum of the remaining partial derivative terms (<span class="math notranslate nohighlight">\((\partial v / \partial \theta) \dot{\theta} + \dots\)</span>). If a <code class="docutils literal notranslate"><span class="pre">_partials</span></code> method is absent, a <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> exception will be raised upon instantiating <code class="docutils literal notranslate"><span class="pre">diabayes.forward_models.Forward</span></code>.</p>
+<p>Correspondingly, the solution vector gains an extra component, <span class="math notranslate nohighlight">\(\vec{X}(t) = \left[ \mu(t), \theta(t), x(t) \right]^\intercal\)</span>. Also notice that the invertial spring-block requires the partial derivatives of <span class="math notranslate nohighlight">\(\partial v\)</span> with respect to <span class="math notranslate nohighlight">\(\mu\)</span> and the various state variables. These are computed automatically through the JAX’s automatic differentiation routines, and so they do not need to be implemented in analytical form by the user. This is especially helpful if the friction law does not have a convenient explicit derivative (e.g. a Neural Network, or a conditional switch).</p>
 <p>The inertial spring-block model is available through <code class="docutils literal notranslate"><span class="pre">diabayes.forward_models.inertial_springblock</span></code>.</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>

@@ -153,6 +153,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../community.html">
     DiaBayes Community
   </a>
@@ -237,6 +244,13 @@
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="../index.html">
     User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Reference
   </a>
 </li>
 
@@ -359,7 +373,7 @@
 <p>Concretely, performing a maximum-likelihood inversion in DiaBayes is fairly straightforward. Assuming that a solver has already been instantiated with an appropriate forward model (see the <a class="reference internal" href="../../getting-started.html"><span class="doc std std-doc">Getting Started guide</span></a>), and given some measured friction curve <code class="docutils literal notranslate"><span class="pre">mu_measured</span></code> and initial guess parameters <code class="docutils literal notranslate"><span class="pre">params_guess</span></code>, the inversion can be performed with a single function call:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inv_result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">max_likelihood_inversion</span><span class="p">(</span>
     <span class="n">t</span><span class="p">,</span> <span class="n">mu_measured</span><span class="p">,</span>
-    <span class="n">params</span><span class="o">=</span><span class="n">params_guess</span><span class="p">,</span>
+    <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params_guess</span><span class="p">,</span>
     <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
     <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
