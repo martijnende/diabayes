@@ -3,7 +3,8 @@
 ```{toctree}
 :maxdepth: 1
 
-forward_models
-svi.md
+typedefs.md
+forward_models.md
 solver.md
+svi.md
 ```

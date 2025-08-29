@@ -36,6 +36,14 @@ bibtex_bibfiles = ["references.bib"]
 templates_path = ["_templates"]
 exclude_patterns = []
 
+autodoc_class_content = "class"
+autodoc_member_order = "groupwise"
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "inherited-members": True,
+}
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
