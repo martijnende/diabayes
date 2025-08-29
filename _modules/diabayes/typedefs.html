@@ -701,6 +701,8 @@
     <span class="n">nan_count</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">]</span>
     <span class="n">statistics</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFStatistics</span><span class="p">,</span> <span class="n">CNSStatistics</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
+<div class="viewcode-block" id="BayesianSolution.__init__">
+<a class="viewcode-back" href="../../_autosummary/diabayes.typedefs.BayesianSolution.html#diabayes.typedefs.BayesianSolution.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_params</span><span class="p">:</span> <span class="n">_Params</span><span class="p">,</span>
@@ -714,7 +716,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log_likelihood</span> <span class="o">=</span> <span class="n">log_likelihood</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nan_count</span> <span class="o">=</span> <span class="n">nan_count</span>
         <span class="c1"># TODO: need to generalise this...</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">RSFStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">RSFStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="BayesianSolution.plot_convergence">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution.plot_convergence">[docs]</a>

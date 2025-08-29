@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Forward models &#8212; DiaBayes  documentation</title>
+    <title>Data containers &#8212; DiaBayes  documentation</title>
   
   
   
@@ -53,13 +53,11 @@
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/forward_models';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/typedefs';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="diabayes.forward_models.Forward" href="../_autosummary/diabayes.forward_models.Forward.html" />
-    <link rel="prev" title="diabayes.typedefs.BayesianSolution" href="../_autosummary/diabayes.typedefs.BayesianSolution.html" />
+    <link rel="next" title="diabayes.typedefs.Variables" href="../_autosummary/diabayes.typedefs.Variables.html" />
+    <link rel="prev" title="API Reference" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -293,13 +291,13 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="typedefs.html">Data containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Data containers</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.typedefs.Variables.html">diabayes.typedefs.Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.typedefs.StateDict.html">diabayes.typedefs.StateDict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.typedefs.BayesianSolution.html">diabayes.typedefs.BayesianSolution</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Forward models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="forward_models.html">Forward models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.Forward.html">diabayes.forward_models.Forward</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.ageing_law.html">diabayes.forward_models.ageing_law</a></li>
@@ -363,7 +361,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Forward models</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Data containers</span></li>
   </ul>
 </nav>
 </div>
@@ -380,53 +378,28 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="forward-models">
-<h1>Forward models<a class="headerlink" href="#forward-models" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="data-containers">
+<h1>Data containers<a class="headerlink" href="#data-containers" title="Link to this heading">#</a></h1>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>(friction_model, state_evolution, ...)</p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">Forward</span></code> class assembles the various components that comprise a forward model, such that <code class="docutils literal notranslate"><span class="pre">Forward.__call__</span></code> takes some variables and returns the rate of change of these variables</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Variables</span></code></a>(mu, state)</p></td>
+<td><p></p></td>
 </tr>
-</tbody>
-</table>
-</div>
-<section id="friction-laws">
-<h2>Friction laws<a class="headerlink" href="#friction-laws" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.rsf" title="diabayes.forward_models.rsf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsf</span></code></a>(variables, params, constants)</p></td>
-<td><p>The classical rate-and-state friction law</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="diabayes.html#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StateDict</span></code></a>(keys, vals)</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="state-evolution-models">
-<h2>State evolution models<a class="headerlink" href="#state-evolution-models" title="Link to this heading">#</a></h2>
+<section id="inversion-results">
+<h2>Inversion results<a class="headerlink" href="#inversion-results" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.ageing_law" title="diabayes.forward_models.ageing_law"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ageing_law</span></code></a>(v, variables, params, constants)</p></td>
-<td><p>The conventional ageing law state evolution formulation</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.aging_law" title="diabayes.forward_models.aging_law"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aging_law</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Alias for the <code class="docutils literal notranslate"><span class="pre">ageing_law</span></code> function</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.slip_rate" title="diabayes.forward_models.slip_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slip_rate</span></code></a>(v, variables, params, constants)</p></td>
-<td><p>Evolve slip from slip rate</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="stress-transfer-models">
-<h2>Stress-transfer models<a class="headerlink" href="#stress-transfer-models" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.springblock" title="diabayes.forward_models.springblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springblock</span></code></a>(t, v, v_partials, variables, ...)</p></td>
-<td><p>A conventional (non-inertial) spring-block loading formulation</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.inertial_springblock" title="diabayes.forward_models.inertial_springblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inertial_springblock</span></code></a>(t, v, v_partials, ...)</p></td>
-<td><p>An inertial spring-block loading formulation</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.typedefs.BayesianSolution" title="diabayes.typedefs.BayesianSolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BayesianSolution</span></code></a>(log_params, log_likelihood, ...)</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -445,20 +418,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../_autosummary/diabayes.typedefs.BayesianSolution.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">diabayes.typedefs.BayesianSolution</p>
+        <p class="prev-next-title">API Reference</p>
       </div>
     </a>
     <a class="right-next"
-       href="../_autosummary/diabayes.forward_models.Forward.html"
+       href="../_autosummary/diabayes.typedefs.Variables.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">diabayes.forward_models.Forward</p>
+        <p class="prev-next-title">diabayes.typedefs.Variables</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -481,9 +454,8 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#friction-laws">Friction laws</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#state-evolution-models">State evolution models</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stress-transfer-models">Stress-transfer models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">Variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inversion-results">Inversion results</a></li>
 </ul>
   </nav></div>
 

@@ -1,0 +1,30 @@
+﻿diabayes.typedefs.StateDict
+===========================
+
+.. currentmodule:: diabayes.typedefs
+
+.. autoclass:: StateDict
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StateDict.__init__
+      ~StateDict.replace_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~StateDict.keys
+      ~StateDict.vals
+   
+   

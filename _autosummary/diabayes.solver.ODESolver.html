@@ -291,6 +291,12 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/typedefs.html">Data containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.Variables.html">diabayes.typedefs.Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.StateDict.html">diabayes.typedefs.StateDict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.BayesianSolution.html">diabayes.typedefs.BayesianSolution</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api/forward_models.html">Forward models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.Forward.html">diabayes.forward_models.Forward</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
@@ -301,15 +307,15 @@
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.inertial_springblock.html">diabayes.forward_models.inertial_springblock</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/svi.html">Stein Variational Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.SVI.compute_phi.html">diabayes.SVI.compute_phi</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api/solver.html">Solver routines</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">diabayes.solver.ODESolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.bayesian_inversion.html">diabayes.solver.ODESolver.bayesian_inversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.max_likelihood_inversion.html">diabayes.solver.ODESolver.max_likelihood_inversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.solve_forward.html">diabayes.solver.ODESolver.solve_forward</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/svi.html">Stein Variational Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.SVI.compute_phi.html">diabayes.SVI.compute_phi</a></li>
 </ul>
 </details></li>
 </ul>
@@ -490,6 +496,152 @@ stability and speed, at the expense of more GPU memory</p></li>
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.bayesian_inversion">
+<span class="sig-name descname"><span class="pre">bayesian_inversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nparticles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution" title="diabayes.typedefs.BayesianSolution"><span class="pre">BayesianSolution</span></a></span></span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver.bayesian_inversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver.bayesian_inversion" title="Link to this definition">#</a></dt>
+<dd><p>A Bayesian inversion routine using the Stein Variational Inference
+method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Array</em>) – A vector or time values (in units of seconds). The time steps
+do not need to be uniform</p></li>
+<li><p><strong>mu</strong> (<em>Array</em>) – The observed friction curve sampled at <code class="docutils literal notranslate"><span class="pre">t</span></code></p></li>
+<li><p><strong>noise_std</strong> (<em>Float</em>) – An estimate of the standard deviation of the noise in the
+measured friction curve. A conservative value is recommended,
+i.e. if the noise has a standard deviation of $10^{-3}$, a good
+starting point would be to set <code class="docutils literal notranslate"><span class="pre">noise_std</span> <span class="pre">=</span> <span class="pre">0.5e-3</span></code></p></li>
+<li><p><strong>y0</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The initial values for the modelled friction and any state
+variables</p></li>
+<li><p><strong>params</strong> (<em>_Params</em>) – The initial guess for the invertible parameters that characterise
+the forward problem. It is recommended to use the result from
+<code class="docutils literal notranslate"><span class="pre">ODESolver.max_likelihood_inversion</span></code>. The prior distribution
+will be centered around this initial guess</p></li>
+<li><p><strong>friction_constants</strong> (<em>_Constants</em>) – The non-invertible constants that characterise the forward
+problem</p></li>
+<li><p><strong>block_constants</strong> (<em>_BlockConstants</em>) – The stress transfer constants (e.g. stiffness and loading rate)</p></li>
+<li><p><strong>Nparticles</strong> (<em>int</em>) – The number of particles (= posterior samples) to include. A higher
+value gives a more accurate estimation of the posterior
+distribution, at a higher computational cost.</p></li>
+<li><p><strong>Nsteps</strong> (<em>int</em>) – The number of iterations before convergence is expected to be
+achieved. It is recommended to start with a value of 100 and then
+see if an equilibrium was actually achieved. Increasing this value
+beyond the point of equilibrium does not do anything.</p></li>
+<li><p><strong>rng</strong> (<em>None</em><em>, </em><em>int</em><em>, </em><em>jax.random.PRNGKey</em>) – The random seed used to initialise the particle swarm distribution.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the current time will be used as a seed, which leads
+to different result for each realisation. When an integer is
+provided, a new <code class="docutils literal notranslate"><span class="pre">jax.random.PRNGKey</span></code> is generated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – The result of the inversion incapsulated in a <code class="docutils literal notranslate"><span class="pre">BayesianSolution</span></code>
+container, which provides access to the full convergence chains,
+as well as diagnostic and visualisation routines.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>diabayes.BayesianSolution</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method is currently only compatible with standard rate-and-state
+friction models.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.max_likelihood_inversion">
+<span class="sig-name descname"><span class="pre">max_likelihood_inversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Solution</span></span></span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver.max_likelihood_inversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver.max_likelihood_inversion" title="Link to this definition">#</a></dt>
+<dd><p>Minimises the least-squares residuals between the observed friction
+curve and the parameterised one, using the Levenberg-Marquardt
+algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Array</em>) – A vector or time values (in units of seconds). The time steps
+do not need to be uniform</p></li>
+<li><p><strong>mu</strong> (<em>Array</em>) – The observed friction curve sampled at <code class="docutils literal notranslate"><span class="pre">t</span></code></p></li>
+<li><p><strong>y0</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The initial values for the modelled friction and any state
+variables</p></li>
+<li><p><strong>params</strong> (<em>_Params</em>) – The initial guess for the invertible parameters that characterise
+the forward problem. These need to be sufficiently close to the
+“true” values for the algorithm to converge</p></li>
+<li><p><strong>friction_constants</strong> (<em>_Constants</em>) – The non-invertible constants that characterise the forward
+problem</p></li>
+<li><p><strong>block_constants</strong> (<em>_BlockConstants</em>) – The stress transfer constants (e.g. stiffness and loading rate)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether or not to output detailed progress of the inversion.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sol</strong> – The inversion result, including various diagnostics. The
+inverted parameter values can be accessed as <code class="docutils literal notranslate"><span class="pre">sol.values</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimistix.Solution</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If an error is produced in the first iteration step, it is quite
+possible that the initial guess parameters were too far off from
+the “true” values (i.e., the mismatch between the observed and
+modelled friction curves is too large), breaking the Gauss-Newton
+step of the Levenberg-Marquardt algorithm. Initial manual tuning
+is recommended.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.solve_forward">
+<span class="sig-name descname"><span class="pre">solve_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RK45'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver.solve_forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver.solve_forward" title="Link to this definition">#</a></dt>
+<dd><p>Solve a forward problem using SciPy’s <cite>solve_ivp</cite> routine.
+While this routine doesn’t propagate any gradients, it is
+much faster to initialise and to perform a single forward
+run. Hence for playing around with different parameters,
+it is preferred over a JITed JAX implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Float</em><em>[</em><em>Array</em><em>, </em><em>&quot;Nt&quot;</em><em>]</em>) – A vector of time samples where a solution is requested</p></li>
+<li><p><strong>y0</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The initial values (fricton and state) wrapped in a
+<cite>Variables</cite> container.</p></li>
+<li><p><strong>params</strong> (<em>_Params</em>) – The (invertible) parameters that govern the dynamics,
+wrapped in a <cite>Params</cite> container.</p></li>
+<li><p><strong>friction_constants</strong> (<em>_Constants</em>) – A container object containing the friction constants</p></li>
+<li><p><strong>block_constants</strong> (<em>_BlockConstants</em>) – A container object containing the block constants</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – Solution time series of friction and state</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables">Variables</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.atol">
+<span class="sig-name descname"><span class="pre">atol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.atol" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">checkpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">forward_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><span class="pre">Forward</span></a></em><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.rtol">
+<span class="sig-name descname"><span class="pre">rtol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.rtol" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -546,6 +698,14 @@ stability and speed, at the expense of more GPU memory</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.checkpoints"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.learning_rate"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.__init__"><code class="docutils literal notranslate"><span class="pre">ODESolver.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.bayesian_inversion"><code class="docutils literal notranslate"><span class="pre">ODESolver.bayesian_inversion()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.max_likelihood_inversion"><code class="docutils literal notranslate"><span class="pre">ODESolver.max_likelihood_inversion()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.solve_forward"><code class="docutils literal notranslate"><span class="pre">ODESolver.solve_forward()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.atol"><code class="docutils literal notranslate"><span class="pre">ODESolver.atol</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.rtol"><code class="docutils literal notranslate"><span class="pre">ODESolver.rtol</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -1,0 +1,32 @@
+﻿diabayes.typedefs.Variables
+===========================
+
+.. currentmodule:: diabayes.typedefs
+
+.. autoclass:: Variables
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Variables.__init__
+      ~Variables.from_array
+      ~Variables.set_values
+      ~Variables.to_array
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Variables.mu
+      ~Variables.state
+   
+   

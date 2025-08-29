@@ -293,6 +293,12 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/typedefs.html">Data containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.Variables.html">diabayes.typedefs.Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.StateDict.html">diabayes.typedefs.StateDict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.BayesianSolution.html">diabayes.typedefs.BayesianSolution</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api/forward_models.html">Forward models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">diabayes.forward_models.Forward</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
@@ -303,15 +309,15 @@
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.inertial_springblock.html">diabayes.forward_models.inertial_springblock</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/svi.html">Stein Variational Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.SVI.compute_phi.html">diabayes.SVI.compute_phi</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api/solver.html">Solver routines</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.html">diabayes.solver.ODESolver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.bayesian_inversion.html">diabayes.solver.ODESolver.bayesian_inversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.max_likelihood_inversion.html">diabayes.solver.ODESolver.max_likelihood_inversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.solve_forward.html">diabayes.solver.ODESolver.solve_forward</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/svi.html">Stein Variational Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.SVI.compute_phi.html">diabayes.SVI.compute_phi</a></li>
 </ul>
 </details></li>
 </ul>
@@ -416,6 +422,43 @@ a “state” evolution law, and a stress transfer model.</p>
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="diabayes.forward_models.Forward.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BC</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></span><a class="headerlink" href="#diabayes.forward_models.Forward.call" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the rate of change of the variables, defining the ODE
+to be solved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>Float</em>) – Current value of time [s]</p></li>
+<li><p><strong>variables</strong> (<em>diabayes.Variables</em>) – The instantaneous values of the variables for which the time
+derivative will be computed</p></li>
+<li><p><strong>params</strong> (<em>_Params</em>) – The forward model (invertible) parameters</p></li>
+<li><p><strong>friction_constants</strong> (<em>_Constants</em>) – The forward model constants</p></li>
+<li><p><strong>block_constants</strong> (<em>_BlockConstants</em>) – The constants associated with the stress transfer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dvars</strong> – The instantaneous rate of change of the <code class="docutils literal notranslate"><span class="pre">variables</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables">Variables</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diabayes.forward_models.Forward.set_initial_values">
+<span class="sig-name descname"><span class="pre">set_initial_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#Forward.set_initial_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.Forward.set_initial_values" title="Link to this definition">#</a></dt>
+<dd><p>Set the initial values of the <code class="docutils literal notranslate"><span class="pre">variables</span></code>. This sets the
+values as <code class="docutils literal notranslate"><span class="pre">self.variables</span></code>, which is a <code class="docutils literal notranslate"><span class="pre">Variables</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Key-value pairs of variable names and corresponding values</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -469,6 +512,8 @@ a “state” evolution law, and a stress transfer model.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward"><code class="docutils literal notranslate"><span class="pre">Forward</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward.__init__"><code class="docutils literal notranslate"><span class="pre">Forward.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward.call"><code class="docutils literal notranslate"><span class="pre">Forward.call()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward.set_initial_values"><code class="docutils literal notranslate"><span class="pre">Forward.set_initial_values()</span></code></a></li>
 </ul>
 </li>
 </ul>

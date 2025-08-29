@@ -1,0 +1,35 @@
+﻿diabayes.typedefs.BayesianSolution
+==================================
+
+.. currentmodule:: diabayes.typedefs
+
+.. autoclass:: BayesianSolution
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BayesianSolution.__init__
+      ~BayesianSolution.cornerplot
+      ~BayesianSolution.plot_convergence
+      ~BayesianSolution.sample
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BayesianSolution.statistics
+      ~BayesianSolution.log_params
+      ~BayesianSolution.chains
+      ~BayesianSolution.log_likelihood
+      ~BayesianSolution.nan_count
+   
+   
