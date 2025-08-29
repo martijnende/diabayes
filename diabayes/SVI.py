@@ -13,6 +13,7 @@ GradientArray: TypeAlias = ParticleArray
 
 @eqx.filter_jit
 def _distance(x1: ParticleArray, x2: ParticleArray) -> Float[Array, "N N"]:
+    """Euclidean distance between two particles `x1` and `x2`"""
     return jnp.square(x1 - x2).sum(axis=-1)
 
 
@@ -45,25 +46,25 @@ def compute_phi(
 ) -> GradientArray:
     """
     Compute the Stein variational gradients for a set of
-    particles (`x`) and the gradients of the log-likelihood
-    function (`gradp`) and the log-prior (`gradq`).
+    particles (``x``) and the gradients of the log-likelihood
+    function (``gradp``) and the log-prior (``gradq``).
 
     Parameters
     ----------
     x : ParticleArray
         The set of invertible parameters ("particles")
-        of shape (Nparticles, Ndimensions)
+        of shape ``(Nparticles, Ndimensions)``
     gradp, gradq : GradientArray
-        The gradients of the log-likelihood (`gradp`) and the
-        log-prior (`gradq`) with respect to the invertible parameters.
-        Has a shape (Nparticles, Ndimensions)
+        The gradients of the log-likelihood (``gradp``) and the
+        log-prior (``gradq``) with respect to the invertible parameters.
+        Has a shape ``(Nparticles, Ndimensions)``
 
     Returns
     -------
     grad_x : Gradients
         The directional gradients for the particle updates, e.g.
-        `new_x = x + step_size * grad_x`. Has the same
-        shape as `x` and `gradp, gradq`.
+        ``new_x = x + step_size * grad_x``. Has the same
+        shape as ``x`` and ``gradp, gradq``.
     """
     h = _median_trick_h(x)
     map_over_a = (0, None, None)

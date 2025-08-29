@@ -1,23 +1,12 @@
 import dataclasses as dcs
 from time import time_ns
-from typing import (
-    Any,
-    Iterable,
-    Mapping,
-    NamedTuple,
-    Protocol,
-    Tuple,
-    TypeAlias,
-    TypeVar,
-    Union,
-)
+from typing import Any, NamedTuple, Protocol, Tuple, TypeVar, Union
 
 import equinox as eqx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import matplotlib.pyplot as plt
-from jax import tree_util
 from jaxtyping import Array, Float
 
 """

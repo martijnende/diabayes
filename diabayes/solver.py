@@ -29,6 +29,27 @@ jax.config.update("jax_enable_x64", True)
 
 
 class ODESolver:
+    """
+    The main solver class that contains forward and inverse modelling
+    methods.
+
+    Attributes
+    ----------
+    forward_model : Forward
+        An instantiated ``diabayes.Forward`` class, including
+        friction law, state evolution equations, and stress
+        transfer equation
+    rtol, atol : float
+        The relative and absolute tolerances used by the ODE solver
+    checkpoints : int
+        The number of checkpoints to use to compute the (adjoint)
+        gradients through the ODE routine. A higher number increases
+        stability and speed, at the expense of more GPU memory
+    learning_rate : float
+        The initial learning rate provided to the Adam algorithm
+        for the Stein Variational Inference. The default value of
+        ``1e-2`` seems like a sensible choice for most models.
+    """
 
     forward_model: Forward
     rtol: float
@@ -43,6 +64,20 @@ class ODESolver:
         atol: float = 1e-12,
         checkpoints: int = 100,
     ) -> None:
+        """
+        Parameters
+        ----------
+        forward_model : Forward
+            An instantiated ``diabayes.Forward`` class, including
+            friction law, state evolution equations, and stress
+            transfer equation
+        rtol, atol : float
+            The relative and absolute tolerances used by the ODE solver
+        checkpoints : int
+            The number of checkpoints to use to compute the (adjoint)
+            gradients through the ODE routine. A higher number increases
+            stability and speed, at the expense of more GPU memory
+        """
         self.forward_model = forward_model
         self.rtol = rtol
         self.atol = atol
@@ -212,6 +247,49 @@ class ODESolver:
         block_constants: _BlockConstants,
         verbose: bool = False,
     ) -> optx.Solution:
+        r"""
+        Minimises the least-squares residuals between the observed friction
+        curve and the parameterised one, using the Levenberg-Marquardt
+        algorithm.
+
+        Parameters
+        ----------
+        t : Array
+            A vector or time values (in units of seconds). The time steps
+            do not need to be uniform
+        mu : Array
+            The observed friction curve sampled at ``t``
+        y0 : Variables
+            The initial values for the modelled friction and any state
+            variables
+        params : _Params
+            The initial guess for the invertible parameters that characterise
+            the forward problem. These need to be sufficiently close to the
+            "true" values for the algorithm to converge
+        friction_constants : _Constants
+            The non-invertible constants that characterise the forward
+            problem
+        block_constants : _BlockConstants
+            The stress transfer constants (e.g. stiffness and loading rate)
+        verbose : bool
+            Whether or not to output detailed progress of the inversion.
+            Defaults to ``False``
+
+        Returns
+        -------
+        sol : optimistix.Solution
+            The inversion result, including various diagnostics. The
+            inverted parameter values can be accessed as ``sol.values``
+
+        Notes
+        -----
+        If an error is produced in the first iteration step, it is quite
+        possible that the initial guess parameters were too far off from
+        the "true" values (i.e., the mismatch between the observed and
+        modelled friction curves is too large), breaking the Gauss-Newton
+        step of the Levenberg-Marquardt algorithm. Initial manual tuning
+        is recommended.
+        """
 
         if verbose:
             verbose_opts = frozenset(["step", "loss"])
@@ -247,7 +325,63 @@ class ODESolver:
         Nparticles: int = 1000,
         Nsteps: int = 150,
         rng: Union[None, int, jax.Array] = None,
-    ):
+    ) -> BayesianSolution:
+        """
+        A Bayesian inversion routine using the Stein Variational Inference
+        method.
+
+        Parameters
+        ----------
+        t : Array
+            A vector or time values (in units of seconds). The time steps
+            do not need to be uniform
+        mu : Array
+            The observed friction curve sampled at ``t``
+        noise_std : Float
+            An estimate of the standard deviation of the noise in the
+            measured friction curve. A conservative value is recommended,
+            i.e. if the noise has a standard deviation of $10^{-3}$, a good
+            starting point would be to set ``noise_std = 0.5e-3``
+        y0 : Variables
+            The initial values for the modelled friction and any state
+            variables
+        params : _Params
+            The initial guess for the invertible parameters that characterise
+            the forward problem. It is recommended to use the result from
+            ``ODESolver.max_likelihood_inversion``. The prior distribution
+            will be centered around this initial guess
+        friction_constants : _Constants
+            The non-invertible constants that characterise the forward
+            problem
+        block_constants : _BlockConstants
+            The stress transfer constants (e.g. stiffness and loading rate)
+        Nparticles : int
+            The number of particles (= posterior samples) to include. A higher
+            value gives a more accurate estimation of the posterior
+            distribution, at a higher computational cost.
+        Nsteps : int
+            The number of iterations before convergence is expected to be
+            achieved. It is recommended to start with a value of 100 and then
+            see if an equilibrium was actually achieved. Increasing this value
+            beyond the point of equilibrium does not do anything.
+        rng: None, int, jax.random.PRNGKey
+            The random seed used to initialise the particle swarm distribution.
+            If ``None``, the current time will be used as a seed, which leads
+            to different result for each realisation. When an integer is
+            provided, a new ``jax.random.PRNGKey`` is generated.
+
+        Returns
+        -------
+        result : diabayes.BayesianSolution
+            The result of the inversion incapsulated in a ``BayesianSolution``
+            container, which provides access to the full convergence chains,
+            as well as diagnostic and visualisation routines.
+
+        Notes
+        -----
+        This method is currently only compatible with standard rate-and-state
+        friction models.
+        """
 
         assert isinstance(
             params, RSFParams
