@@ -32,30 +32,30 @@ class ODESolver:
     """
     The main solver class that contains forward and inverse modelling
     methods.
-
-    Attributes
-    ----------
-    forward_model : Forward
-        An instantiated ``diabayes.Forward`` class, including
-        friction law, state evolution equations, and stress
-        transfer equation
-    rtol, atol : float
-        The relative and absolute tolerances used by the ODE solver
-    checkpoints : int
-        The number of checkpoints to use to compute the (adjoint)
-        gradients through the ODE routine. A higher number increases
-        stability and speed, at the expense of more GPU memory
-    learning_rate : float
-        The initial learning rate provided to the Adam algorithm
-        for the Stein Variational Inference. The default value of
-        ``1e-2`` seems like a sensible choice for most models.
     """
 
     forward_model: Forward
+    """
+    An instantiated ``diabayes.Forward`` class, including
+    friction law, state evolution equations, and stress
+    transfer equation
+    """
     rtol: float
+    """The absolute tolerance used by the ODE solver"""
     atol: float
+    """The absolute tolerance used by the ODE solver"""
     checkpoints: int
+    """
+    The number of checkpoints to use to compute the (adjoint)
+    gradients through the ODE routine. A higher number increases
+    stability and speed, at the expense of more GPU memory
+    """
     learning_rate: float = 1e-2
+    """
+    The initial learning rate provided to the Adam algorithm
+    for the Stein Variational Inference. The default value of
+    ``1e-2`` seems like a sensible choice for most models.
+    """
 
     def __init__(
         self,
@@ -64,20 +64,6 @@ class ODESolver:
         atol: float = 1e-12,
         checkpoints: int = 100,
     ) -> None:
-        """
-        Parameters
-        ----------
-        forward_model : Forward
-            An instantiated ``diabayes.Forward`` class, including
-            friction law, state evolution equations, and stress
-            transfer equation
-        rtol, atol : float
-            The relative and absolute tolerances used by the ODE solver
-        checkpoints : int
-            The number of checkpoints to use to compute the (adjoint)
-            gradients through the ODE routine. A higher number increases
-            stability and speed, at the expense of more GPU memory
-        """
         self.forward_model = forward_model
         self.rtol = rtol
         self.atol = atol
@@ -94,7 +80,7 @@ class ODESolver:
         method: str = "RK45",
     ) -> Any:
         """
-        Solve a forward problem using SciPy's `solve_ivp` routine.
+        Solve a forward problem using SciPy's ``solve_ivp`` routine.
         While this routine doesn't propagate any gradients, it is
         much faster to initialise and to perform a single forward
         run. Hence for playing around with different parameters,

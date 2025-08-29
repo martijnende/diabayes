@@ -17,24 +17,74 @@ Parameter containers
 
 
 class StateDict(eqx.Module):
+    """
+    A container class for state variables. A user would typically not
+    interact with this class directly (only through ``Variables`` and
+    ``Forward.set_initial_values``).
+
+    Examples
+    --------
+    >>> from diabayes.typedefs import StateDict
+    >>> import jax.numpy as jnp
+    >>> keys = ("x", "y")
+    >>> vals = jnp.array([1.0, -5.1])
+    >>> state_dict = StateDict(keys=keys, vals=vals)
+    """
+
     keys: tuple[str, ...] = eqx.field(static=True)
+    """A tuple of key names (strings) corresponding with the state variable names"""
     vals: jax.Array
+    """An array of values corresponding (in order) with the variables defined by ``keys``"""
 
     def __getitem__(self, k: str) -> Array:
+        """Get the value of the variable ``k``"""
         i = self.keys.index(k)
         return self.vals[i]
 
     def replace_values(self, **kwargs) -> "StateDict":
-        # Why is it so fucking problematic to set a JAX array?
-        # How many dozens of hours do I need to spend to set a fucking array?
+        """
+        Update the values of the state variables. Since immutability is
+        required for JIT caching, this method will return a copy of the
+        class with the updated values.
+
+        Examples
+        --------
+        >>> from diabayes.typedefs import StateDict
+        >>> import jax.numpy as jnp
+        >>> state_dict = StateDict(keys=("x",), vals=jnp.asarray(1.0))
+        >>> state_dict = state_dict.replace_values({"x": jnp.asarray(2.0)})
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Key-value pairs to update. These can overwrite existing values
+            or create entirely new ones.
+
+        Returns
+        -------
+        state_dict : StateDict
+            A copy of the current StateDict with updated values
+        """
         mapping = dict(zip(self.keys, self.vals))
         mapping.update(kwargs)
         return StateDict(self.keys, jnp.array([mapping[k] for k in self.keys]))
 
 
 class Variables(eqx.Module):
+    """
+    The main container class for variables (friction and state). It
+    contains additional convenience routines for mapping between
+    this class object and JAX arrays.
+
+    Users would typically not instantiate a ``Variables`` object
+    directly; instead, it is created through the ``Forward.set_initial_values``
+    method and retreived as ``Forward.variables``.
+    """
+
     mu: jax.Array
+    """The friction coefficient"""
     state: StateDict
+    """A container with the various state variables"""
 
     def __getattr__(self, name: str):
         # NOTE: __getattr__ is only called when __getattribute__,
@@ -45,6 +95,18 @@ class Variables(eqx.Module):
         raise AttributeError(f"{type(self).__name__} has no attribute {name!r}")
 
     def set_values(self, **kwargs) -> "Variables":
+        """
+        Set the values of friction and the state variables through key-value
+        pair arguments. The state parameters are provided individually as
+        key-value pairs as well. Because this class is immutable, ``set_values``
+        returns a copy of the class with updated values.
+
+        Examples
+        --------
+        >>> state_dict = StateDict(keys=("x", "y"), vals=jnp.array([0.1, 0.2]))
+        >>> variables = Variables(mu=jnp.asarray(0.6), state=state_dict)
+        >>> variables = variables.set_values(mu=..., x=..., y=...)
+        """
         mu = jnp.atleast_1d(kwargs.pop("mu"))
         return dcs.replace(self, mu=mu, state=self.state.replace_values(**kwargs))
 
@@ -55,6 +117,24 @@ class Variables(eqx.Module):
         return f"Variables(mu={self.mu}, {state_str})"
 
     def to_array(self) -> Float[Array, "..."]:
+        """
+        Convert the container values to a JAX array. The order of the output
+        follows the order of `StateDict.keys`, with the first item being
+        the friction coefficient. For ``n`` state variables, the output is
+        an array of shape ``(1+n,)`` for scalars, and ``(t, 1+n)`` for
+        time series.
+
+        Examples
+        --------
+        >>> scalars = Variables(...)
+        >>> mu = scalars.to_array()[0]  # friction is first element
+        >>> timeseries = Variables(...)
+        >>> mu = timeseries.to_array()[:, 0]
+        >>> all_final_values = timeseries.to_array()[-1, :]
+
+        Of course, in this example one could simply do ``scalars.mu``
+        and ``timeseries.mu`` to extract ``mu`` directly.
+        """
         mu = jnp.asarray(jnp.squeeze(self.mu))
         state = jnp.asarray(jnp.squeeze(self.state.vals))
 
@@ -218,8 +298,6 @@ Inversion results
 -----------------
 """
 
-Chains = Float[Array, "Nsteps Nparticles Nparams"]
-
 
 class Statistics(NamedTuple):
     mean: Float
@@ -270,12 +348,36 @@ class CNSStatistics(ParamStatistics):
 
 @dcs.dataclass
 class BayesianSolution:
+    """
+    The result of a Bayesian inversion. This data class stores the
+    particle trajectories (equivalent of MCMC chains), the final
+    equilibrum state, and various statistcs, as well as helper
+    routines to diagnose or visualise the results.
+
+    Examples
+    --------
+    >>> result = solver.bayesian_inversion(...)
+    >>> print(result.nan_count)  # Check for NaN values
+    >>> print(result.statistics.Dc.median)  # Get the median of Dc
+    >>> result.plot_convergence()  # Visually inspect convergence
+    >>> result.cornerplot(nbins=15)  # Create a cornerplot
+    """
 
     log_params: _Params
-    chains: Chains
+    """
+    The particles representing the (log-valued) parameters,
+    including all the iteration steps
+    """
+    chains: Float[Array, "Nsteps Nparticles Nparams"]
+    """The particle trajectories (to inspect convergence)"""
     log_likelihood: Float[Array, "Nsteps"]
+    """The log-likelihood evolution"""
     nan_count: Float[Array, "Nsteps"]
+    """The number of NaNs encountered during each iteration step"""
+    final_state: Float[Array, "Nparticles Nparams"]
+    """The final state of the particle swarm"""
     statistics: Union[RSFStatistics, CNSStatistics, None] = None
+    """Pre-computed statistics of the parameters"""
 
     def __init__(
         self,
@@ -284,15 +386,31 @@ class BayesianSolution:
         nan_count: Float[Array, "Nsteps"],
     ):
         self.log_params = log_params
+        # Convert the inversion result to an array and transpose
         chains = log_params.to_array().transpose(1, 2, 0)
+        # Undo the log-transform and store chains
         self.chains = jnp.exp(chains)
+        # Undo the log-transform and store final state
         self.final_state = jnp.exp(chains[-1])
+        # Store the log-likelihood
         self.log_likelihood = log_likelihood
+        # Store the number of NaNs encountered during each step
         self.nan_count = nan_count
         # TODO: need to generalise this...
         self.statistics = RSFStatistics.from_state(self.final_state)
 
     def plot_convergence(self):
+        """
+        Helper routine to visualise the convergence of the inversion.
+        Convergence is achieved when the particles settle in an
+        equilibrium position (i.e., they stop moving).
+
+        Returns
+        -------
+        fig : matplotlib.pyplot.figure
+            The figure object that can be manipulated after creation
+            (e.g. to save to disk)
+        """
 
         assert self.statistics is not None
 
@@ -322,6 +440,27 @@ class BayesianSolution:
         return fig
 
     def cornerplot(self, nbins=20):
+        """
+        Create a corner plot from the particle positions. For `N`
+        parameters, a corner plot is the lower half of an `N x N`
+        grid of subplots. On the diagonal, the histogram of the
+        marginal posterior over the `i-th` parameter is plotted.
+        Below the diagonal, the `(i,j)`-th panel is a scatter
+        plot of parameter `i` against parameter `j`, which shows
+        the co-variance between the two quantities.
+
+        Parameters
+        ----------
+        nbins : int
+            The number of bins to use for the histograms on the
+            diagonal of the corner plot
+
+        Returns
+        -------
+        fig : matplotlib.pyplot.figure
+            The figure object that can be manipulated after creation
+            (e.g. to save to disk)
+        """
 
         assert self.statistics is not None
         params = self.statistics.get_param_names()
@@ -371,6 +510,7 @@ class BayesianSolution:
         return fig
 
     def __repr__(self) -> str:
+        """Print out nicely-formatted statistics"""
 
         assert self.statistics is not None
 
@@ -404,6 +544,58 @@ class BayesianSolution:
         nsamples: int = 10,
         rng: Union[None, int, jax.Array] = None,
     ):
+        """
+        Draw random samples from the posterior distribution. Each
+        particle should represent one realisation of a plausible
+        friction curve. For ``nsamples`` realisations requested by a
+        user, it is more beneficial to `vmap` the forward simulations
+        rather than compute them one by one.
+
+        The resulting friction curves can be used for validation
+        purposes (does the posterior match the data?).
+
+        Examples
+        --------
+        >>> result = solver.bayesian_inversion(...)
+        >>> samples, sample_results = result.sample(
+        ...    solver=solver, y0=y0, t=t,
+        ...    friction_constants=constants,
+        ...    block_constants=block_constants,
+        ...    nsamples=20, rng=42)
+        ... )
+
+        Parameters
+        ----------
+        solver : ODESolver
+            The ``ODESolver`` class instantiated with the ``Forward``
+            model (typically the same one as used for the inversion)
+        y0 : Variables
+            The initial values of friction and state
+        t : Array
+            The time samples at which a solution is requested. This
+            does not need to be the same as the time samples recorded
+            in the experiment (from which the observed friction curve
+            is obtained)
+        friction_constants : _Constants
+            The friction and state model constants
+        block_constants : _BlockConstants
+            The stress transfer constants
+        nsamples : int
+            The number of random samples for which a solution should
+            be computed
+        rng: None, int, jax.random.PRNGKey
+            The random seed used to sample from the particle distribution.
+            If ``None``, the current time will be used as a seed, which leads
+            to different result for each realisation. When an integer is
+            provided, a new ``jax.random.PRNGKey`` is generated.
+
+        Returns
+        -------
+        samples : _Params
+            The samples drawn from the posterior distribution
+        sample_results : Variables
+            The forward simulation results corresponding with ``samples``
+        """
 
         if rng is None:
             key = jr.PRNGKey(time_ns())
