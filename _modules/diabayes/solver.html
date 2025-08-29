@@ -369,6 +369,27 @@
 <div class="viewcode-block" id="ODESolver">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.solver.ODESolver">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ODESolver</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The main solver class that contains forward and inverse modelling</span>
+<span class="sd">    methods.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    forward_model : Forward</span>
+<span class="sd">        An instantiated ``diabayes.Forward`` class, including</span>
+<span class="sd">        friction law, state evolution equations, and stress</span>
+<span class="sd">        transfer equation</span>
+<span class="sd">    rtol, atol : float</span>
+<span class="sd">        The relative and absolute tolerances used by the ODE solver</span>
+<span class="sd">    checkpoints : int</span>
+<span class="sd">        The number of checkpoints to use to compute the (adjoint)</span>
+<span class="sd">        gradients through the ODE routine. A higher number increases</span>
+<span class="sd">        stability and speed, at the expense of more GPU memory</span>
+<span class="sd">    learning_rate : float</span>
+<span class="sd">        The initial learning rate provided to the Adam algorithm</span>
+<span class="sd">        for the Stein Variational Inference. The default value of</span>
+<span class="sd">        ``1e-2`` seems like a sensible choice for most models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">forward_model</span><span class="p">:</span> <span class="n">Forward</span>
     <span class="n">rtol</span><span class="p">:</span> <span class="nb">float</span>
@@ -376,6 +397,8 @@
     <span class="n">checkpoints</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-2</span>
 
+<div class="viewcode-block" id="ODESolver.__init__">
+<a class="viewcode-back" href="../../_autosummary/diabayes.solver.ODESolver.html#diabayes.solver.ODESolver.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">forward_model</span><span class="p">:</span> <span class="n">Forward</span><span class="p">,</span>
@@ -383,11 +406,26 @@
         <span class="n">atol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
         <span class="n">checkpoints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        forward_model : Forward</span>
+<span class="sd">            An instantiated ``diabayes.Forward`` class, including</span>
+<span class="sd">            friction law, state evolution equations, and stress</span>
+<span class="sd">            transfer equation</span>
+<span class="sd">        rtol, atol : float</span>
+<span class="sd">            The relative and absolute tolerances used by the ODE solver</span>
+<span class="sd">        checkpoints : int</span>
+<span class="sd">            The number of checkpoints to use to compute the (adjoint)</span>
+<span class="sd">            gradients through the ODE routine. A higher number increases</span>
+<span class="sd">            stability and speed, at the expense of more GPU memory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">forward_model</span> <span class="o">=</span> <span class="n">forward_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="n">rtol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="n">atol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checkpoints</span> <span class="o">=</span> <span class="n">checkpoints</span>
-        <span class="k">pass</span>
+        <span class="k">pass</span></div>
+
 
 <div class="viewcode-block" id="ODESolver.solve_forward">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.solver.ODESolver.solve_forward">[docs]</a>
@@ -557,6 +595,49 @@
         <span class="n">block_constants</span><span class="p">:</span> <span class="n">_BlockConstants</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">optx</span><span class="o">.</span><span class="n">Solution</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Minimises the least-squares residuals between the observed friction</span>
+<span class="sd">        curve and the parameterised one, using the Levenberg-Marquardt</span>
+<span class="sd">        algorithm.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : Array</span>
+<span class="sd">            A vector or time values (in units of seconds). The time steps</span>
+<span class="sd">            do not need to be uniform</span>
+<span class="sd">        mu : Array</span>
+<span class="sd">            The observed friction curve sampled at ``t``</span>
+<span class="sd">        y0 : Variables</span>
+<span class="sd">            The initial values for the modelled friction and any state</span>
+<span class="sd">            variables</span>
+<span class="sd">        params : _Params</span>
+<span class="sd">            The initial guess for the invertible parameters that characterise</span>
+<span class="sd">            the forward problem. These need to be sufficiently close to the</span>
+<span class="sd">            &quot;true&quot; values for the algorithm to converge</span>
+<span class="sd">        friction_constants : _Constants</span>
+<span class="sd">            The non-invertible constants that characterise the forward</span>
+<span class="sd">            problem</span>
+<span class="sd">        block_constants : _BlockConstants</span>
+<span class="sd">            The stress transfer constants (e.g. stiffness and loading rate)</span>
+<span class="sd">        verbose : bool</span>
+<span class="sd">            Whether or not to output detailed progress of the inversion.</span>
+<span class="sd">            Defaults to ``False``</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sol : optimistix.Solution</span>
+<span class="sd">            The inversion result, including various diagnostics. The</span>
+<span class="sd">            inverted parameter values can be accessed as ``sol.values``</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If an error is produced in the first iteration step, it is quite</span>
+<span class="sd">        possible that the initial guess parameters were too far off from</span>
+<span class="sd">        the &quot;true&quot; values (i.e., the mismatch between the observed and</span>
+<span class="sd">        modelled friction curves is too large), breaking the Gauss-Newton</span>
+<span class="sd">        step of the Levenberg-Marquardt algorithm. Initial manual tuning</span>
+<span class="sd">        is recommended.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">verbose_opts</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s2">&quot;step&quot;</span><span class="p">,</span> <span class="s2">&quot;loss&quot;</span><span class="p">])</span>
@@ -595,7 +676,63 @@
         <span class="n">Nparticles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
         <span class="n">Nsteps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span>
         <span class="n">rng</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BayesianSolution</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A Bayesian inversion routine using the Stein Variational Inference</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : Array</span>
+<span class="sd">            A vector or time values (in units of seconds). The time steps</span>
+<span class="sd">            do not need to be uniform</span>
+<span class="sd">        mu : Array</span>
+<span class="sd">            The observed friction curve sampled at ``t``</span>
+<span class="sd">        noise_std : Float</span>
+<span class="sd">            An estimate of the standard deviation of the noise in the</span>
+<span class="sd">            measured friction curve. A conservative value is recommended,</span>
+<span class="sd">            i.e. if the noise has a standard deviation of $10^{-3}$, a good</span>
+<span class="sd">            starting point would be to set ``noise_std = 0.5e-3``</span>
+<span class="sd">        y0 : Variables</span>
+<span class="sd">            The initial values for the modelled friction and any state</span>
+<span class="sd">            variables</span>
+<span class="sd">        params : _Params</span>
+<span class="sd">            The initial guess for the invertible parameters that characterise</span>
+<span class="sd">            the forward problem. It is recommended to use the result from</span>
+<span class="sd">            ``ODESolver.max_likelihood_inversion``. The prior distribution</span>
+<span class="sd">            will be centered around this initial guess</span>
+<span class="sd">        friction_constants : _Constants</span>
+<span class="sd">            The non-invertible constants that characterise the forward</span>
+<span class="sd">            problem</span>
+<span class="sd">        block_constants : _BlockConstants</span>
+<span class="sd">            The stress transfer constants (e.g. stiffness and loading rate)</span>
+<span class="sd">        Nparticles : int</span>
+<span class="sd">            The number of particles (= posterior samples) to include. A higher</span>
+<span class="sd">            value gives a more accurate estimation of the posterior</span>
+<span class="sd">            distribution, at a higher computational cost.</span>
+<span class="sd">        Nsteps : int</span>
+<span class="sd">            The number of iterations before convergence is expected to be</span>
+<span class="sd">            achieved. It is recommended to start with a value of 100 and then</span>
+<span class="sd">            see if an equilibrium was actually achieved. Increasing this value</span>
+<span class="sd">            beyond the point of equilibrium does not do anything.</span>
+<span class="sd">        rng: None, int, jax.random.PRNGKey</span>
+<span class="sd">            The random seed used to initialise the particle swarm distribution.</span>
+<span class="sd">            If ``None``, the current time will be used as a seed, which leads</span>
+<span class="sd">            to different result for each realisation. When an integer is</span>
+<span class="sd">            provided, a new ``jax.random.PRNGKey`` is generated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : diabayes.BayesianSolution</span>
+<span class="sd">            The result of the inversion incapsulated in a ``BayesianSolution``</span>
+<span class="sd">            container, which provides access to the full convergence chains,</span>
+<span class="sd">            as well as diagnostic and visualisation routines.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is currently only compatible with standard rate-and-state</span>
+<span class="sd">        friction models.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
             <span class="n">params</span><span class="p">,</span> <span class="n">RSFParams</span>

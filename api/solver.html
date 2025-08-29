@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Advanced use cases &#8212; DiaBayes  documentation</title>
+    <title>Solver routines &#8212; DiaBayes  documentation</title>
   
   
   
@@ -53,11 +53,11 @@
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/advanced_usage';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/solver';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Adding custom physics" href="adding_features.html" />
-    <link rel="prev" title="Bayesian inversion" href="inversion/bayesian.html" />
+    <link rel="next" title="diabayes.solver.ODESolver" href="../_autosummary/diabayes.solver.ODESolver.html" />
+    <link rel="prev" title="diabayes.SVI.compute_phi" href="../_autosummary/diabayes.SVI.compute_phi.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -143,15 +143,15 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../api/index.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
     API Reference
   </a>
 </li>
@@ -239,15 +239,15 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../api/index.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
     API Reference
   </a>
 </li>
@@ -287,20 +287,27 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="friction_experiments.html">Rock friction experiments</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="forward/index.html">Forward modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="forward/rate-and-state.html">Rate-and-state friction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forward/chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forward/spring-block.html">Spring-blocks</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="forward_models.html">Forward models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.Forward.html">diabayes.forward_models.Forward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.ageing_law.html">diabayes.forward_models.ageing_law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.aging_law.html">diabayes.forward_models.aging_law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.slip_rate.html">diabayes.forward_models.slip_rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.springblock.html">diabayes.forward_models.springblock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.inertial_springblock.html">diabayes.forward_models.inertial_springblock</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="inversion/index.html">Inverse modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="inversion/max-likelihood.html">Maximum-likelihood inversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inversion/bayesian.html">Bayesian inversion</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="svi.html">Stein Variational Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.SVI.compute_phi.html">diabayes.SVI.compute_phi</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Advanced use cases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="adding_features.html">Adding custom physics</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Solver routines</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.solver.ODESolver.html">diabayes.solver.ODESolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.solver.ODESolver.bayesian_inversion.html">diabayes.solver.ODESolver.bayesian_inversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.solver.ODESolver.max_likelihood_inversion.html">diabayes.solver.ODESolver.max_likelihood_inversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.solver.ODESolver.solve_forward.html">diabayes.solver.ODESolver.solve_forward</a></li>
+</ul>
+</details></li>
 </ul>
 </div>
 </nav></div>
@@ -342,9 +349,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Advanced use cases</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Solver routines</span></li>
   </ul>
 </nav>
 </div>
@@ -361,16 +368,24 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="advanced-use-cases">
-<h1>Advanced use cases<a class="headerlink" href="#advanced-use-cases" title="Link to this heading">#</a></h1>
-<div class="admonition-future-work admonition">
-<p class="admonition-title">Future work</p>
-<p>To be written. This page will include</p>
-<ul class="simple">
-<li><p>Combining multiple state equations</p></li>
-<li><p>Stick-slip inversion</p></li>
-<li><p>Neural Networks</p></li>
-</ul>
+  <section class="tex2jax_ignore mathjax_ignore" id="solver-routines">
+<h1>Solver routines<a class="headerlink" href="#solver-routines" title="Link to this heading">#</a></h1>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver" title="diabayes.solver.ODESolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ODESolver</span></code></a>(forward_model[, rtol, atol, ...])</p></td>
+<td><p>The main solver class that contains forward and inverse modelling methods.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.bayesian_inversion" title="diabayes.solver.ODESolver.bayesian_inversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ODESolver.bayesian_inversion</span></code></a>(t, mu, ...[, ...])</p></td>
+<td><p>A Bayesian inversion routine using the Stein Variational Inference method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.max_likelihood_inversion" title="diabayes.solver.ODESolver.max_likelihood_inversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ODESolver.max_likelihood_inversion</span></code></a>(t, mu, ...)</p></td>
+<td><p>Minimises the least-squares residuals between the observed friction curve and the parameterised one, using the Levenberg-Marquardt algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="diabayes.html#diabayes.solver.ODESolver.solve_forward" title="diabayes.solver.ODESolver.solve_forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ODESolver.solve_forward</span></code></a>(t, y0, params, ...)</p></td>
+<td><p>Solve a forward problem using SciPy's <cite>solve_ivp</cite> routine.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </section>
 
@@ -385,20 +400,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="inversion/bayesian.html"
+       href="../_autosummary/diabayes.SVI.compute_phi.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Bayesian inversion</p>
+        <p class="prev-next-title">diabayes.SVI.compute_phi</p>
       </div>
     </a>
     <a class="right-next"
-       href="adding_features.html"
+       href="../_autosummary/diabayes.solver.ODESolver.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Adding custom physics</p>
+        <p class="prev-next-title">diabayes.solver.ODESolver</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

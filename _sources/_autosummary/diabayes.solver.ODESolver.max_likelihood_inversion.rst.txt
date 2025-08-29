@@ -1,0 +1,6 @@
+﻿diabayes.solver.ODESolver.max\_likelihood\_inversion
+====================================================
+
+.. currentmodule:: diabayes.solver
+
+.. automethod:: ODESolver.max_likelihood_inversion

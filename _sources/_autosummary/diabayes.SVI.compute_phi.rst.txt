@@ -1,0 +1,6 @@
+﻿diabayes.SVI.compute\_phi
+=========================
+
+.. currentmodule:: diabayes.SVI
+
+.. autofunction:: compute_phi

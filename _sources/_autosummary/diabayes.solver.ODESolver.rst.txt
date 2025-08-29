@@ -1,0 +1,35 @@
+﻿diabayes.solver.ODESolver
+=========================
+
+.. currentmodule:: diabayes.solver
+
+.. autoclass:: ODESolver
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ODESolver.__init__
+      ~ODESolver.bayesian_inversion
+      ~ODESolver.max_likelihood_inversion
+      ~ODESolver.solve_forward
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ODESolver.learning_rate
+      ~ODESolver.forward_model
+      ~ODESolver.rtol
+      ~ODESolver.atol
+      ~ODESolver.checkpoints
+   
+   

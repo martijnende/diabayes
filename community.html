@@ -56,7 +56,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'community';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="diabayes.forward_models.inertial_springblock" href="_autosummary/diabayes.forward_models.inertial_springblock.html" />
+    <link rel="prev" title="diabayes.solver.ODESolver.solve_forward" href="_autosummary/diabayes.solver.ODESolver.solve_forward.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -340,10 +340,31 @@
 <h1>DiaBayes Community<a class="headerlink" href="#diabayes-community" title="Link to this heading">#</a></h1>
 <section id="frequently-asked-questions">
 <h2>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading">#</a></h2>
+<section id="the-maximum-likelihood-inversion-crashes-before-converging">
+<h3>The maximum-likelihood inversion crashes before converging<a class="headerlink" href="#the-maximum-likelihood-inversion-crashes-before-converging" title="Link to this heading">#</a></h3>
+<p>To ensure that everything is wired-up correctly, check that you are able to run a forward simulation with your specified forward model. If that works well, make sure that the initial guess of the parameters produces a friction curve that is sufficiently close to the observed friction. For parameter estimates that are too far off, the Gauss-Newton step of the Levenberg-Marquardt algorithm may fail.</p>
+</section>
+<section id="i-am-getting-a-mysterious-error">
+<h3>I am getting a mysterious error<a class="headerlink" href="#i-am-getting-a-mysterious-error" title="Link to this heading">#</a></h3>
+<p>Under the hood, most of the computations are handled by JAX, which compiles and ports the code to a GPU or multi-core CPU. One disadvantage of this automatic optimisation and acceleration, is that the error messages that are being produced tend to be rather cryptic, and often the final <code class="docutils literal notranslate"><span class="pre">Exception</span></code> is not at all informative of the code segment that causes trouble. To facilitate debugging, you can turn off the <em>Just-in-Time</em> (JIT) compiler by including the following at the top of your script:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_disable_jit&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If NaNs are produced, it may also help to turn on NaN debugging:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_debug_nans&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">jax.config</span></code> should be set only at the start of your script before any JAX routines are called. The configuration will stay enabled until the script terminates.</p>
+</section>
 </section>
 <section id="how-to-cite">
 <h2>How to cite?<a class="headerlink" href="#how-to-cite" title="Link to this heading">#</a></h2>
 <p>A publication describing this software package is underway. Until then, feel free to refer to the GitHub repository: https://github.com/martijnende/diabayes</p>
+</section>
+<section id="how-to-contribute">
+<h2>How to contribute?<a class="headerlink" href="#how-to-contribute" title="Link to this heading">#</a></h2>
+<p>If you have ideas for new features to include, you can submit an issue on <a class="reference external" href="https://github.com/martijnende/diabayes">GitHub</a> to discuss it. See <a class="reference internal" href="user-guide/adding_features.html"><span class="std std-doc">the User Guide</span></a> for general guidelines on how to extend DiaBayes with new physics. Contributed example Jupyter Notebooks and documentation improvements are also welcome.</p>
 </section>
 <section id="useful-resources">
 <h2>Useful resources<a class="headerlink" href="#useful-resources" title="Link to this heading">#</a></h2>
@@ -361,12 +382,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="_autosummary/diabayes.forward_models.inertial_springblock.html"
+       href="_autosummary/diabayes.solver.ODESolver.solve_forward.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">diabayes.forward_models.inertial_springblock</p>
+        <p class="prev-next-title">diabayes.solver.ODESolver.solve_forward</p>
       </div>
     </a>
 </div>
@@ -388,8 +409,13 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#frequently-asked-questions">Frequently Asked Questions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#frequently-asked-questions">Frequently Asked Questions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-maximum-likelihood-inversion-crashes-before-converging">The maximum-likelihood inversion crashes before converging</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#i-am-getting-a-mysterious-error">I am getting a mysterious error</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-cite">How to cite?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-contribute">How to contribute?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#useful-resources">Useful resources</a></li>
 </ul>
   </nav></div>

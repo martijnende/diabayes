@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>diabayes.forward_models.Forward &#8212; DiaBayes  documentation</title>
+    <title>diabayes.SVI.compute_phi &#8212; DiaBayes  documentation</title>
   
   
   
@@ -53,13 +53,11 @@
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/diabayes.forward_models.Forward';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/diabayes.SVI.compute_phi';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="diabayes.forward_models.rsf" href="diabayes.forward_models.rsf.html" />
-    <link rel="prev" title="Forward models" href="../api/forward_models.html" />
+    <link rel="next" title="Solver routines" href="../api/solver.html" />
+    <link rel="prev" title="Stein Variational Inference" href="../api/svi.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -293,8 +291,8 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api/forward_models.html">Forward models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">diabayes.forward_models.Forward</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/forward_models.html">Forward models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.Forward.html">diabayes.forward_models.Forward</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.ageing_law.html">diabayes.forward_models.ageing_law</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.aging_law.html">diabayes.forward_models.aging_law</a></li>
@@ -303,8 +301,8 @@
 <li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.inertial_springblock.html">diabayes.forward_models.inertial_springblock</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/svi.html">Stein Variational Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="diabayes.SVI.compute_phi.html">diabayes.SVI.compute_phi</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api/svi.html">Stein Variational Inference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">diabayes.SVI.compute_phi</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../api/solver.html">Solver routines</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -358,9 +356,9 @@
     <li class="breadcrumb-item"><a href="../api/index.html" class="nav-link">API Reference</a></li>
     
     
-    <li class="breadcrumb-item"><a href="../api/forward_models.html" class="nav-link">Forward models</a></li>
+    <li class="breadcrumb-item"><a href="../api/svi.html" class="nav-link">Stein Variational Inference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">diabayes.forward_models.Forward</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">diabayes.SVI.compute_phi</span></li>
   </ul>
 </nav>
 </div>
@@ -377,45 +375,36 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="diabayes-forward-models-forward">
-<h1>diabayes.forward_models.Forward<a class="headerlink" href="#diabayes-forward-models-forward" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="diabayes.forward_models.Forward">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">Forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">friction_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.FrictionModel" title="diabayes.typedefs.FrictionModel"><span class="pre">FrictionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_evolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress_transfer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.StressTransfer" title="diabayes.typedefs.StressTransfer"><span class="pre">StressTransfer</span></a><span class="p"><span class="pre">[</span></span><span class="pre">BC</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/forward_models.html#Forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.Forward" title="Link to this definition">#</a></dt>
-<dd><p>The <code class="docutils literal notranslate"><span class="pre">Forward</span></code> class assembles the various components that comprise
-a forward model, such that <code class="docutils literal notranslate"><span class="pre">Forward.__call__</span></code> takes some variables
-and returns the rate of change of these variables</p>
-<div class="math notranslate nohighlight">
-\[\frac{\mathrm{d} \vec{X}}{\mathrm{d}t} = f \left( \vec{X} \right)\]</div>
-<p>This forward ODE can then be solved by any ODE solver.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Forward</span></code> class is instantiated by providing a friction model,
-a “state” evolution law, and a stress transfer model.</p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.forward_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ageing_law</span><span class="p">,</span> <span class="n">rsf</span><span class="p">,</span> <span class="n">springblock</span><span class="p">,</span> <span class="n">Forward</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">foward_model</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">(</span><span class="n">rsf</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="n">ageing_law</span><span class="p">},</span> <span class="n">springblock</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_dot</span> <span class="o">=</span> <span class="n">forward_model</span><span class="p">(</span><span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">params</span><span class="o">=...</span><span class="p">,</span> <span class="n">friction_constants</span><span class="o">=...</span><span class="p">,</span> <span class="n">block_constants</span><span class="o">=...</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="diabayes.forward_models.Forward.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">friction_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.FrictionModel" title="diabayes.typedefs.FrictionModel"><span class="pre">FrictionModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_evolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress_transfer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.StressTransfer" title="diabayes.typedefs.StressTransfer"><span class="pre">StressTransfer</span></a><span class="p"><span class="pre">[</span></span><span class="pre">BC</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/diabayes/forward_models.html#Forward.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.Forward.__init__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<p class="rubric">Methods</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#diabayes.forward_models.Forward.__init__" title="diabayes.forward_models.Forward.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(friction_model, state_evolution, ...)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward.call" title="diabayes.forward_models.Forward.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(t, variables, params, ...)</p></td>
-<td><p>Calculate the rate of change of the variables, defining the ODE to be solved.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward.set_initial_values" title="diabayes.forward_models.Forward.set_initial_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_initial_values</span></code></a>(**kwargs)</p></td>
-<td><p>Set the initial values of the <code class="docutils literal notranslate"><span class="pre">variables</span></code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+  <section id="diabayes-svi-compute-phi">
+<h1>diabayes.SVI.compute_phi<a class="headerlink" href="#diabayes-svi-compute-phi" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="diabayes.SVI.compute_phi">
+<span class="sig-prename descclassname"><span class="pre">diabayes.SVI.</span></span><span class="sig-name descname"><span class="pre">compute_phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'N</span> <span class="pre">M'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'N</span> <span class="pre">M'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'N</span> <span class="pre">M'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'N</span> <span class="pre">M'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/diabayes/SVI.html#compute_phi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.SVI.compute_phi" title="Link to this definition">#</a></dt>
+<dd><p>Compute the Stein variational gradients for a set of
+particles (<code class="docutils literal notranslate"><span class="pre">x</span></code>) and the gradients of the log-likelihood
+function (<code class="docutils literal notranslate"><span class="pre">gradp</span></code>) and the log-prior (<code class="docutils literal notranslate"><span class="pre">gradq</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ParticleArray</em>) – The set of invertible parameters (“particles”)
+of shape <code class="docutils literal notranslate"><span class="pre">(Nparticles,</span> <span class="pre">Ndimensions)</span></code></p></li>
+<li><p><strong>gradp</strong> (<em>GradientArray</em>) – The gradients of the log-likelihood (<code class="docutils literal notranslate"><span class="pre">gradp</span></code>) and the
+log-prior (<code class="docutils literal notranslate"><span class="pre">gradq</span></code>) with respect to the invertible parameters.
+Has a shape <code class="docutils literal notranslate"><span class="pre">(Nparticles,</span> <span class="pre">Ndimensions)</span></code></p></li>
+<li><p><strong>gradq</strong> (<em>GradientArray</em>) – The gradients of the log-likelihood (<code class="docutils literal notranslate"><span class="pre">gradp</span></code>) and the
+log-prior (<code class="docutils literal notranslate"><span class="pre">gradq</span></code>) with respect to the invertible parameters.
+Has a shape <code class="docutils literal notranslate"><span class="pre">(Nparticles,</span> <span class="pre">Ndimensions)</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>grad_x</strong> – The directional gradients for the particle updates, e.g.
+<code class="docutils literal notranslate"><span class="pre">new_x</span> <span class="pre">=</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">step_size</span> <span class="pre">*</span> <span class="pre">grad_x</span></code>. Has the same
+shape as <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">gradp,</span> <span class="pre">gradq</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Gradients</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -431,20 +420,20 @@ a “state” evolution law, and a stress transfer model.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../api/forward_models.html"
+       href="../api/svi.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Forward models</p>
+        <p class="prev-next-title">Stein Variational Inference</p>
       </div>
     </a>
     <a class="right-next"
-       href="diabayes.forward_models.rsf.html"
+       href="../api/solver.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">diabayes.forward_models.rsf</p>
+        <p class="prev-next-title">Solver routines</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -467,10 +456,7 @@ a “state” evolution law, and a stress transfer model.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward"><code class="docutils literal notranslate"><span class="pre">Forward</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.Forward.__init__"><code class="docutils literal notranslate"><span class="pre">Forward.__init__()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.SVI.compute_phi"><code class="docutils literal notranslate"><span class="pre">compute_phi()</span></code></a></li>
 </ul>
   </nav></div>
 

@@ -1,0 +1,6 @@
+﻿diabayes.solver.ODESolver.solve\_forward
+========================================
+
+.. currentmodule:: diabayes.solver
+
+.. automethod:: ODESolver.solve_forward

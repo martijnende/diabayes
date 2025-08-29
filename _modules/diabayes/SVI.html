@@ -351,6 +351,7 @@
 
 <span class="nd">@eqx</span><span class="o">.</span><span class="n">filter_jit</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_distance</span><span class="p">(</span><span class="n">x1</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">ParticleArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;N N&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Euclidean distance between two particles `x1` and `x2`&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
 
@@ -385,25 +386,25 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the Stein variational gradients for a set of</span>
-<span class="sd">    particles (`x`) and the gradients of the log-likelihood</span>
-<span class="sd">    function (`gradp`) and the log-prior (`gradq`).</span>
+<span class="sd">    particles (``x``) and the gradients of the log-likelihood</span>
+<span class="sd">    function (``gradp``) and the log-prior (``gradq``).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : ParticleArray</span>
 <span class="sd">        The set of invertible parameters (&quot;particles&quot;)</span>
-<span class="sd">        of shape (Nparticles, Ndimensions)</span>
+<span class="sd">        of shape ``(Nparticles, Ndimensions)``</span>
 <span class="sd">    gradp, gradq : GradientArray</span>
-<span class="sd">        The gradients of the log-likelihood (`gradp`) and the</span>
-<span class="sd">        log-prior (`gradq`) with respect to the invertible parameters.</span>
-<span class="sd">        Has a shape (Nparticles, Ndimensions)</span>
+<span class="sd">        The gradients of the log-likelihood (``gradp``) and the</span>
+<span class="sd">        log-prior (``gradq``) with respect to the invertible parameters.</span>
+<span class="sd">        Has a shape ``(Nparticles, Ndimensions)``</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    grad_x : Gradients</span>
 <span class="sd">        The directional gradients for the particle updates, e.g.</span>
-<span class="sd">        `new_x = x + step_size * grad_x`. Has the same</span>
-<span class="sd">        shape as `x` and `gradp, gradq`.</span>
+<span class="sd">        ``new_x = x + step_size * grad_x``. Has the same</span>
+<span class="sd">        shape as ``x`` and ``gradp, gradq``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">h</span> <span class="o">=</span> <span class="n">_median_trick_h</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">map_over_a</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>

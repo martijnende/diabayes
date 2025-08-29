@@ -1,0 +1,6 @@
+﻿diabayes.solver.ODESolver.bayesian\_inversion
+=============================================
+
+.. currentmodule:: diabayes.solver
+
+.. automethod:: ODESolver.bayesian_inversion
