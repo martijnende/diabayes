@@ -1,0 +1,51 @@
+[project]
+name = "diabayes"
+version = "0.1.0"
+requires-python = "> 3.0"
+authors = [
+    { name = "Martijn van den Ende", email = "martijnende@gmail.com" },
+]
+dependencies = [
+    "jax",
+    "jax_tqdm",
+    "jaxtyping",
+    "equinox",
+    "diffrax",
+    "optax",
+    "optimistix",
+    "matplotlib",
+    "ipympl",
+    "ipython",
+    "jupyter",
+    "pytest",
+]
+
+[project.optional-dependencies]
+dev = ["black", "isort", "twine"]
+gpu = ["jax[cuda12]"]
+docs = [
+    "make",
+    "myst-nb",
+    "pydata-sphinx-theme",
+    "sphinx",
+    "sphinx-copybutton",
+    "sphinx-togglebutton",
+    "sphinx-design",
+    "sphinxcontrib-bibtex",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["diabayes"]
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["test"]
+pythonpath = ["scripts"]
