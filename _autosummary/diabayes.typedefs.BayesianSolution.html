@@ -385,8 +385,20 @@
 <h1>diabayes.typedefs.BayesianSolution<a class="headerlink" href="#diabayes-typedefs-bayesiansolution" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">BayesianSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">diabayes.typedefs.RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">diabayes.typedefs.CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_likelihood</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">jaxtyping.Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">jaxtyping.Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution" title="Link to this definition">#</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">BayesianSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_likelihood</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution" title="Link to this definition">#</a></dt>
+<dd><p>The result of a Bayesian inversion. This data class stores the
+particle trajectories (equivalent of MCMC chains), the final
+equilibrum state, and various statistcs, as well as helper
+routines to diagnose or visualise the results.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">bayesian_inversion</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">nan_count</span><span class="p">)</span>  <span class="c1"># Check for NaN values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">Dc</span><span class="o">.</span><span class="n">median</span><span class="p">)</span>  <span class="c1"># Get the median of Dc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">plot_convergence</span><span class="p">()</span>  <span class="c1"># Visually inspect convergence</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">cornerplot</span><span class="p">(</span><span class="n">nbins</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>  <span class="c1"># Create a cornerplot</span>
+</pre></div>
+</div>
+<dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_likelihood</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.__init__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -398,13 +410,13 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.cornerplot" title="diabayes.typedefs.BayesianSolution.cornerplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cornerplot</span></code></a>([nbins])</p></td>
-<td><p></p></td>
+<td><p>Create a corner plot from the particle positions.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.plot_convergence" title="diabayes.typedefs.BayesianSolution.plot_convergence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_convergence</span></code></a>()</p></td>
-<td><p></p></td>
+<td><p>Helper routine to visualise the convergence of the inversion.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.sample" title="diabayes.typedefs.BayesianSolution.sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample</span></code></a>(solver, y0, t, friction_constants, ...)</p></td>
-<td><p></p></td>
+<td><p>Draw random samples from the posterior distribution.</p></td>
 </tr>
 </tbody>
 </table>
@@ -413,19 +425,22 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.statistics" title="diabayes.typedefs.BayesianSolution.statistics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statistics</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Pre-computed statistics of the parameters</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.log_params" title="diabayes.typedefs.BayesianSolution.log_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_params</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The particles representing the (log-valued) parameters, including all the iteration steps</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.chains" title="diabayes.typedefs.BayesianSolution.chains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chains</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The particle trajectories (to inspect convergence)</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.log_likelihood" title="diabayes.typedefs.BayesianSolution.log_likelihood"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_likelihood</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The log-likelihood evolution</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.nan_count" title="diabayes.typedefs.BayesianSolution.nan_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nan_count</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The number of NaNs encountered during each iteration step</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.BayesianSolution.final_state" title="diabayes.typedefs.BayesianSolution.final_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">final_state</span></code></a></p></td>
+<td><p>The final state of the particle swarm</p></td>
 </tr>
 </tbody>
 </table>
@@ -433,42 +448,131 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.cornerplot">
 <span class="sig-name descname"><span class="pre">cornerplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution.cornerplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.cornerplot" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Create a corner plot from the particle positions. For <cite>N</cite>
+parameters, a corner plot is the lower half of an <cite>N x N</cite>
+grid of subplots. On the diagonal, the histogram of the
+marginal posterior over the <cite>i-th</cite> parameter is plotted.
+Below the diagonal, the <cite>(i,j)</cite>-th panel is a scatter
+plot of parameter <cite>i</cite> against parameter <cite>j</cite>, which shows
+the co-variance between the two quantities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nbins</strong> (<em>int</em>) – The number of bins to use for the histograms on the
+diagonal of the corner plot</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The figure object that can be manipulated after creation
+(e.g. to save to disk)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.pyplot.figure</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.plot_convergence">
 <span class="sig-name descname"><span class="pre">plot_convergence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution.plot_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.plot_convergence" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Helper routine to visualise the convergence of the inversion.
+Convergence is achieved when the particles settle in an
+equilibrium position (i.e., they stop moving).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fig</strong> – The figure object that can be manipulated after creation
+(e.g. to save to disk)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.pyplot.figure</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsamples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw random samples from the posterior distribution. Each
+particle should represent one realisation of a plausible
+friction curve. For <code class="docutils literal notranslate"><span class="pre">nsamples</span></code> realisations requested by a
+user, it is more beneficial to <cite>vmap</cite> the forward simulations
+rather than compute them one by one.</p>
+<p>The resulting friction curves can be used for validation
+purposes (does the posterior match the data?).</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">bayesian_inversion</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">samples</span><span class="p">,</span> <span class="n">sample_results</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">solver</span><span class="o">=</span><span class="n">solver</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">nsamples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solver</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.solver.ODESolver" title="diabayes.solver.ODESolver"><em>ODESolver</em></a>) – The <code class="docutils literal notranslate"><span class="pre">ODESolver</span></code> class instantiated with the <code class="docutils literal notranslate"><span class="pre">Forward</span></code>
+model (typically the same one as used for the inversion)</p></li>
+<li><p><strong>y0</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The initial values of friction and state</p></li>
+<li><p><strong>t</strong> (<em>Array</em>) – The time samples at which a solution is requested. This
+does not need to be the same as the time samples recorded
+in the experiment (from which the observed friction curve
+is obtained)</p></li>
+<li><p><strong>friction_constants</strong> (<em>_Constants</em>) – The friction and state model constants</p></li>
+<li><p><strong>block_constants</strong> (<em>_BlockConstants</em>) – The stress transfer constants</p></li>
+<li><p><strong>nsamples</strong> (<em>int</em>) – The number of random samples for which a solution should
+be computed</p></li>
+<li><p><strong>rng</strong> (<em>None</em><em>, </em><em>int</em><em>, </em><em>jax.random.PRNGKey</em>) – The random seed used to sample from the particle distribution.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the current time will be used as a seed, which leads
+to different result for each realisation. When an integer is
+provided, a new <code class="docutils literal notranslate"><span class="pre">jax.random.PRNGKey</span></code> is generated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>samples</strong> (<em>_Params</em>) – The samples drawn from the posterior distribution</p></li>
+<li><p><strong>sample_results</strong> (<em>Variables</em>) – The forward simulation results corresponding with <code class="docutils literal notranslate"><span class="pre">samples</span></code></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.chains">
 <span class="sig-name descname"><span class="pre">chains</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps</span> <span class="pre">Nparticles</span> <span class="pre">Nparams'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.chains" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The particle trajectories (to inspect convergence)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.final_state">
+<span class="sig-name descname"><span class="pre">final_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nparticles</span> <span class="pre">Nparams'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.final_state" title="Link to this definition">#</a></dt>
+<dd><p>The final state of the particle swarm</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.log_likelihood">
 <span class="sig-name descname"><span class="pre">log_likelihood</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.log_likelihood" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The log-likelihood evolution</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.log_params">
 <span class="sig-name descname"><span class="pre">log_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.log_params" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The particles representing the (log-valued) parameters,
+including all the iteration steps</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.nan_count">
 <span class="sig-name descname"><span class="pre">nan_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.nan_count" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The number of NaNs encountered during each iteration step</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.statistics">
 <span class="sig-name descname"><span class="pre">statistics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFStatistics" title="diabayes.typedefs.RSFStatistics"><span class="pre">RSFStatistics</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSStatistics" title="diabayes.typedefs.CNSStatistics"><span class="pre">CNSStatistics</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.statistics" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Pre-computed statistics of the parameters</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -527,6 +631,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.plot_convergence"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.plot_convergence()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.sample"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.sample()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.chains"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.chains</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.final_state"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.final_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.log_likelihood"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.log_likelihood</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.log_params"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.log_params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.nan_count"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.nan_count</span></code></a></li>

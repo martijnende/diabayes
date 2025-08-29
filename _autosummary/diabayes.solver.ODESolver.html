@@ -388,74 +388,10 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.solver.</span></span><span class="sig-name descname"><span class="pre">ODESolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><span class="pre">Forward</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver" title="Link to this definition">#</a></dt>
 <dd><p>The main solver class that contains forward and inverse modelling
 methods.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="diabayes.solver.ODESolver.forward_model">
-<span class="sig-name descname"><span class="pre">forward_model</span></span><a class="headerlink" href="#diabayes.solver.ODESolver.forward_model" title="Link to this definition">#</a></dt>
-<dd><p>An instantiated <code class="docutils literal notranslate"><span class="pre">diabayes.Forward</span></code> class, including
-friction law, state evolution equations, and stress
-transfer equation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward">Forward</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">rtol,</span> <span class="pre">atol</span></span></dt>
-<dd><p>The relative and absolute tolerances used by the ODE solver</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="diabayes.solver.ODESolver.checkpoints">
-<span class="sig-name descname"><span class="pre">checkpoints</span></span><a class="headerlink" href="#diabayes.solver.ODESolver.checkpoints" title="Link to this definition">#</a></dt>
-<dd><p>The number of checkpoints to use to compute the (adjoint)
-gradients through the ODE routine. A higher number increases
-stability and speed, at the expense of more GPU memory</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="diabayes.solver.ODESolver.learning_rate">
-<span class="sig-name descname"><span class="pre">learning_rate</span></span><a class="headerlink" href="#diabayes.solver.ODESolver.learning_rate" title="Link to this definition">#</a></dt>
-<dd><p>The initial learning rate provided to the Adam algorithm
-for the Stein Variational Inference. The default value of
-<code class="docutils literal notranslate"><span class="pre">1e-2</span></code> seems like a sensible choice for most models.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><span class="pre">Forward</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver.__init__" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>forward_model</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><em>Forward</em></a>) – An instantiated <code class="docutils literal notranslate"><span class="pre">diabayes.Forward</span></code> class, including
-friction law, state evolution equations, and stress
-transfer equation</p></li>
-<li><p><strong>rtol</strong> (<em>float</em>) – The relative and absolute tolerances used by the ODE solver</p></li>
-<li><p><strong>atol</strong> (<em>float</em>) – The relative and absolute tolerances used by the ODE solver</p></li>
-<li><p><strong>checkpoints</strong> (<em>int</em>) – The number of checkpoints to use to compute the (adjoint)
-gradients through the ODE routine. A higher number increases
-stability and speed, at the expense of more GPU memory</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
@@ -470,7 +406,7 @@ stability and speed, at the expense of more GPU memory</p></li>
 <td><p>Minimises the least-squares residuals between the observed friction curve and the parameterised one, using the Levenberg-Marquardt algorithm.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.solver.ODESolver.solve_forward" title="diabayes.solver.ODESolver.solve_forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_forward</span></code></a>(t, y0, params, ...[, method])</p></td>
-<td><p>Solve a forward problem using SciPy's <cite>solve_ivp</cite> routine.</p></td>
+<td><p>Solve a forward problem using SciPy's <code class="docutils literal notranslate"><span class="pre">solve_ivp</span></code> routine.</p></td>
 </tr>
 </tbody>
 </table>
@@ -478,20 +414,20 @@ stability and speed, at the expense of more GPU memory</p></li>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#id2" title="diabayes.solver.ODESolver.learning_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">learning_rate</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.solver.ODESolver.learning_rate" title="diabayes.solver.ODESolver.learning_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">learning_rate</span></code></a></p></td>
+<td><p>The initial learning rate provided to the Adam algorithm for the Stein Variational Inference.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#id1" title="diabayes.solver.ODESolver.forward_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forward_model</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.solver.ODESolver.forward_model" title="diabayes.solver.ODESolver.forward_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forward_model</span></code></a></p></td>
+<td><p>An instantiated <code class="docutils literal notranslate"><span class="pre">diabayes.Forward</span></code> class, including friction law, state evolution equations, and stress transfer equation</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.solver.ODESolver.rtol" title="diabayes.solver.ODESolver.rtol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rtol</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The absolute tolerance used by the ODE solver</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.solver.ODESolver.atol" title="diabayes.solver.ODESolver.atol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atol</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The absolute tolerance used by the ODE solver</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#id0" title="diabayes.solver.ODESolver.checkpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkpoints</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.solver.ODESolver.checkpoints" title="diabayes.solver.ODESolver.checkpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkpoints</span></code></a></p></td>
+<td><p>The number of checkpoints to use to compute the (adjoint) gradients through the ODE routine.</p></td>
 </tr>
 </tbody>
 </table>
@@ -591,7 +527,7 @@ is recommended.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.solve_forward">
 <span class="sig-name descname"><span class="pre">solve_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RK45'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver.solve_forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver.solve_forward" title="Link to this definition">#</a></dt>
-<dd><p>Solve a forward problem using SciPy’s <cite>solve_ivp</cite> routine.
+<dd><p>Solve a forward problem using SciPy’s <code class="docutils literal notranslate"><span class="pre">solve_ivp</span></code> routine.
 While this routine doesn’t propagate any gradients, it is
 much faster to initialise and to perform a single forward
 run. Hence for playing around with different parameters,
@@ -620,27 +556,38 @@ wrapped in a <cite>Params</cite> container.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.atol">
 <span class="sig-name descname"><span class="pre">atol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.atol" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The absolute tolerance used by the ODE solver</p>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">checkpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.checkpoints">
+<span class="sig-name descname"><span class="pre">checkpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.checkpoints" title="Link to this definition">#</a></dt>
+<dd><p>The number of checkpoints to use to compute the (adjoint)
+gradients through the ODE routine. A higher number increases
+stability and speed, at the expense of more GPU memory</p>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">forward_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><span class="pre">Forward</span></a></em><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.forward_model">
+<span class="sig-name descname"><span class="pre">forward_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../api/diabayes.html#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><span class="pre">Forward</span></a></em><a class="headerlink" href="#diabayes.solver.ODESolver.forward_model" title="Link to this definition">#</a></dt>
+<dd><p>An instantiated <code class="docutils literal notranslate"><span class="pre">diabayes.Forward</span></code> class, including
+friction law, state evolution equations, and stress
+transfer equation</p>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.learning_rate">
+<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.learning_rate" title="Link to this definition">#</a></dt>
+<dd><p>The initial learning rate provided to the Adam algorithm
+for the Stein Variational Inference. The default value of
+<code class="docutils literal notranslate"><span class="pre">1e-2</span></code> seems like a sensible choice for most models.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.rtol">
 <span class="sig-name descname"><span class="pre">rtol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.rtol" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The absolute tolerance used by the ODE solver</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -694,17 +641,14 @@ wrapped in a <cite>Params</cite> container.</p></li>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver"><code class="docutils literal notranslate"><span class="pre">ODESolver</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.forward_model"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.checkpoints"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.learning_rate"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.__init__"><code class="docutils literal notranslate"><span class="pre">ODESolver.__init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.bayesian_inversion"><code class="docutils literal notranslate"><span class="pre">ODESolver.bayesian_inversion()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.max_likelihood_inversion"><code class="docutils literal notranslate"><span class="pre">ODESolver.max_likelihood_inversion()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.solve_forward"><code class="docutils literal notranslate"><span class="pre">ODESolver.solve_forward()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.atol"><code class="docutils literal notranslate"><span class="pre">ODESolver.atol</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.checkpoints"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.forward_model"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.learning_rate"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.rtol"><code class="docutils literal notranslate"><span class="pre">ODESolver.rtol</span></code></a></li>
 </ul>
 </li>

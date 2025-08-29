@@ -600,56 +600,6 @@ and load-point velocity <code class="docutils literal notranslate"><span class="
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The main solver class that contains forward and inverse modelling
 methods.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="diabayes.solver.ODESolver.forward_model">
-<span class="sig-name descname"><span class="pre">forward_model</span></span><a class="headerlink" href="#diabayes.solver.ODESolver.forward_model" title="Link to this definition">#</a></dt>
-<dd><p>An instantiated <code class="docutils literal notranslate"><span class="pre">diabayes.Forward</span></code> class, including
-friction law, state evolution equations, and stress
-transfer equation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward">Forward</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">rtol,</span> <span class="pre">atol</span></span></dt>
-<dd><p>The relative and absolute tolerances used by the ODE solver</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="diabayes.solver.ODESolver.checkpoints">
-<span class="sig-name descname"><span class="pre">checkpoints</span></span><a class="headerlink" href="#diabayes.solver.ODESolver.checkpoints" title="Link to this definition">#</a></dt>
-<dd><p>The number of checkpoints to use to compute the (adjoint)
-gradients through the ODE routine. A higher number increases
-stability and speed, at the expense of more GPU memory</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="diabayes.solver.ODESolver.learning_rate">
-<span class="sig-name descname"><span class="pre">learning_rate</span></span><a class="headerlink" href="#diabayes.solver.ODESolver.learning_rate" title="Link to this definition">#</a></dt>
-<dd><p>The initial learning rate provided to the Adam algorithm
-for the Stein Variational Inference. The default value of
-<code class="docutils literal notranslate"><span class="pre">1e-2</span></code> seems like a sensible choice for most models.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.bayesian_inversion">
 <span class="sig-name descname"><span class="pre">bayesian_inversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nparticles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#diabayes.typedefs.BayesianSolution" title="diabayes.typedefs.BayesianSolution"><span class="pre">BayesianSolution</span></a></span></span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver.bayesian_inversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver.bayesian_inversion" title="Link to this definition">#</a></dt>
@@ -745,7 +695,7 @@ is recommended.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.solve_forward">
 <span class="sig-name descname"><span class="pre">solve_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RK45'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/diabayes/solver.html#ODESolver.solve_forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.solver.ODESolver.solve_forward" title="Link to this definition">#</a></dt>
-<dd><p>Solve a forward problem using SciPy’s <cite>solve_ivp</cite> routine.
+<dd><p>Solve a forward problem using SciPy’s <code class="docutils literal notranslate"><span class="pre">solve_ivp</span></code> routine.
 While this routine doesn’t propagate any gradients, it is
 much faster to initialise and to perform a single forward
 run. Hence for playing around with different parameters,
@@ -774,27 +724,38 @@ wrapped in a <cite>Params</cite> container.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.atol">
 <span class="sig-name descname"><span class="pre">atol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.atol" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The absolute tolerance used by the ODE solver</p>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">checkpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.checkpoints">
+<span class="sig-name descname"><span class="pre">checkpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.checkpoints" title="Link to this definition">#</a></dt>
+<dd><p>The number of checkpoints to use to compute the (adjoint)
+gradients through the ODE routine. A higher number increases
+stability and speed, at the expense of more GPU memory</p>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">forward_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><span class="pre">Forward</span></a></em><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.forward_model">
+<span class="sig-name descname"><span class="pre">forward_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.forward_models.Forward" title="diabayes.forward_models.Forward"><span class="pre">Forward</span></a></em><a class="headerlink" href="#diabayes.solver.ODESolver.forward_model" title="Link to this definition">#</a></dt>
+<dd><p>An instantiated <code class="docutils literal notranslate"><span class="pre">diabayes.Forward</span></code> class, including
+friction law, state evolution equations, and stress
+transfer equation</p>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#id2" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="diabayes.solver.ODESolver.learning_rate">
+<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.learning_rate" title="Link to this definition">#</a></dt>
+<dd><p>The initial learning rate provided to the Adam algorithm
+for the Stein Variational Inference. The default value of
+<code class="docutils literal notranslate"><span class="pre">1e-2</span></code> seems like a sensible choice for most models.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.solver.ODESolver.rtol">
 <span class="sig-name descname"><span class="pre">rtol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#diabayes.solver.ODESolver.rtol" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The absolute tolerance used by the ODE solver</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -812,47 +773,148 @@ wrapped in a <cite>Params</cite> container.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">BayesianSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">diabayes.typedefs.RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">diabayes.typedefs.CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_likelihood</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">jaxtyping.Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">jaxtyping.Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">BayesianSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_likelihood</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The result of a Bayesian inversion. This data class stores the
+particle trajectories (equivalent of MCMC chains), the final
+equilibrum state, and various statistcs, as well as helper
+routines to diagnose or visualise the results.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">bayesian_inversion</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">nan_count</span><span class="p">)</span>  <span class="c1"># Check for NaN values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">Dc</span><span class="o">.</span><span class="n">median</span><span class="p">)</span>  <span class="c1"># Get the median of Dc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">plot_convergence</span><span class="p">()</span>  <span class="c1"># Visually inspect convergence</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">cornerplot</span><span class="p">(</span><span class="n">nbins</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>  <span class="c1"># Create a cornerplot</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.cornerplot">
 <span class="sig-name descname"><span class="pre">cornerplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution.cornerplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.cornerplot" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Create a corner plot from the particle positions. For <cite>N</cite>
+parameters, a corner plot is the lower half of an <cite>N x N</cite>
+grid of subplots. On the diagonal, the histogram of the
+marginal posterior over the <cite>i-th</cite> parameter is plotted.
+Below the diagonal, the <cite>(i,j)</cite>-th panel is a scatter
+plot of parameter <cite>i</cite> against parameter <cite>j</cite>, which shows
+the co-variance between the two quantities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nbins</strong> (<em>int</em>) – The number of bins to use for the histograms on the
+diagonal of the corner plot</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The figure object that can be manipulated after creation
+(e.g. to save to disk)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.pyplot.figure</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.plot_convergence">
 <span class="sig-name descname"><span class="pre">plot_convergence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution.plot_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.plot_convergence" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Helper routine to visualise the convergence of the inversion.
+Convergence is achieved when the particles settle in an
+equilibrium position (i.e., they stop moving).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fig</strong> – The figure object that can be manipulated after creation
+(e.g. to save to disk)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.pyplot.figure</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.RSFConstants" title="diabayes.typedefs.RSFConstants"><span class="pre">RSFConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.SpringBlockConstants" title="diabayes.typedefs.SpringBlockConstants"><span class="pre">SpringBlockConstants</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.InertialSpringBlockConstants" title="diabayes.typedefs.InertialSpringBlockConstants"><span class="pre">InertialSpringBlockConstants</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsamples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#BayesianSolution.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw random samples from the posterior distribution. Each
+particle should represent one realisation of a plausible
+friction curve. For <code class="docutils literal notranslate"><span class="pre">nsamples</span></code> realisations requested by a
+user, it is more beneficial to <cite>vmap</cite> the forward simulations
+rather than compute them one by one.</p>
+<p>The resulting friction curves can be used for validation
+purposes (does the posterior match the data?).</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">bayesian_inversion</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">samples</span><span class="p">,</span> <span class="n">sample_results</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">solver</span><span class="o">=</span><span class="n">solver</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">nsamples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solver</strong> (<a class="reference internal" href="#diabayes.solver.ODESolver" title="diabayes.solver.ODESolver"><em>ODESolver</em></a>) – The <code class="docutils literal notranslate"><span class="pre">ODESolver</span></code> class instantiated with the <code class="docutils literal notranslate"><span class="pre">Forward</span></code>
+model (typically the same one as used for the inversion)</p></li>
+<li><p><strong>y0</strong> (<a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The initial values of friction and state</p></li>
+<li><p><strong>t</strong> (<em>Array</em>) – The time samples at which a solution is requested. This
+does not need to be the same as the time samples recorded
+in the experiment (from which the observed friction curve
+is obtained)</p></li>
+<li><p><strong>friction_constants</strong> (<em>_Constants</em>) – The friction and state model constants</p></li>
+<li><p><strong>block_constants</strong> (<em>_BlockConstants</em>) – The stress transfer constants</p></li>
+<li><p><strong>nsamples</strong> (<em>int</em>) – The number of random samples for which a solution should
+be computed</p></li>
+<li><p><strong>rng</strong> (<em>None</em><em>, </em><em>int</em><em>, </em><em>jax.random.PRNGKey</em>) – The random seed used to sample from the particle distribution.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the current time will be used as a seed, which leads
+to different result for each realisation. When an integer is
+provided, a new <code class="docutils literal notranslate"><span class="pre">jax.random.PRNGKey</span></code> is generated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>samples</strong> (<em>_Params</em>) – The samples drawn from the posterior distribution</p></li>
+<li><p><strong>sample_results</strong> (<em>Variables</em>) – The forward simulation results corresponding with <code class="docutils literal notranslate"><span class="pre">samples</span></code></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.chains">
 <span class="sig-name descname"><span class="pre">chains</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps</span> <span class="pre">Nparticles</span> <span class="pre">Nparams'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.chains" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The particle trajectories (to inspect convergence)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.final_state">
+<span class="sig-name descname"><span class="pre">final_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nparticles</span> <span class="pre">Nparams'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.final_state" title="Link to this definition">#</a></dt>
+<dd><p>The final state of the particle swarm</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.log_likelihood">
 <span class="sig-name descname"><span class="pre">log_likelihood</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.log_likelihood" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The log-likelihood evolution</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.log_params">
 <span class="sig-name descname"><span class="pre">log_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.RSFParams" title="diabayes.typedefs.RSFParams"><span class="pre">RSFParams</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.log_params" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The particles representing the (log-valued) parameters,
+including all the iteration steps</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.nan_count">
 <span class="sig-name descname"><span class="pre">nan_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Nsteps'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.nan_count" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The number of NaNs encountered during each iteration step</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.BayesianSolution.statistics">
 <span class="sig-name descname"><span class="pre">statistics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.RSFStatistics" title="diabayes.typedefs.RSFStatistics"><span class="pre">RSFStatistics</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.CNSStatistics" title="diabayes.typedefs.CNSStatistics"><span class="pre">CNSStatistics</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#diabayes.typedefs.BayesianSolution.statistics" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Pre-computed statistics of the parameters</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1119,22 +1181,57 @@ wrapped in a <cite>Params</cite> container.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">StateDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">jax.Array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#StateDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.StateDict" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">StateDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#StateDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.StateDict" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>A container class for state variables. A user would typically not
+interact with this class directly (only through <code class="docutils literal notranslate"><span class="pre">Variables</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Forward.set_initial_values</span></code>).</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.typedefs</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateDict</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state_dict</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">vals</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict.replace_values">
 <span class="sig-name descname"><span class="pre">replace_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict"><span class="pre">StateDict</span></a></span></span><a class="reference internal" href="../_modules/diabayes/typedefs.html#StateDict.replace_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.StateDict.replace_values" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Update the values of the state variables. Since immutability is
+required for JIT caching, this method will return a copy of the
+class with the updated values.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.typedefs</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateDict</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state_dict</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,),</span> <span class="n">vals</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state_dict</span> <span class="o">=</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">replace_values</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)})</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Key-value pairs to update. These can overwrite existing values
+or create entirely new ones.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>state_dict</strong> – A copy of the current StateDict with updated values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict">StateDict</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict.keys">
 <span class="sig-name descname"><span class="pre">keys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.StateDict.keys" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>A tuple of key names (strings) corresponding with the state variable names</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict.vals">
 <span class="sig-name descname"><span class="pre">vals</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Array</span></em><a class="headerlink" href="#diabayes.typedefs.StateDict.vals" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>An array of values corresponding (in order) with the variables defined by <code class="docutils literal notranslate"><span class="pre">keys</span></code></p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1211,8 +1308,14 @@ wrapped in a <cite>Params</cite> container.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="diabayes.typedefs.Variables">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">Variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">jax.Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict"><span class="pre">diabayes.typedefs.StateDict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#Variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.Variables" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">Variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict"><span class="pre">StateDict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#Variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.Variables" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>The main container class for variables (friction and state). It
+contains additional convenience routines for mapping between
+this class object and JAX arrays.</p>
+<p>Users would typically not instantiate a <code class="docutils literal notranslate"><span class="pre">Variables</span></code> object
+directly; instead, it is created through the <code class="docutils literal notranslate"><span class="pre">Forward.set_initial_values</span></code>
+method and retreived as <code class="docutils literal notranslate"><span class="pre">Forward.variables</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.Variables.from_array">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></span><a class="reference internal" href="../_modules/diabayes/typedefs.html#Variables.from_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.Variables.from_array" title="Link to this definition">#</a></dt>
@@ -1226,22 +1329,49 @@ variables, matching the number and order of the <cite>keys</cite> tuple.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.Variables.set_values">
 <span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></span><a class="reference internal" href="../_modules/diabayes/typedefs.html#Variables.set_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.Variables.set_values" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Set the values of friction and the state variables through key-value
+pair arguments. The state parameters are provided individually as
+key-value pairs as well. Because this class is immutable, <code class="docutils literal notranslate"><span class="pre">set_values</span></code>
+returns a copy of the class with updated values.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state_dict</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">),</span> <span class="n">vals</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">variables</span> <span class="o">=</span> <span class="n">Variables</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mf">0.6</span><span class="p">),</span> <span class="n">state</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">variables</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">set_values</span><span class="p">(</span><span class="n">mu</span><span class="o">=...</span><span class="p">,</span> <span class="n">x</span><span class="o">=...</span><span class="p">,</span> <span class="n">y</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.Variables.to_array">
 <span class="sig-name descname"><span class="pre">to_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'...'</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/diabayes/typedefs.html#Variables.to_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.Variables.to_array" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Convert the container values to a JAX array. The order of the output
+follows the order of <cite>StateDict.keys</cite>, with the first item being
+the friction coefficient. For <code class="docutils literal notranslate"><span class="pre">n</span></code> state variables, the output is
+an array of shape <code class="docutils literal notranslate"><span class="pre">(1+n,)</span></code> for scalars, and <code class="docutils literal notranslate"><span class="pre">(t,</span> <span class="pre">1+n)</span></code> for
+time series.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scalars</span> <span class="o">=</span> <span class="n">Variables</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mu</span> <span class="o">=</span> <span class="n">scalars</span><span class="o">.</span><span class="n">to_array</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># friction is first element</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">Variables</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mu</span> <span class="o">=</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">to_array</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">all_final_values</span> <span class="o">=</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">to_array</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+<p>Of course, in this example one could simply do <code class="docutils literal notranslate"><span class="pre">scalars.mu</span></code>
+and <code class="docutils literal notranslate"><span class="pre">timeseries.mu</span></code> to extract <code class="docutils literal notranslate"><span class="pre">mu</span></code> directly.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.Variables.mu">
 <span class="sig-name descname"><span class="pre">mu</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Array</span></em><a class="headerlink" href="#diabayes.typedefs.Variables.mu" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The friction coefficient</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.Variables.state">
 <span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict"><span class="pre">StateDict</span></a></em><a class="headerlink" href="#diabayes.typedefs.Variables.state" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>A container with the various state variables</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1302,16 +1432,13 @@ variables, matching the number and order of the <cite>keys</cite> tuple.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-diabayes.solver">diabayes.solver module</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver"><code class="docutils literal notranslate"><span class="pre">ODESolver</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.forward_model"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.checkpoints"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.learning_rate"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.bayesian_inversion"><code class="docutils literal notranslate"><span class="pre">ODESolver.bayesian_inversion()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.max_likelihood_inversion"><code class="docutils literal notranslate"><span class="pre">ODESolver.max_likelihood_inversion()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.solve_forward"><code class="docutils literal notranslate"><span class="pre">ODESolver.solve_forward()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.atol"><code class="docutils literal notranslate"><span class="pre">ODESolver.atol</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.checkpoints"><code class="docutils literal notranslate"><span class="pre">ODESolver.checkpoints</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.forward_model"><code class="docutils literal notranslate"><span class="pre">ODESolver.forward_model</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.learning_rate"><code class="docutils literal notranslate"><span class="pre">ODESolver.learning_rate</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.solver.ODESolver.rtol"><code class="docutils literal notranslate"><span class="pre">ODESolver.rtol</span></code></a></li>
 </ul>
 </li>
@@ -1324,6 +1451,7 @@ variables, matching the number and order of the <cite>keys</cite> tuple.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.plot_convergence"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.plot_convergence()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.sample"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.sample()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.chains"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.chains</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.final_state"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.final_state</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.log_likelihood"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.log_likelihood</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.log_params"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.log_params</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.typedefs.BayesianSolution.nan_count"><code class="docutils literal notranslate"><span class="pre">BayesianSolution.nan_count</span></code></a></li>

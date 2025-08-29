@@ -385,8 +385,19 @@
 <h1>diabayes.typedefs.StateDict<a class="headerlink" href="#diabayes-typedefs-statedict" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">StateDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">jax.Array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#StateDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.StateDict" title="Link to this definition">#</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diabayes.typedefs.</span></span><span class="sig-name descname"><span class="pre">StateDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/diabayes/typedefs.html#StateDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.StateDict" title="Link to this definition">#</a></dt>
+<dd><p>A container class for state variables. A user would typically not
+interact with this class directly (only through <code class="docutils literal notranslate"><span class="pre">Variables</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Forward.set_initial_values</span></code>).</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.typedefs</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateDict</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state_dict</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">vals</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#diabayes.typedefs.StateDict.__init__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -398,7 +409,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.StateDict.replace_values" title="diabayes.typedefs.StateDict.replace_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace_values</span></code></a>(**kwargs)</p></td>
-<td><p></p></td>
+<td><p>Update the values of the state variables.</p></td>
 </tr>
 </tbody>
 </table>
@@ -407,10 +418,10 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.StateDict.keys" title="diabayes.typedefs.StateDict.keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code></a></p></td>
-<td><p></p></td>
+<td><p>A tuple of key names (strings) corresponding with the state variable names</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.StateDict.vals" title="diabayes.typedefs.StateDict.vals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vals</span></code></a></p></td>
-<td><p></p></td>
+<td><p>An array of values corresponding (in order) with the variables defined by <code class="docutils literal notranslate"><span class="pre">keys</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -418,17 +429,41 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict.replace_values">
 <span class="sig-name descname"><span class="pre">replace_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict"><span class="pre">StateDict</span></a></span></span><a class="reference internal" href="../_modules/diabayes/typedefs.html#StateDict.replace_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.typedefs.StateDict.replace_values" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Update the values of the state variables. Since immutability is
+required for JIT caching, this method will return a copy of the
+class with the updated values.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.typedefs</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateDict</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state_dict</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,),</span> <span class="n">vals</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state_dict</span> <span class="o">=</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">replace_values</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)})</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Key-value pairs to update. These can overwrite existing values
+or create entirely new ones.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>state_dict</strong> – A copy of the current StateDict with updated values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.StateDict" title="diabayes.typedefs.StateDict">StateDict</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict.keys">
 <span class="sig-name descname"><span class="pre">keys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diabayes.typedefs.StateDict.keys" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>A tuple of key names (strings) corresponding with the state variable names</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="diabayes.typedefs.StateDict.vals">
 <span class="sig-name descname"><span class="pre">vals</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Array</span></em><a class="headerlink" href="#diabayes.typedefs.StateDict.vals" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>An array of values corresponding (in order) with the variables defined by <code class="docutils literal notranslate"><span class="pre">keys</span></code></p>
+</dd></dl>
 
 </dd></dl>
 

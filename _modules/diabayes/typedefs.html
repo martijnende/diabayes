@@ -357,18 +357,56 @@
 <div class="viewcode-block" id="StateDict">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.StateDict">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StateDict</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A container class for state variables. A user would typically not</span>
+<span class="sd">    interact with this class directly (only through ``Variables`` and</span>
+<span class="sd">    ``Forward.set_initial_values``).</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from diabayes.typedefs import StateDict</span>
+<span class="sd">    &gt;&gt;&gt; import jax.numpy as jnp</span>
+<span class="sd">    &gt;&gt;&gt; keys = (&quot;x&quot;, &quot;y&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; vals = jnp.array([1.0, -5.1])</span>
+<span class="sd">    &gt;&gt;&gt; state_dict = StateDict(keys=keys, vals=vals)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">keys</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A tuple of key names (strings) corresponding with the state variable names&quot;&quot;&quot;</span>
     <span class="n">vals</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An array of values corresponding (in order) with the variables defined by ``keys``&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the value of the variable ``k``&quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
 <div class="viewcode-block" id="StateDict.replace_values">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.StateDict.replace_values">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">replace_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;StateDict&quot;</span><span class="p">:</span>
-        <span class="c1"># Why is it so fucking problematic to set a JAX array?</span>
-        <span class="c1"># How many dozens of hours do I need to spend to set a fucking array?</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the values of the state variables. Since immutability is</span>
+<span class="sd">        required for JIT caching, this method will return a copy of the</span>
+<span class="sd">        class with the updated values.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from diabayes.typedefs import StateDict</span>
+<span class="sd">        &gt;&gt;&gt; import jax.numpy as jnp</span>
+<span class="sd">        &gt;&gt;&gt; state_dict = StateDict(keys=(&quot;x&quot;,), vals=jnp.asarray(1.0))</span>
+<span class="sd">        &gt;&gt;&gt; state_dict = state_dict.replace_values({&quot;x&quot;: jnp.asarray(2.0)})</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Key-value pairs to update. These can overwrite existing values</span>
+<span class="sd">            or create entirely new ones.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        state_dict : StateDict</span>
+<span class="sd">            A copy of the current StateDict with updated values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span>
         <span class="n">mapping</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">StateDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mapping</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">]))</span></div>
@@ -379,8 +417,20 @@
 <div class="viewcode-block" id="Variables">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Variables</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The main container class for variables (friction and state). It</span>
+<span class="sd">    contains additional convenience routines for mapping between</span>
+<span class="sd">    this class object and JAX arrays.</span>
+
+<span class="sd">    Users would typically not instantiate a ``Variables`` object</span>
+<span class="sd">    directly; instead, it is created through the ``Forward.set_initial_values``</span>
+<span class="sd">    method and retreived as ``Forward.variables``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">mu</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The friction coefficient&quot;&quot;&quot;</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A container with the various state variables&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># NOTE: __getattr__ is only called when __getattribute__,</span>
@@ -393,6 +443,18 @@
 <div class="viewcode-block" id="Variables.set_values">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables.set_values">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Variables&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the values of friction and the state variables through key-value</span>
+<span class="sd">        pair arguments. The state parameters are provided individually as</span>
+<span class="sd">        key-value pairs as well. Because this class is immutable, ``set_values``</span>
+<span class="sd">        returns a copy of the class with updated values.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; state_dict = StateDict(keys=(&quot;x&quot;, &quot;y&quot;), vals=jnp.array([0.1, 0.2]))</span>
+<span class="sd">        &gt;&gt;&gt; variables = Variables(mu=jnp.asarray(0.6), state=state_dict)</span>
+<span class="sd">        &gt;&gt;&gt; variables = variables.set_values(mu=..., x=..., y=...)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dcs</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">replace_values</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
@@ -406,6 +468,24 @@
 <div class="viewcode-block" id="Variables.to_array">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Variables.to_array">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the container values to a JAX array. The order of the output</span>
+<span class="sd">        follows the order of `StateDict.keys`, with the first item being</span>
+<span class="sd">        the friction coefficient. For ``n`` state variables, the output is</span>
+<span class="sd">        an array of shape ``(1+n,)`` for scalars, and ``(t, 1+n)`` for</span>
+<span class="sd">        time series.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; scalars = Variables(...)</span>
+<span class="sd">        &gt;&gt;&gt; mu = scalars.to_array()[0]  # friction is first element</span>
+<span class="sd">        &gt;&gt;&gt; timeseries = Variables(...)</span>
+<span class="sd">        &gt;&gt;&gt; mu = timeseries.to_array()[:, 0]</span>
+<span class="sd">        &gt;&gt;&gt; all_final_values = timeseries.to_array()[-1, :]</span>
+
+<span class="sd">        Of course, in this example one could simply do ``scalars.mu``</span>
+<span class="sd">        and ``timeseries.mu`` to extract ``mu`` directly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span>
 
@@ -613,8 +693,6 @@
 <span class="sd">-----------------</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="n">Chains</span> <span class="o">=</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps Nparticles Nparams&quot;</span><span class="p">]</span>
-
 
 <div class="viewcode-block" id="Statistics">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Statistics">[docs]</a>
@@ -694,12 +772,36 @@
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution">[docs]</a>
 <span class="nd">@dcs</span><span class="o">.</span><span class="n">dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BayesianSolution</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The result of a Bayesian inversion. This data class stores the</span>
+<span class="sd">    particle trajectories (equivalent of MCMC chains), the final</span>
+<span class="sd">    equilibrum state, and various statistcs, as well as helper</span>
+<span class="sd">    routines to diagnose or visualise the results.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; result = solver.bayesian_inversion(...)</span>
+<span class="sd">    &gt;&gt;&gt; print(result.nan_count)  # Check for NaN values</span>
+<span class="sd">    &gt;&gt;&gt; print(result.statistics.Dc.median)  # Get the median of Dc</span>
+<span class="sd">    &gt;&gt;&gt; result.plot_convergence()  # Visually inspect convergence</span>
+<span class="sd">    &gt;&gt;&gt; result.cornerplot(nbins=15)  # Create a cornerplot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">log_params</span><span class="p">:</span> <span class="n">_Params</span>
-    <span class="n">chains</span><span class="p">:</span> <span class="n">Chains</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The particles representing the (log-valued) parameters,</span>
+<span class="sd">    including all the iteration steps</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chains</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps Nparticles Nparams&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The particle trajectories (to inspect convergence)&quot;&quot;&quot;</span>
     <span class="n">log_likelihood</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The log-likelihood evolution&quot;&quot;&quot;</span>
     <span class="n">nan_count</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The number of NaNs encountered during each iteration step&quot;&quot;&quot;</span>
+    <span class="n">final_state</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nparticles Nparams&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The final state of the particle swarm&quot;&quot;&quot;</span>
     <span class="n">statistics</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFStatistics</span><span class="p">,</span> <span class="n">CNSStatistics</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pre-computed statistics of the parameters&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BayesianSolution.__init__">
 <a class="viewcode-back" href="../../_autosummary/diabayes.typedefs.BayesianSolution.html#diabayes.typedefs.BayesianSolution.__init__">[docs]</a>
@@ -710,10 +812,15 @@
         <span class="n">nan_count</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;Nsteps&quot;</span><span class="p">],</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_params</span> <span class="o">=</span> <span class="n">log_params</span>
+        <span class="c1"># Convert the inversion result to an array and transpose</span>
         <span class="n">chains</span> <span class="o">=</span> <span class="n">log_params</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Undo the log-transform and store chains</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+        <span class="c1"># Undo the log-transform and store final state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">final_state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># Store the log-likelihood</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_likelihood</span> <span class="o">=</span> <span class="n">log_likelihood</span>
+        <span class="c1"># Store the number of NaNs encountered during each step</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nan_count</span> <span class="o">=</span> <span class="n">nan_count</span>
         <span class="c1"># TODO: need to generalise this...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">RSFStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span></div>
@@ -722,6 +829,17 @@
 <div class="viewcode-block" id="BayesianSolution.plot_convergence">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution.plot_convergence">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper routine to visualise the convergence of the inversion.</span>
+<span class="sd">        Convergence is achieved when the particles settle in an</span>
+<span class="sd">        equilibrium position (i.e., they stop moving).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : matplotlib.pyplot.figure</span>
+<span class="sd">            The figure object that can be manipulated after creation</span>
+<span class="sd">            (e.g. to save to disk)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -754,6 +872,27 @@
 <div class="viewcode-block" id="BayesianSolution.cornerplot">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.BayesianSolution.cornerplot">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cornerplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a corner plot from the particle positions. For `N`</span>
+<span class="sd">        parameters, a corner plot is the lower half of an `N x N`</span>
+<span class="sd">        grid of subplots. On the diagonal, the histogram of the</span>
+<span class="sd">        marginal posterior over the `i-th` parameter is plotted.</span>
+<span class="sd">        Below the diagonal, the `(i,j)`-th panel is a scatter</span>
+<span class="sd">        plot of parameter `i` against parameter `j`, which shows</span>
+<span class="sd">        the co-variance between the two quantities.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nbins : int</span>
+<span class="sd">            The number of bins to use for the histograms on the</span>
+<span class="sd">            diagonal of the corner plot</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : matplotlib.pyplot.figure</span>
+<span class="sd">            The figure object that can be manipulated after creation</span>
+<span class="sd">            (e.g. to save to disk)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">get_param_names</span><span class="p">()</span>
@@ -804,6 +943,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print out nicely-formatted statistics&quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -839,6 +979,58 @@
         <span class="n">nsamples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">rng</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jax</span><span class="o">.</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draw random samples from the posterior distribution. Each</span>
+<span class="sd">        particle should represent one realisation of a plausible</span>
+<span class="sd">        friction curve. For ``nsamples`` realisations requested by a</span>
+<span class="sd">        user, it is more beneficial to `vmap` the forward simulations</span>
+<span class="sd">        rather than compute them one by one.</span>
+
+<span class="sd">        The resulting friction curves can be used for validation</span>
+<span class="sd">        purposes (does the posterior match the data?).</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; result = solver.bayesian_inversion(...)</span>
+<span class="sd">        &gt;&gt;&gt; samples, sample_results = result.sample(</span>
+<span class="sd">        ...    solver=solver, y0=y0, t=t,</span>
+<span class="sd">        ...    friction_constants=constants,</span>
+<span class="sd">        ...    block_constants=block_constants,</span>
+<span class="sd">        ...    nsamples=20, rng=42)</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        solver : ODESolver</span>
+<span class="sd">            The ``ODESolver`` class instantiated with the ``Forward``</span>
+<span class="sd">            model (typically the same one as used for the inversion)</span>
+<span class="sd">        y0 : Variables</span>
+<span class="sd">            The initial values of friction and state</span>
+<span class="sd">        t : Array</span>
+<span class="sd">            The time samples at which a solution is requested. This</span>
+<span class="sd">            does not need to be the same as the time samples recorded</span>
+<span class="sd">            in the experiment (from which the observed friction curve</span>
+<span class="sd">            is obtained)</span>
+<span class="sd">        friction_constants : _Constants</span>
+<span class="sd">            The friction and state model constants</span>
+<span class="sd">        block_constants : _BlockConstants</span>
+<span class="sd">            The stress transfer constants</span>
+<span class="sd">        nsamples : int</span>
+<span class="sd">            The number of random samples for which a solution should</span>
+<span class="sd">            be computed</span>
+<span class="sd">        rng: None, int, jax.random.PRNGKey</span>
+<span class="sd">            The random seed used to sample from the particle distribution.</span>
+<span class="sd">            If ``None``, the current time will be used as a seed, which leads</span>
+<span class="sd">            to different result for each realisation. When an integer is</span>
+<span class="sd">            provided, a new ``jax.random.PRNGKey`` is generated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        samples : _Params</span>
+<span class="sd">            The samples drawn from the posterior distribution</span>
+<span class="sd">        sample_results : Variables</span>
+<span class="sd">            The forward simulation results corresponding with ``samples``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="n">jr</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">time_ns</span><span class="p">())</span>

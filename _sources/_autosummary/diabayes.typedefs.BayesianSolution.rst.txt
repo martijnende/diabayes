@@ -31,5 +31,6 @@
       ~BayesianSolution.chains
       ~BayesianSolution.log_likelihood
       ~BayesianSolution.nan_count
+      ~BayesianSolution.final_state
    
    
