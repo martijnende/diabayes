@@ -6,7 +6,7 @@ authors = [
     { name = "Martijn van den Ende", email = "martijnende@gmail.com" },
 ]
 dependencies = [
-    "jax",
+    "jax==0.7.0",
     "jax_tqdm",
     "jaxtyping",
     "equinox",
@@ -22,7 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["black", "isort", "twine"]
-gpu = ["jax[cuda12]"]
+gpu = ["jax[cuda12]==0.7.0"]
 docs = [
     "make",
     "myst-nb",
