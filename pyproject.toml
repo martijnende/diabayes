@@ -23,6 +23,14 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["black", "isort", "twine"]
 gpu = ["jax[cuda12]<=0.7.0"]
+gui = [
+    "flask",
+    "flask-sqlalchemy",
+    "flask-socketio",
+    "python-dotenv",
+    "plotly",
+    "pandas",
+]
 docs = [
     "make",
     "myst-nb",

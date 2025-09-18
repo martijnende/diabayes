@@ -1,0 +1,170 @@
+/* General */
+
+
+
+.invisible {
+  display: none;
+}
+
+div.container {
+  max-width: 90%;
+}
+
+div.content-box {
+  min-height: 5em;
+  border: 2px solid #adadad;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  padding: 2em;
+}
+
+.content-header {
+  margin-bottom: 1rem !important;
+}
+
+main div.row {
+  margin-bottom: 2em;
+}
+
+/* Spinner */
+
+/* Full-page overlay */
+#loading-overlay {
+  top: 0;
+  left: 0;
+  height: 15em;
+  min-height: 15em;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #000000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Spinner Keyframes */
+@keyframes spin {
+from { transform: rotate(0deg); }
+to { transform: rotate(360deg); }
+}
+
+/* End spinner */
+
+
+/* Navigation */
+
+.nav-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  gap: 30px;
+}
+
+.nav-box {
+  position: relative;
+  background-color: white;
+  color: black;
+  padding: 15px 30px;
+  border-radius: 50px;
+  text-align: center;
+  border: 5px solid #565656;
+  min-width: 150px;
+  /* box-shadow: 0 0 15px rgba(250, 120, 0, 0.3); */
+}
+
+.nav-box.active {
+  border-color: #147a1b;
+}
+
+.nav-box span.bi a {
+  margin-left: 10px;
+  text-decoration: none;
+  font-weight: bold;
+  color: black;
+}
+
+.nav-box::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -35px;
+  width: 35px;
+  height: 4px;
+  background-color: #565656;
+  transform: translateY(-50%);
+}
+
+.nav-box:last-child::after {
+  display: none; /* Remove line from last item */
+}
+
+/* Logging */
+
+div.logger {
+  background-color: #4c4c4c;
+  height: 15em;
+  padding-top: 1em;
+  border: 2px solid #dbdbdb;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+div.logger ul li {
+  color: white;
+  list-style-type: none;
+  margin-top: 0.3em;
+  font-family: "Courier New";
+}
+
+div.logger ul li span.log-level-info {
+  color: #3197bc;
+}
+
+div.logger ul li span.log-level-warning {
+  color: #dd8c35;
+}
+
+div.logger ul li span.log-level-error, div.logger ul li span.log-level-critical {
+  color: #dd3d35;
+  font-weight: bold;
+}
+
+
+/* Footer */
+
+footer {
+  text-align: center;
+  padding: 1em;
+}
+
+footer ul {
+  margin: 0;
+  padding: 0;
+}
+
+footer ul li {
+  list-style-type: none;
+  display: inline;
+  padding-left: 1em;
+  padding-right: 1em;
+  border-right: 1px solid gray;
+}
+
+footer ul li:last-child {
+  border: none;
+}
+
+footer a {
+  color: gray;
+}
