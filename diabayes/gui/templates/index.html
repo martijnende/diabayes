@@ -3,7 +3,7 @@
   <head lang="en">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Noitcirf</title>
+    <title>DiaBayes</title>
 
     <link href="{{ url_for('static', filename='css/bootstrap-5.3.3.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/bootstrap-icons-1.11.3.min.css') }}" rel="stylesheet">
@@ -15,45 +15,46 @@
   </head>
   <body class="d-flex flex-column min-vh-100">
 
-    <div class="container">
-
-      <div class="row">
-        <div class="col-md-12">
-          {% include "menu.html" with context %}
-        </div>
+    <main class="flex-grow-1 d-flex">
+      <div class="col-6 d-flex flex-column flex-grow-1 bg-light border-end p-3">
+        {% block content %}{% endblock %}
       </div>
-
-      <div class="row mt-4">
-
-        <div class="col-xxl-8 col-xl-12">
-          <div id="loading-overlay">
-            <div class="spinner"></div>
+      <div class="col-6 d-flex flex-column flex-grow-1 p-3">
+        {% block visualisation %}
+        <!-- Top row: Data Visualisation 1 -->
+        <div class="mb-3 flex-shrink-0" id="viz-row-1">
+          <div class="bg-white border rounded p-2" id="viz1">
+            <h6>Visualization 1</h6>
+            <div id="plot1"></div>
           </div>
-          <main id="main-content" class="invisible">
-            {% block content %}{% endblock %}
-          </main>
         </div>
 
-        <div class="col-xxl-1 col-xl-12 my-4"></div>
-
-        <div class="col-xxl-3 col-xl-12">
-          <aside>
-            {% include "logger.html" %}
-          </aside>
+        <!-- Middle row: Data Visualisation 2 -->
+        <div class="mb-3 flex-shrink-0" id="viz-row-2">
+          <div class="bg-white border rounded p-2" id="viz2">
+            <h6>Visualization 2</h6>
+            <div id="plot2"></div>
+          </div>
         </div>
 
+        <!-- Bottom row: Logs -->
+        <div class="flex-grow-1 d-flex bg-dark text-white border rounded p-2 overflow-auto" id="logs">
+          <h6>Logs</h6>
+          <pre id="log-entries"></pre>
+        </div>
+        {% endblock %}
       </div>
-    </div>
+    </main>
 
-    <footer class="mt-auto">
+    <footer class="py-2 text-center bg-light border-top">
       <ul>
-        <li><a href="" target="_blank">GitHub</a></li>
-        <li><a href="" target="_blank">Documentation</a></li>
+        <li><a href="https://diabayes.science/" target="_blank">GitHub</a></li>
+        <li><a href="https://docs.diabayes.science/" target="_blank">Documentation</a></li>
         <li><a href="" target="_blank">Report an issue</a></li>
         <li><a href="" target="_blank">How to cite</a></li>
       </ul>
     </footer>
-
+    
   </body>
   {% block javascript %}
   <script src="{{ url_for('static', filename='js/socket-logs.js') }}" charset="utf-8"></script>

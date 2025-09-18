@@ -24,6 +24,7 @@ dependencies = [
 dev = ["black", "isort", "twine"]
 gpu = ["jax[cuda12]<=0.7.0"]
 gui = [
+    "click",
     "flask",
     "flask-sqlalchemy",
     "flask-socketio",
@@ -42,12 +43,15 @@ docs = [
     "sphinxcontrib-bibtex",
 ]
 
+[project.scripts]
+diabayes = "diabayes.gui.cli:cli"
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["diabayes"]
+packages = ["diabayes", "diabayes.gui"]
 
 [tool.isort]
 profile = "black"
