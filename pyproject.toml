@@ -26,6 +26,7 @@ gpu = ["jax[cuda12]<=0.7.0"]
 gui = [
     "click",
     "flask",
+    "Flask-Migrate",
     "flask-sqlalchemy",
     "flask-socketio",
     "python-dotenv",

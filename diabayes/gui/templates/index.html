@@ -17,14 +17,18 @@
 
     <main class="flex-grow-1 d-flex">
       <div class="col-6 d-flex flex-column flex-grow-1 bg-light border-end p-3">
-        {% block content %}{% endblock %}
+        <div class="mb-3 d-flex align-items-center">
+          <input type="file" class="form-control" id="data-file" style="flex: 1;">
+          <button class="btn btn-danger ms-2" id="clear-data" disabled>
+            <i class="bi bi-trash"></i> Clear data
+          </button>
+        </div>
       </div>
       <div class="col-6 d-flex flex-column flex-grow-1 p-3">
         {% block visualisation %}
         <!-- Top row: Data Visualisation 1 -->
         <div class="mb-3 flex-shrink-0" id="viz-row-1">
           <div class="bg-white border rounded p-2" id="viz1">
-            <h6>Visualization 1</h6>
             <div id="plot1"></div>
           </div>
         </div>
@@ -32,13 +36,13 @@
         <!-- Middle row: Data Visualisation 2 -->
         <div class="mb-3 flex-shrink-0" id="viz-row-2">
           <div class="bg-white border rounded p-2" id="viz2">
-            <h6>Visualization 2</h6>
+            <h6>Visualisation 2</h6>
             <div id="plot2"></div>
           </div>
         </div>
 
         <!-- Bottom row: Logs -->
-        <div class="flex-grow-1 d-flex bg-dark text-white border rounded p-2 overflow-auto" id="logs">
+        <div class="flex-grow-1 d-flex bg-dark text-white border rounded p-2 overflow-auto" id="logs-panel">
           <h6>Logs</h6>
           <pre id="log-entries"></pre>
         </div>
@@ -57,9 +61,12 @@
     
   </body>
   {% block javascript %}
-  <script src="{{ url_for('static', filename='js/socket-logs.js') }}" charset="utf-8"></script>
+  <!--<script src="{{ url_for('static', filename='js/socket-logs.js') }}" charset="utf-8"></script>-->
+  <script src="{{ url_for('static', filename='js/socket.io-4.0.1.min.js') }}" charset="utf-8"></script>
+  <script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>
   <script src="{{ url_for('static', filename='js/plotly-3.0.1.min.js') }}" charset="utf-8"></script>
-  <script src="{{ url_for('static', filename='js/resize-plotly.js') }}" charset="utf-8"></script>
-  <script src="{{ url_for('static', filename='js/loading-animation.js') }}" charset="utf-8"></script>
+  <!--<script src="{{ url_for('static', filename='js/resize-plotly.js') }}" charset="utf-8"></script>-->
+  <!--<script src="{{ url_for('static', filename='js/loading-animation.js') }}" charset="utf-8"></script>-->
+  <script src="{{ url_for('static', filename='js/data_upload.js') }}"></script>
   {% endblock %}
 </html>

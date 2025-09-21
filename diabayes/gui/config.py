@@ -1,5 +1,7 @@
 import os
+
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 class Config:
     # Flask
@@ -18,4 +20,3 @@ class Config:
 
     # Logging (basic setup for file logging, can expand)
     LOG_FILE = os.path.join(basedir, "instance", "app.log")
-

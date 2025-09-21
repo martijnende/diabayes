@@ -1,14 +1,33 @@
 import os
 import sys
-import click
 from pathlib import Path
 
-from .workspace import create_workspace, find_workspace
-from . import create_app
+import click
+from flask.cli import FlaskGroup, with_appcontext
+from flask_migrate import downgrade as mig_downgrade
+from flask_migrate import init as mig_init
+from flask_migrate import migrate as mig_migrate
+from flask_migrate import upgrade as mig_upgrade
 
-@click.group()
+from . import create_app, socketio
+from .workspace import create_workspace, find_workspace
+
+
+def _create_app():
+    """Run the web app inside the current workspace."""
+    ws = find_workspace(Path.cwd())
+    if ws is None:
+        click.echo("Error: no workspace found in current or parent directories.")
+        sys.exit(1)
+
+    app = create_app(workspace=ws)
+    return app
+
+
+@click.group(cls=FlaskGroup, create_app=_create_app)
 def cli():
     """MyApp CLI tool."""
+
 
 @cli.command()
 @click.argument("dirname", required=False, default="workspace")
@@ -18,14 +37,50 @@ def init(dirname):
     create_workspace(path)
     click.echo(f"Workspace created at {path}")
 
+
 @cli.command()
 def run():
-    """Run the web app inside the current workspace."""
-    ws = find_workspace(Path.cwd())
-    if ws is None:
-        click.echo("Error: no workspace found in current or parent directories.")
-        sys.exit(1)
+    app = _create_app()
+    socketio.run(app, host="127.0.0.1", port=5000, debug=bool(app.config["DEBUG"]))
 
-    app = create_app(workspace=ws)
-    app.run(host="127.0.0.1", port=5000)
 
+# Database migrations
+@click.group()
+def migrate():
+    """Database migration commands."""
+    pass
+
+
+@migrate.command()
+@with_appcontext
+def init():
+    """Initialize migrations directory."""
+    mig_init()
+
+
+@migrate.command()
+@click.option("-m", "--message", help="Revision message")
+@with_appcontext
+def revision(message):
+    """Create new migration revision."""
+    mig_migrate(message=message)
+
+
+@migrate.command()
+@with_appcontext
+def upgrade():
+    """Apply migrations."""
+    mig_upgrade()
+
+
+@migrate.command()
+@click.option(
+    "--revision", default="-1", help="Which revision to downgrade to (default: -1)"
+)
+@with_appcontext
+def downgrade(revision):
+    """Revert migrations."""
+    mig_downgrade(revision)
+
+
+cli.add_command(migrate)
