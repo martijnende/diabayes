@@ -10,7 +10,7 @@
     <script src="{{ url_for('static', filename='js/bootstrap-5.3.3.bundle.min.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='js/socket.io-4.0.1.min.js') }}" charset="utf-8"></script>
-
+    <script src="{{ url_for('static', filename='js/plotly-3.0.1.min.js') }}" charset="utf-8"></script>
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   </head>
   <body class="d-flex flex-column min-vh-100">
@@ -44,7 +44,7 @@
         <!-- Bottom row: Logs -->
         <div class="flex-grow-1 d-flex bg-dark text-white border rounded p-2 overflow-auto" id="logs-panel">
           <h6>Logs</h6>
-          <pre id="log-entries"></pre>
+          <div id="log-container"></div>
         </div>
         {% endblock %}
       </div>
@@ -61,10 +61,8 @@
     
   </body>
   {% block javascript %}
-  <!--<script src="{{ url_for('static', filename='js/socket-logs.js') }}" charset="utf-8"></script>-->
-  <script src="{{ url_for('static', filename='js/socket.io-4.0.1.min.js') }}" charset="utf-8"></script>
-  <script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>
-  <script src="{{ url_for('static', filename='js/plotly-3.0.1.min.js') }}" charset="utf-8"></script>
+  <script src="{{ url_for('static', filename='js/socket-logs.js') }}" charset="utf-8"></script>
+  <!--<script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>-->
   <!--<script src="{{ url_for('static', filename='js/resize-plotly.js') }}" charset="utf-8"></script>-->
   <!--<script src="{{ url_for('static', filename='js/loading-animation.js') }}" charset="utf-8"></script>-->
   <script src="{{ url_for('static', filename='js/data_upload.js') }}"></script>

@@ -1,25 +1,32 @@
-var socket = io.connect("http://" + document.domain + ":" + location.port);
+$(document).ready(function() {
 
-// Request logs when the page loads
-socket.emit("request_logs");
+  var socket = io("/logs");
 
-// Update logs when a new log entry is received
-socket.on("new_log", function(log) {
-  let logList = document.getElementById("log-list");
-  let newLog = document.createElement("li");
-  // newLog.textContent = `[${log.timestamp}] ${log.level}: ${log.message}`;
-  newLog.innerHTML = log;
-  logList.prepend(newLog);
-});
+  function renderLogEntry(entry) {
+    return `<div class="log-entry">[${entry.timestamp}] ${entry.level}: ${entry.msg}</div>`;
+  }
 
-// Update full log list if requested
-socket.on("update_logs", function(logs) {
-  let logList = document.getElementById("log-list");
-  logList.innerHTML = "";  // Clear existing logs
-  logs.forEach(log => {
-    let logItem = document.createElement("li");
-    logItem.innerHTML = log;
-    // logItem.textContent = `[${log.timestamp}] ${log.level}: ${log.message}`;
-    logList.appendChild(logItem);
+  function loadLogs() {
+    $.getJSON("/logs/all", function(data) {
+        const container = $("#log-container");
+        container.empty();
+        data.forEach(entry => {
+          container.append(renderLogEntry(entry));
+      });
+    });
+  }
+
+  // Request logs when the page loads
+  loadLogs();
+
+  socket.on("connect", () => {
+      console.log("Connected to /logs namespace");
   });
+
+  // Update logs when a new log entry is received
+  socket.on("new_log", function(entry) {
+    console.log("Entry received");
+    $("#log-container").prepend(renderLogEntry(entry));
+  });
+
 });

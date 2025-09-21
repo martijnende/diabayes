@@ -14,11 +14,6 @@ def format(entry):
     return f"{time} [{level}] {entry.msg}"
 
 
-def get_logs():
-    log_entries = LogEntry.query.order_by(LogEntry.timestamp.desc()).all()
-    return [format(entry) for entry in log_entries]
-
-
 class SQLiteHandler(logging.Handler):
 
     def __init__(self, socketio=None):
@@ -32,28 +27,29 @@ class SQLiteHandler(logging.Handler):
             trace = traceback.format_exc(exc)
 
         try:
-            log = LogEntry(
+            entry = LogEntry(
                 level=record.__dict__["levelname"],
                 msg=record.__dict__["msg"],
                 trace=trace,
             )
-            db.session.add(log)
+            db.session.add(entry)
             # Potentially DANGEROUS caveat:
             # When using this logger to log exceptions,
             # make sure to first session.rollback() before
             # calling emit(), for otherwise emit() will
             # do db.session.commit() before the rollback!
             db.session.commit()
-            if self.socketio:
-                self.socketio.emit(
-                    "new_log",
-                    {
-                        "timestamp": entry.timestamp.isoformat(),
-                        "level": entry.level.lower(),
-                        "msg": entry.msg,
-                    },
-                    namespace="/logs",
-                )
+
+            # Websocket broadcast
+            self.socketio.emit(
+                "new_log",
+                {
+                    "timestamp": entry.timestamp.isoformat(),
+                    "level": entry.level.lower(),
+                    "msg": entry.msg,
+                },
+                namespace="/logs",
+            )
         except Exception:
             db.session.rollback()
             logging.getLogger("sqlite_handler").exception("Failed to log to DB")

@@ -20,10 +20,11 @@ def create_app(workspace: str | None = None):
         raise RuntimeError("Workspace path is required")
 
     app.config.from_file(workspace / "workspace.toml", load=tomllib.load, text=False)
+    app.config["SECRET_KEY"] = "123"
 
     db.init_app(app)
     migrate = Migrate(app, db)
-    socketio.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     from . import routes
 
@@ -41,3 +42,13 @@ def create_app(workspace: str | None = None):
     app.logger.setLevel(logging.INFO)
 
     return app
+
+
+@socketio.on("connect", namespace="/logs")
+def test_connect(auth):
+    socketio.emit("connection_response", {"data": "Connected"}, namespace="/logs")
+
+
+@socketio.on("disconnect")
+def test_disconnect(reason):
+    print("Client disconnected, reason:", reason)

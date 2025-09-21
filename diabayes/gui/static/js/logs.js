@@ -4,7 +4,7 @@ $(document).ready(function() {
 
     socket.on("new_log", function(data) {
         const row = `<div>[${data.timestamp}] ${data.level}: ${data.msg}</div>`;
-        $("#logs-panel").prepend(row);
+        $("pre#log-entries").append(row);
     });
 });
 

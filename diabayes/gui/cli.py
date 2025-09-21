@@ -24,7 +24,8 @@ def _create_app():
     return app
 
 
-@click.group(cls=FlaskGroup, create_app=_create_app)
+# @click.group(cls=FlaskGroup, create_app=_create_app)
+@click.group
 def cli():
     """MyApp CLI tool."""
 
@@ -52,35 +53,39 @@ def migrate():
 
 
 @migrate.command()
-@with_appcontext
 def init():
     """Initialize migrations directory."""
-    mig_init()
+    app = _create_app()
+    with app.app_context():
+        mig_init()
 
 
 @migrate.command()
 @click.option("-m", "--message", help="Revision message")
-@with_appcontext
 def revision(message):
     """Create new migration revision."""
-    mig_migrate(message=message)
+    app = _create_app()
+    with app.app_context():
+        mig_migrate(message=message)
 
 
 @migrate.command()
-@with_appcontext
 def upgrade():
     """Apply migrations."""
-    mig_upgrade()
+    app = _create_app()
+    with app.app_context():
+        mig_upgrade()
 
 
 @migrate.command()
 @click.option(
     "--revision", default="-1", help="Which revision to downgrade to (default: -1)"
 )
-@with_appcontext
 def downgrade(revision):
     """Revert migrations."""
-    mig_downgrade(revision)
+    app = _create_app()
+    with app.app_context():
+        mig_downgrade(revision)
 
 
 cli.add_command(migrate)

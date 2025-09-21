@@ -2,6 +2,8 @@ import os
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
+from .models import LogEntry
+
 bp = Blueprint("main", __name__)
 
 
@@ -18,17 +20,23 @@ def upload_file():
         path = os.path.join(upload_folder, file.filename)
         file.save(path)
         current_app.logger.info("File upload successful")
+        return jsonify({"status": "ok", "message": ""}), 200
     except Exception:
         current_app.logger.error("File upload failed")
-    return jsonify({"status": "ok", "message": "pong"})
+        return jsonify({"status": "error", "message": f"{Exception}"}), 500
 
 
-@bp.route("/api/echo", methods=["POST"])
-def echo():
-    data = request.get_json(silent=True) or {}
-    return jsonify({"you_sent": data})
-
-
-@bp.route("/hello/<name>")
-def hello(name):
-    return f"Hello, {name}!"
+@bp.route("/logs/all")
+def check_db():
+    entries = LogEntry.query.order_by(LogEntry.timestamp.desc()).all()
+    return jsonify(
+        [
+            {
+                "id": e.id,
+                "timestamp": e.timestamp.isoformat(),
+                "level": e.level.lower(),
+                "msg": e.msg,
+            }
+            for e in entries
+        ]
+    )
