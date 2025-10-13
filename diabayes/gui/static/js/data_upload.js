@@ -38,6 +38,7 @@ $(document).ready(function() {
       success: function() {
         Plotly.purge('plot1');
         Plotly.purge('plot2');
+        $('#log-container div.log-entry').not(':first').remove();
         $('#data-file').prop('disabled', false).val('');
         $('#clear-data').prop('disabled', true);
       }

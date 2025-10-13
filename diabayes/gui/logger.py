@@ -44,7 +44,7 @@ class SQLiteHandler(logging.Handler):
             self.socketio.emit(
                 "new_log",
                 {
-                    "timestamp": entry.timestamp.isoformat(),
+                    "timestamp": entry.timestamp.strftime("%Y-%d-%m %H:%M:%S"),
                     "level": entry.level.lower(),
                     "msg": entry.msg,
                 },

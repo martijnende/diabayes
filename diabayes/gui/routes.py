@@ -1,8 +1,8 @@
-import os
-
 from flask import Blueprint, current_app, jsonify, render_template, request
 
-from .models import LogEntry
+from .file_handler import FileHandler
+from .models import LogEntry, db
+from .plot_handler import PlotHandler
 
 bp = Blueprint("main", __name__)
 
@@ -14,15 +14,41 @@ def index():
 
 @bp.route("/upload", methods=["POST"])
 def upload_file():
+
+    # Instantiate file and plot handlers
+    fhandler = FileHandler()
+    phandler = PlotHandler()
+
+    # Get data file from request
+    file = request.files["data_file"]
+    # Attempt to save the file
+    # This will perform checks to ensure readability
+    if not fhandler.save(file):
+        # An exception occurred, raise status 500
+        return jsonify({"status": "error", "message": f"{Exception}"}), 500
+
+    # Load the data (already checked in previous step)
+    data = fhandler.load_data()
+
+    # Pass data to plotter
+    phandler.plot(data)
+
+    # All good (status 200)
+    return jsonify({"status": "ok", "message": ""}), 200
+
+
+@bp.route("/clear_data", methods=["POST"])
+def clear_data():
     try:
-        file = request.files["data_file"]
-        upload_folder = current_app.config["UPLOAD_FOLDER"]
-        path = os.path.join(upload_folder, file.filename)
-        file.save(path)
-        current_app.logger.info("File upload successful")
+        rows_deleted = db.session.query(LogEntry).delete()
+        db.session.commit()
+        current_app.logger.info(f"{rows_deleted} entries deleted")
+        # TODO: register file/plot handlers with app so that
+        # FileHandler.clear_all() can be called.
         return jsonify({"status": "ok", "message": ""}), 200
     except Exception:
-        current_app.logger.error("File upload failed")
+        db.session.rollback()
+        current_app.logger.error("Failed to clear data")
         return jsonify({"status": "error", "message": f"{Exception}"}), 500
 
 
@@ -33,7 +59,7 @@ def check_db():
         [
             {
                 "id": e.id,
-                "timestamp": e.timestamp.isoformat(),
+                "timestamp": e.timestamp.astimezone().strftime("%Y-%d-%m %H:%M:%S"),
                 "level": e.level.lower(),
                 "msg": e.msg,
             }

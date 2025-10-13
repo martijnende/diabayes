@@ -1,11 +1,9 @@
 import logging
-import os
 import tomllib
 
 from flask import Flask
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
-from flask_sqlalchemy import SQLAlchemy
 
 from .logger import SQLiteHandler
 from .models import db
@@ -23,7 +21,6 @@ def create_app(workspace: str | None = None):
     app.config["SECRET_KEY"] = "123"
 
     db.init_app(app)
-    migrate = Migrate(app, db)
     socketio.init_app(app, cors_allowed_origins="*")
 
     from . import routes
@@ -33,13 +30,16 @@ def create_app(workspace: str | None = None):
     with app.app_context():
         db.create_all()
 
-    handler = SQLiteHandler(socketio=socketio)
-    handler.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(message)s")
-    handler.setFormatter(formatter)
+    log_handler = SQLiteHandler(socketio=socketio)
+    log_handler.setLevel(logging.INFO)
+    log_formatter = logging.Formatter("%(message)s")
+    log_handler.setFormatter(log_formatter)
 
-    app.logger.addHandler(handler)
+    app.logger.addHandler(log_handler)
     app.logger.setLevel(logging.INFO)
+
+    # Create file and plot handlers
+    # Need to check for data files?
 
     return app
 

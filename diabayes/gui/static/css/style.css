@@ -1,7 +1,5 @@
 /* General */
 
-
-
 .invisible {
   display: none;
 }
@@ -120,10 +118,7 @@ div.logger {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-div.logger ul li {
-  color: white;
-  list-style-type: none;
-  margin-top: 0.3em;
+div#logs-panel {
   font-family: "Courier New";
 }
 
