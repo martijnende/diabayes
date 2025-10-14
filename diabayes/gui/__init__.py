@@ -1,5 +1,6 @@
 import logging
 import tomllib
+from pathlib import Path
 
 from flask import Flask
 from flask_migrate import Migrate
@@ -9,9 +10,10 @@ from .logger import SQLiteHandler
 from .models import db
 
 socketio = SocketIO()
+migrate = Migrate()
 
 
-def create_app(workspace: str | None = None):
+def create_app(workspace: Path | None = None):
     app = Flask(__name__)
 
     if workspace is None:
@@ -21,6 +23,7 @@ def create_app(workspace: str | None = None):
     app.config["SECRET_KEY"] = "123"
 
     db.init_app(app)
+    migrate.init_app(app, db)
     socketio.init_app(app, cors_allowed_origins="*")
 
     from . import routes
