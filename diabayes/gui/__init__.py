@@ -2,13 +2,9 @@ import logging
 import tomllib
 from pathlib import Path
 
-from bokeh.server.server import Server
 from flask import Flask
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
-from tornado.ioloop import IOLoop
-from tornado.web import Application, FallbackHandler
-from tornado.wsgi import WSGIContainer
 
 from .file_handler import FileHandler
 from .logger import SQLiteHandler
@@ -52,35 +48,12 @@ def create_app(workspace: Path | None = None):
     # TODO: add current data file to config toml?
     phandler.init_app(app)
 
-    bokeh_apps = {"/bkapp": phandler.make_bokeh_doc}
-    bokeh_server = Server(
-        bokeh_apps, io_loop=IOLoop.current(), allow_websocket_origin=["*"], port=5006
-    )
-    bokeh_server.start()
-
-    container = WSGIContainer(app)
-    tornado_app = Application(
-        [
-            (r"/bkapp.*", FallbackHandler, {"fallback": bokeh_server._tornado}),
-            (r".*", FallbackHandler, {"fallback": container}),
-        ]
-    )
-    tornado_app.listen(5000)
-
-    try:
-        bokeh_server.io_loop.start()
-    except KeyboardInterrupt:
-        print("Stopping...")
-        bokeh_server.io_loop.stop()
-
-    pass
+    return app
 
 
 @socketio.on("connect", namespace="/logs")
 def test_connect(auth):
-    socketio.server.emit(
-        "connection_response", {"data": "Connected"}, namespace="/logs"
-    )
+    socketio.emit("connection_response", {"data": "Connected"}, namespace="/logs")
 
 
 @socketio.on("disconnect")

@@ -1,8 +1,8 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Text
+from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -18,7 +18,7 @@ class LogEntry(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     timestamp: Mapped[datetime] = mapped_column(
-        default=datetime.now(timezone.utc), nullable=False
+        DateTime(timezone=True), default=func.now(), nullable=False
     )
     level: Mapped[str] = mapped_column(String(10), nullable=False)
     msg: Mapped[str] = mapped_column(Text, nullable=False)

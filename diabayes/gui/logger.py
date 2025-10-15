@@ -40,8 +40,10 @@ class SQLiteHandler(logging.Handler):
             # do db.session.commit() before the rollback!
             db.session.commit()
 
+            print(entry.timestamp)
+
             # Websocket broadcast
-            self.socketio.server.emit(
+            self.socketio.emit(
                 "new_log",
                 {
                     "timestamp": entry.timestamp.strftime("%Y-%d-%m %H:%M:%S"),

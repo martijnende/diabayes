@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import click
+from bokeh.server.server import Server
 from flask_migrate import downgrade as mig_downgrade
 from flask_migrate import init as mig_init
 from flask_migrate import migrate as mig_migrate
@@ -18,10 +19,8 @@ def _create_app():
         click.echo("Error: no workspace found in current or parent directories.")
         sys.exit(1)
 
-    create_app(workspace=ws)
-    return True
-    # app = create_app(workspace=ws)
-    # return app
+    app = create_app(workspace=ws)
+    return app
 
 
 """
@@ -54,9 +53,24 @@ def init(dirname):  # type:ignore
 
 @cli.command()
 def run():
-    _create_app()
-    # app = _create_app()
-    # socketio.run(app, host="127.0.0.1", port=5000, debug=bool(app.config["DEBUG"]))
+    app = _create_app()
+
+    # Create a Bokeh rendering server bound to port 5006
+    bokeh_server = Server(
+        {"/bkapp": app.extensions["plot_handler"].make_bokeh_doc},
+        allow_websocket_origin=["localhost:5000"],
+        port=5006,
+    )
+    bokeh_server.start()
+
+    # Run the main application on port 5000
+    socketio.run(
+        app,
+        host="127.0.0.1",
+        port=5000,
+        debug=bool(app.config["DEBUG"]),
+        use_reloader=False,
+    )
 
 
 """
