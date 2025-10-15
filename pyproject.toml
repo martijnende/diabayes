@@ -30,8 +30,7 @@ gui = [
     "flask-sqlalchemy",
     "flask-socketio",
     "python-dotenv",
-    "plotly",
-    "pandas",
+    "bokeh",
 ]
 docs = [
     "make",

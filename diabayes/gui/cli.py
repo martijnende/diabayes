@@ -18,8 +18,10 @@ def _create_app():
         click.echo("Error: no workspace found in current or parent directories.")
         sys.exit(1)
 
-    app = create_app(workspace=ws)
-    return app
+    create_app(workspace=ws)
+    return True
+    # app = create_app(workspace=ws)
+    # return app
 
 
 """
@@ -52,8 +54,9 @@ def init(dirname):  # type:ignore
 
 @cli.command()
 def run():
-    app = _create_app()
-    socketio.run(app, host="127.0.0.1", port=5000, debug=bool(app.config["DEBUG"]))
+    _create_app()
+    # app = _create_app()
+    # socketio.run(app, host="127.0.0.1", port=5000, debug=bool(app.config["DEBUG"]))
 
 
 """

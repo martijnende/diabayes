@@ -1,8 +1,6 @@
 from flask import Blueprint, current_app, jsonify, render_template, request
 
-from .file_handler import FileHandler
 from .models import LogEntry, db
-from .plot_handler import PlotHandler
 
 bp = Blueprint("main", __name__)
 
@@ -15,9 +13,8 @@ def index():
 @bp.route("/upload", methods=["POST"])
 def upload_file():
 
-    # Instantiate file and plot handlers
-    fhandler = FileHandler()
-    phandler = PlotHandler()
+    fhandler = current_app.extensions["file_handler"]
+    phandler = current_app.extensions["plot_handler"]
 
     # Get data file from request
     file = request.files["data_file"]

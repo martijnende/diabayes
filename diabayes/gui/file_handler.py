@@ -1,20 +1,30 @@
 import os
+from pathlib import Path
 
 import numpy as np
-from flask import current_app
+from flask import Flask
 
 
 class FileHandler:
 
-    data_file = None
+    data_file: Path | None = None
+    app: Flask | None = None
 
     def __init__(self) -> None:
         pass
 
+    def init_app(self, app: Flask) -> None:
+        app.extensions["file_handler"] = self
+        self.app = app
+
     def save(self, file) -> bool:
+
+        app = self.app
+        assert app is not None, "Flask app is not initialised"
+
         try:
             # Get the upload folder from config
-            upload_folder = current_app.config["UPLOAD_FOLDER"]
+            upload_folder = app.config["UPLOAD_FOLDER"]
             # Define absolute path
             path = os.path.join(upload_folder, file.filename)
             # Save file to disk
@@ -22,14 +32,14 @@ class FileHandler:
             self.data_file = path
             # Check that file contents are consistent
             if not self._check_before_save():
-                current_app.logger.error("Uploaded file does not meet criteria")
+                app.logger.error("Uploaded file does not meet criteria")
                 raise IOError
             # Thumbs up in log
-            current_app.logger.info("File upload successful")
+            app.logger.info("File upload successful")
 
         except Exception:
             # Thumbs down in log
-            current_app.logger.error("File upload failed")
+            app.logger.error("File upload failed")
             # Remove uploaded file
             self.clear_all()
             return False
@@ -37,6 +47,7 @@ class FileHandler:
         return True
 
     def load_data(self):
+        assert self.data_file is not None
         return np.load(self.data_file)
 
     def clear_all(self):

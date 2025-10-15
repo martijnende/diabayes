@@ -41,7 +41,7 @@ class SQLiteHandler(logging.Handler):
             db.session.commit()
 
             # Websocket broadcast
-            self.socketio.emit(
+            self.socketio.server.emit(
                 "new_log",
                 {
                     "timestamp": entry.timestamp.strftime("%Y-%d-%m %H:%M:%S"),
