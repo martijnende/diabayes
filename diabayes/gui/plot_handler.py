@@ -22,6 +22,8 @@ class PlotHandler:
 
         source = ColumnDataSource(dict(x=[], y=[]))
         source2 = ColumnDataSource(dict(x=[], y=[]))
+        line_colour = "#3cb371"
+        overlay_colour = "#f5deb3"
 
         p = figure(
             height=300,
@@ -33,7 +35,7 @@ class PlotHandler:
                 ("friction", "$snap_y"),
             ],
         )
-        p.line("x", "y", source=source)
+        p.line("x", "y", line_color=line_colour, source=source)
         p.xaxis.axis_label = "Time [s]"
         p.yaxis.axis_label = "Friction [-]"
         p.toolbar.logo = None
@@ -47,12 +49,11 @@ class PlotHandler:
             tooltips=[
                 ("index", "$index"),
                 ("time", "$snap_x"),
-                ("slip rate", "$snap_y"),
+                ("velocity", "$snap_y"),
             ],
         )
-        q.line("x", "y", source=source2)
-        q.xaxis.axis_label = "Time [s]"
-        q.yaxis.axis_label = "Slip rate [m/s]"
+        q.line("x", "y", line_color=line_colour, source=source2)
+        q.yaxis.axis_label = "Velocty [m/s]"
         q.toolbar.logo = None
 
         select = figure(
@@ -69,10 +70,10 @@ class PlotHandler:
         range_tool = RangeTool(
             x_range=p.x_range, y_range=p.y_range, start_gesture="pan"
         )
-        range_tool.overlay.fill_color = "green"
+        range_tool.overlay.fill_color = overlay_colour
         range_tool.overlay.fill_alpha = 0.3
 
-        select.line("x", "y", source=source)
+        select.line("x", "y", line_color=line_colour, line_width=3, source=source)
         # select.ygrid.grid_line_color = None
         select.add_tools(range_tool)
 
@@ -103,13 +104,13 @@ class PlotHandler:
 
             if hasattr(doc, "_source"):
                 doc.add_next_tick_callback(
-                    lambda: doc._source.data.update(x=data[0], y=data[1])
+                    lambda: doc._source.data.update(x=data[0], y=data[1])  # type: ignore
                 )
                 app.logger.debug("Friction data updated")
 
             if hasattr(doc, "_source2"):
                 doc.add_next_tick_callback(
-                    lambda: doc._source2.data.update(x=data[0], y=data[2])
+                    lambda: doc._source2.data.update(x=data[0], y=data[2])  # type: ignore
                 )
                 app.logger.debug("Slip rate data updated")
 

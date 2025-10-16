@@ -15,13 +15,11 @@
   <body class="d-flex flex-column vh-100 overflow-hidden">
 
     <!-- Main navigation -->
-    <header class="bg-primary text-white p-2">
+    <header>
+      <div class="logo">DiaBayes</div>
       <nav class="navbar">
-        <div class="logo">DiaBayes</div>
         <ul class="nav-links">
-          <li>Documentation</li>
-          <li>Report bug</li>
-          <li>GitHub</li>
+          <li><i class="bi bi-bookmark-check-fill"></i><a href="https://docs.diabayes.science">Documentation</a></li><li><i class="bi bi-bug-fill"></i><a href="https://github.com/martijnende/diabayes/issues">Report a bug</a></li><li><i class="bi bi-github"></i><a href="https://github.com/martijnende/diabayes">GitHub</a></li>
         </ul>
       </nav>
     </header>
@@ -30,68 +28,50 @@
     <!-- Main content -->
     <main class="row flex-fill d-flex shrinkable">
 
-      <!-- Vsteps -->
       <section class="col-6 flex-fill bg-light p-3">
-        <div class="mb-3 d-flex align-items-center">
-          <input type="file" class="form-control" id="data-file" style="flex: 1;">
-          <button class="btn btn-danger ms-2" id="clear-data" disabled>
-            <i class="bi bi-trash"></i> Clear data
-          </button>
+        <!-- Data upload -->
+        <div class="row">
+          <div class="col custom-file">
+            <input type="file" class="custom-file-input form-control" id="data-file">
+            <label class="custom-file-label" for="data-file">Import data (.npy) or project (.dbproj)</label>
+          </div>
         </div>
-        Left col
-      </section>
-      <!-- End vsteps -->
+        <div class="row mt-2">
+          <div class="col">
+            <!-- Clear logs button -->
+            <button class="btn btn-warning ms-2" id="" disabled>
+              <i class="bi bi-file-earmark-x"></i> Clear logs
+            </button>
+            <!-- Clear data button -->
+            <button class="btn btn-warning ms-2" id="clear-data" disabled>
+              <i class="bi bi-trash"></i> Clear data
+            </button>
+          </div>
+        </div>
+        <!-- End data upload -->
 
-      <!-- Plot and logs -->
+        <!-- Vsteps -->
+        Left col
+        <!-- End vsteps -->
+      </section>
+
+      <!-- Plots -->
       <section class="col-6 flex-fill p-3">
         <div id="bkapp">{{ bokeh_script | safe }}</div>
       </div>
-      <!-- End plot/logs -->
+      <!-- End plots -->
 
     </main>
+    <!-- End main content-->
 
+    <!-- Footer -->
     <footer class="row">
       <!-- Logs -->
       <div class="col-12 overflow-auto" id="log-container"></div>
       <!-- End logs -->
     </footer>
-    <!-- End main content-->
+    <!-- End footer -->
 
-    <!--
-    <main class="flex-grow-1 d-flex">
-      <div class="col-6 d-flex flex-column flex-grow-1 bg-light border-end p-3">
-        <div class="mb-3 d-flex align-items-center">
-          <input type="file" class="form-control" id="data-file" style="flex: 1;">
-          <button class="btn btn-danger ms-2" id="clear-data" disabled>
-            <i class="bi bi-trash"></i> Clear data
-          </button>
-        </div>
-      </div>
-      <div class="col-6 d-flex flex-column flex-grow-1 p-3">
-        {% block visualisation %}
-        <div class="mb-3 flex-shrink-0" id="viz-row">
-          <div class="bg-white border rounded p-2" id="viz">
-            <div id="bkapp"></div>
-            {{ bokeh_script | safe }}
-          </div>
-        </div>
-
-        <div class="flex-grow-1 d-flex bg-dark text-white border rounded p-2 overflow-auto" id="logs-panel">
-        </div>
-        {% endblock %}
-      </div>
-    </main>
-
-    <footer class="py-2 text-center bg-light border-top">
-      <ul>
-        <li><a href="https://diabayes.science/" target="_blank">GitHub</a></li>
-        <li><a href="https://docs.diabayes.science/" target="_blank">Documentation</a></li>
-        <li><a href="" target="_blank">Report an issue</a></li>
-        <li><a href="" target="_blank">How to cite</a></li>
-      </ul>
-    </footer>
-    -->
-    
   </body>
   {% block javascript %}
   <script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>
