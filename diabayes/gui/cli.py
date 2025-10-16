@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from threading import Thread
 
 import click
 from bokeh.server.server import Server
@@ -55,13 +56,19 @@ def init(dirname):  # type:ignore
 def run():
     app = _create_app()
 
-    # Create a Bokeh rendering server bound to port 5006
-    bokeh_server = Server(
-        {"/bkapp": app.extensions["plot_handler"].make_bokeh_doc},
-        allow_websocket_origin=["localhost:5000"],
-        port=5006,
-    )
-    bokeh_server.start()
+    def _bk_worker():
+        # Create a Bokeh rendering server bound to port 5006
+        bokeh_server = Server(
+            {"/bkapp": app.extensions["plot_handler"].make_bokeh_doc},
+            # allow_websocket_origin=["localhost:5000"],
+            allow_websocket_origin=["*"],
+            port=5006,
+        )
+        app.extensions["plot_handler"].server = bokeh_server
+        bokeh_server.start()
+        bokeh_server.io_loop.start()
+
+    Thread(target=_bk_worker).start()
 
     # Run the main application on port 5000
     socketio.run(

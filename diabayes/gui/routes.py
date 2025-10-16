@@ -1,3 +1,4 @@
+from bokeh.embed import server_document
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from .models import LogEntry, db
@@ -7,7 +8,9 @@ bp = Blueprint("main", __name__)
 
 @bp.route("/")
 def index():
-    return render_template("index.html")
+    bokeh_url = "http://127.0.0.1:5006/bkapp"
+    bokeh_script = server_document(bokeh_url)
+    return render_template("index.html", bokeh_script=bokeh_script)
 
 
 @bp.route("/upload", methods=["POST"])
@@ -40,8 +43,7 @@ def clear_data():
         rows_deleted = db.session.query(LogEntry).delete()
         db.session.commit()
         current_app.logger.info(f"{rows_deleted} entries deleted")
-        # TODO: register file/plot handlers with app so that
-        # FileHandler.clear_all() can be called.
+        current_app.extensions["plot_handler"].clear_plot()
         return jsonify({"status": "ok", "message": ""}), 200
     except Exception:
         db.session.rollback()

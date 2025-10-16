@@ -19,7 +19,6 @@ $(document).ready(function() {
       processData: false,
       contentType: false,
       success: function(response) {
-        Plotly.newPlot('plot1', response.figure_data);
         $('#clear-data').prop('disabled', false);
       },
       error: function(err) {
@@ -36,8 +35,6 @@ $(document).ready(function() {
       url: '/clear_data',
       type: 'POST',
       success: function() {
-        Plotly.purge('plot1');
-        Plotly.purge('plot2');
         $('#log-container div.log-entry').not(':first').remove();
         $('#data-file').prop('disabled', false).val('');
         $('#clear-data').prop('disabled', true);

@@ -4,17 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DiaBayes</title>
-
     <link href="{{ url_for('static', filename='css/bootstrap-5.3.3.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/bootstrap-icons-1.11.3.min.css') }}" rel="stylesheet">
     <script src="{{ url_for('static', filename='js/bootstrap-5.3.3.bundle.min.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='js/socket.io-4.0.1.min.js') }}" charset="utf-8"></script>
-    <script src="{{ url_for('static', filename='js/plotly-3.0.1.min.js') }}" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='js/bokeh-3.8.0.min.js') }}" charset="utf-8"></script>
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   </head>
-  <body class="d-flex flex-column min-vh-100">
+  <body class="d-flex flex-column vh-100 overflow-hidden">
 
+    <!-- Main navigation -->
+    <header class="bg-primary text-white p-2">
+      <nav class="navbar">
+        <div class="logo">DiaBayes</div>
+        <ul class="nav-links">
+          <li>Documentation</li>
+          <li>Report bug</li>
+          <li>GitHub</li>
+        </ul>
+      </nav>
+    </header>
+    <!-- End main navigation -->
+
+    <!-- Main content -->
+    <main class="row flex-fill d-flex shrinkable">
+
+      <!-- Vsteps -->
+      <section class="col-6 flex-fill bg-light p-3">
+        <div class="mb-3 d-flex align-items-center">
+          <input type="file" class="form-control" id="data-file" style="flex: 1;">
+          <button class="btn btn-danger ms-2" id="clear-data" disabled>
+            <i class="bi bi-trash"></i> Clear data
+          </button>
+        </div>
+        Left col
+      </section>
+      <!-- End vsteps -->
+
+      <!-- Plot and logs -->
+      <section class="col-6 flex-fill p-3">
+        <div id="bkapp">{{ bokeh_script | safe }}</div>
+      </div>
+      <!-- End plot/logs -->
+
+    </main>
+
+    <footer class="row">
+      <!-- Logs -->
+      <div class="col-12 overflow-auto" id="log-container"></div>
+      <!-- End logs -->
+    </footer>
+    <!-- End main content-->
+
+    <!--
     <main class="flex-grow-1 d-flex">
       <div class="col-6 d-flex flex-column flex-grow-1 bg-light border-end p-3">
         <div class="mb-3 d-flex align-items-center">
@@ -26,24 +69,14 @@
       </div>
       <div class="col-6 d-flex flex-column flex-grow-1 p-3">
         {% block visualisation %}
-        <!-- Top row: Data Visualisation 1 -->
-        <div class="mb-3 flex-shrink-0" id="viz-row-1">
-          <div class="bg-white border rounded p-2" id="viz1">
-            <div id="plot1"></div>
+        <div class="mb-3 flex-shrink-0" id="viz-row">
+          <div class="bg-white border rounded p-2" id="viz">
+            <div id="bkapp"></div>
+            {{ bokeh_script | safe }}
           </div>
         </div>
 
-        <!-- Middle row: Data Visualisation 2 -->
-        <div class="mb-3 flex-shrink-0" id="viz-row-2">
-          <div class="bg-white border rounded p-2" id="viz2">
-            <h6>Visualisation 2</h6>
-            <div id="plot2"></div>
-          </div>
-        </div>
-
-        <!-- Bottom row: Logs -->
         <div class="flex-grow-1 d-flex bg-dark text-white border rounded p-2 overflow-auto" id="logs-panel">
-          <div id="log-container"></div>
         </div>
         {% endblock %}
       </div>
@@ -57,13 +90,11 @@
         <li><a href="" target="_blank">How to cite</a></li>
       </ul>
     </footer>
+    -->
     
   </body>
   {% block javascript %}
-  <script src="{{ url_for('static', filename='js/socket-logs.js') }}" charset="utf-8"></script>
-  <!--<script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>-->
-  <!--<script src="{{ url_for('static', filename='js/resize-plotly.js') }}" charset="utf-8"></script>-->
-  <!--<script src="{{ url_for('static', filename='js/loading-animation.js') }}" charset="utf-8"></script>-->
+  <script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>
   <script src="{{ url_for('static', filename='js/data_upload.js') }}"></script>
   {% endblock %}
 </html>

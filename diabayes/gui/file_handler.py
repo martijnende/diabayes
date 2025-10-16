@@ -25,10 +25,12 @@ class FileHandler:
         try:
             # Get the upload folder from config
             upload_folder = app.config["UPLOAD_FOLDER"]
+            app.logger.debug(f"Received {file.filename}")
             # Define absolute path
             path = os.path.join(upload_folder, file.filename)
             # Save file to disk
             file.save(path)
+            app.logger.debug("File saved")
             self.data_file = path
             # Check that file contents are consistent
             if not self._check_before_save():
@@ -47,7 +49,9 @@ class FileHandler:
         return True
 
     def load_data(self):
+        assert self.app is not None
         assert self.data_file is not None
+        self.app.logger.debug("Loading data...")
         return np.load(self.data_file)
 
     def clear_all(self):

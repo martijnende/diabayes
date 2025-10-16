@@ -16,7 +16,7 @@ def format(entry):
 
 class SQLiteHandler(logging.Handler):
 
-    def __init__(self, socketio=None):
+    def __init__(self, socketio):
         super().__init__()
         self.socketio = socketio
 
@@ -28,9 +28,9 @@ class SQLiteHandler(logging.Handler):
 
         try:
             entry = LogEntry(
-                level=record.__dict__["levelname"],
-                msg=record.__dict__["msg"],
-                trace=trace,
+                level=record.__dict__["levelname"],  # type:ignore
+                msg=record.__dict__["msg"],  # type:ignore
+                trace=trace,  # type:ignore
             )
             db.session.add(entry)
             # Potentially DANGEROUS caveat:
@@ -39,8 +39,6 @@ class SQLiteHandler(logging.Handler):
             # calling emit(), for otherwise emit() will
             # do db.session.commit() before the rollback!
             db.session.commit()
-
-            print(entry.timestamp)
 
             # Websocket broadcast
             self.socketio.emit(
