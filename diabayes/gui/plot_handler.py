@@ -27,7 +27,7 @@ class PlotHandler:
 
         p = figure(
             height=300,
-            tools="hover,pan,box_zoom,undo,redo,reset",
+            tools="hover,pan,box_zoom,xwheel_zoom,ywheel_zoom,undo,redo,reset",
             sizing_mode="stretch_width",
             tooltips=[
                 ("index", "$index"),
@@ -36,7 +36,6 @@ class PlotHandler:
             ],
         )
         p.line("x", "y", line_color=line_colour, source=source)
-        p.xaxis.axis_label = "Time [s]"
         p.yaxis.axis_label = "Friction [-]"
         p.toolbar.logo = None
 
@@ -44,7 +43,7 @@ class PlotHandler:
             height=300,
             x_range=p.x_range,
             y_axis_type="log",
-            tools="hover,pan,box_zoom,undo,redo,reset",
+            tools="hover,pan,box_zoom",
             sizing_mode="stretch_width",
             tooltips=[
                 ("index", "$index"),
@@ -57,7 +56,7 @@ class PlotHandler:
         q.toolbar.logo = None
 
         select = figure(
-            height=200,
+            height=100,
             y_axis_type=None,
             y_range=p.y_range,
             tools="",
@@ -66,6 +65,7 @@ class PlotHandler:
         )
         # select.x_range.range_padding = 0.1
         select.x_range.bounds = "auto"  # type: ignore
+        select.xaxis.axis_label = "Time [s]"
 
         range_tool = RangeTool(
             x_range=p.x_range, y_range=p.y_range, start_gesture="pan"
@@ -82,7 +82,7 @@ class PlotHandler:
         def set_marker_mode(attr, old, new):
             doc._mode = new
 
-        doc.add_root(column([select, q, p], sizing_mode="stretch_width"))
+        doc.add_root(column([q, p, select], sizing_mode="stretch_width"))
         doc.add_next_tick_callback(lambda: print("Bokeh doc ready"))
         doc._source = source
         doc._source2 = source2

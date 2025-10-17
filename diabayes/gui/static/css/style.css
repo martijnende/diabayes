@@ -4,6 +4,10 @@
   --logs-colour: #353839;
   --warning-light-colour: #ffa700;
   --warning-dark-colour: #cd5700;
+  --greenish: #39816B;
+  --greenish-lighter: #4DAE91;
+  --greenish-darker: #285B4C;
+  --purplish: #6B3981;
 }
 
 .btn-warning {
@@ -17,11 +21,27 @@
   color: white;
 }
 
+
+/* File upload */
+
+#file-upload-group input#data-file::file-selector-button {
+  background-color: var(--greenish);
+  color: white;
+}
+
+#file-upload-group input#data-file:disabled::file-selector-button {
+  background-color: #f8f9fa;
+  color: black;
+}
+
+/* End file upload */
+
 /* Plotting */
 div#bkapp {
   height: 100%;
   width: 100%;
 }
+
 /* End plotting */
 
 
@@ -68,6 +88,7 @@ header nav.navbar ul.nav-links li i.bi {
   color: var(--accent-colour);
   font-size: 1.5em;
 }
+
 header nav.navbar ul.nav-links li a {
   color: inherit;
   text-decoration: none;
@@ -78,7 +99,7 @@ header nav.navbar ul.nav-links li a:hover {
   text-decoration: underline;
 }
 
-header nav.navbar ul.nav-links li + li {
+header nav.navbar ul.nav-links li+li {
   border-left: 1px solid var(--accent-colour);
 }
 
