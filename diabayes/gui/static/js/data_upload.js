@@ -20,6 +20,7 @@ $(document).ready(function() {
       contentType: false,
       success: function(response) {
         $('#clear-data').prop('disabled', false);
+        $('.vstep').removeClass('hidden');
       },
       error: function(err) {
         console.error(err);
@@ -35,9 +36,9 @@ $(document).ready(function() {
       url: '/clear_data',
       type: 'POST',
       success: function() {
-        $('#log-container div.log-entry').not(':first').remove();
         $('#data-file').prop('disabled', false).val('');
         $('#clear-data').prop('disabled', true);
+        $('.vstep').addClass('hidden');
       }
     });
   });

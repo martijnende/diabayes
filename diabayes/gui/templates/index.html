@@ -42,10 +42,10 @@
         </div>
       </div>
 
-      <div class="row mt-2 ps-3">
-        <div class="col">
+      <div class="row mt-2 ps-3" id="data-controls">
+        <div class="col d-flex justify-content-end gap-2">
           <!-- Clear logs button -->
-          <button class="btn btn-warning" id="" disabled>
+          <button class="btn btn-warning" id="clear-logs">
             <i class="bi bi-file-earmark-x"></i> Clear logs
           </button>
           <!-- Clear data button -->
@@ -59,34 +59,54 @@
       <!-- Vsteps -->
       <div class="row mt-3 ps-3">
         <div class="col">
-          <div class="vstep input-group">
-            <form>
-              <div class="row g-2">
-                <div class="col-md-6">
-                  <label for="start" class="form-label">Start</label>
-                  <input type="number" class="form-control" id="start" name="start" step="1">
-                </div>
 
-                <div class="col-md-6">
-                  <label for="stop" class="form-label">Stop</label>
-                  <input type="number" class="form-control" id="stop" name="stop" step="1">
-                </div>
-              </div>
+          {% for id, step in vsteps.items() %}
+            <div class="vstep input-group">
 
-              <div class="row g-2 mt-2">
-                <div class="col-md-6">
-                  <label for="startValue" class="form-label">Start value</label>
-                  <input type="number" class="form-control" id="startValue" name="startValue" step="any">
-                </div>
+              <form id="form_vstep_{{ id }}">
 
-                <div class="col-md-6">
-                  <label for="stopValue" class="form-label">Stop value</label>
-                  <input type="number" class="form-control" id="stopValue" name="stopValue" step="any">
-                </div>
-              </div>
-            </form>
+                <!-- Velocity step ID -->
+                <input type="hidden" name="step_id" value="{{ id }}" />
 
-          </div>
+                <!-- Start/stop values -->
+                <div class="row g-2">
+
+                  <!-- Start value -->
+                  <div class="col-md-6">
+                    <label for="start" class="form-label">Start</label>
+                    <input type="number" inputmode="numeric" pattern="\d*" class="form-control" id="start" name="start" min="0" step="1" id="count" value="{{ step.start }}">
+                  </div>
+
+                  <!-- Stop value -->
+                  <div class="col-md-6">
+                    <label for="stop" class="form-label">Stop</label>
+                    <input type="number" class="form-control" id="stop" name="stop" min="0" step="1" value="{{ step.stop }}">
+                  </div>
+
+                </div>
+                <!-- End start/stop values -->
+
+                <!-- Update/delete buttons -->
+                <div class="row g-2">
+
+                  <div class="col-md-6">
+                    <button type="button" class="btn btn-success action-btn" data-action="update">
+                      <i class="bi bi-arrow-clockwise"></i> Update
+                    </button>
+                  </div>
+
+                  <div class="col-md-6">
+                    <button type="button" class="btn btn-warning action-btn" data-action="delete">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+                <!-- End update/delete buttons -->
+
+              </form>
+            </div>
+          {% endfor %}
+
         </div>
       </div>
       <!-- End vsteps -->
@@ -113,6 +133,7 @@
 {% block javascript %}
 <script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>
 <script src="{{ url_for('static', filename='js/data_upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vsteps.js') }}"></script>
 {% endblock %}
 
 </html>

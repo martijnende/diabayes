@@ -29,4 +29,17 @@ $(document).ready(function() {
     $("#log-container").prepend(renderLogEntry(entry));
   });
 
+  // Clear logs
+  $('#clear-logs').on('click', function() {
+    $.ajax({
+      url: '/clear_logs',
+      type: 'POST',
+      success: function() {
+        $('#log-container div.log-entry').remove();
+        loadLogs();
+      }
+    });
+  });
+
+
 });

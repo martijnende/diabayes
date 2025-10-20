@@ -1,6 +1,6 @@
 import numpy as np
 from bokeh.layouts import column
-from bokeh.models import ColumnDataSource, RangeTool
+from bokeh.models import BoxZoomTool, ColumnDataSource, RangeTool
 from bokeh.plotting import figure
 from bokeh.server.server import Server
 from flask import Flask
@@ -38,6 +38,7 @@ class PlotHandler:
         p.line("x", "y", line_color=line_colour, source=source)
         p.yaxis.axis_label = "Friction [-]"
         p.toolbar.logo = None
+        p.toolbar.active_drag = None
 
         q = figure(
             height=300,
@@ -54,6 +55,7 @@ class PlotHandler:
         q.line("x", "y", line_color=line_colour, source=source2)
         q.yaxis.axis_label = "Velocty [m/s]"
         q.toolbar.logo = None
+        q.toolbar.active_drag = None
 
         select = figure(
             height=100,
@@ -100,7 +102,6 @@ class PlotHandler:
 
         for ctx in self.server.get_sessions("/bkapp"):
             doc = ctx.document
-            app.logger.debug("Server not initialised")
 
             if hasattr(doc, "_source"):
                 doc.add_next_tick_callback(

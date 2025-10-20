@@ -55,12 +55,16 @@ class FileHandler:
         return np.load(self.data_file)
 
     def clear_all(self):
+        assert self.app is not None
+        assert self.data_file is not None
         # Check that a file path is set and that the file exists
         if self.data_file and os.path.isfile(self.data_file):
             os.remove(self.data_file)
+            self.app.logger.debug(f"Deleted {self.data_file}")
         self.data_file = None
 
     def _check_before_save(self) -> bool:
+        # TODO: expand initial checks
         try:
             data = self.load_data()
             assert isinstance(data, np.ndarray)

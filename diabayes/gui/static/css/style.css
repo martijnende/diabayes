@@ -47,6 +47,21 @@ div#bkapp {
 
 /* Vsteps */
 
+div.vstep {
+  background-color: white;
+  border-radius: 1em;
+  padding: 2em;
+  border: 1px solid var(--greenish-lighter);
+}
+
+div.vstep:hover {
+  box-shadow: 0 0 0.5em var(--greenish-lighter);
+}
+
+div.vstep.hidden {
+  display: none;
+}
+
 /* End vsteps */
 
 
