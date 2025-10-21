@@ -30,9 +30,9 @@
   <!-- End main navigation -->
 
   <!-- Main content -->
-  <main class="row flex-fill d-flex shrinkable">
+  <main class="row vh-100">
 
-    <section class="col-6 flex-fill bg-light p-3">
+    <section class="col-6 bg-light p-3 scroll-container">
 
       <!-- Data upload -->
       <div class="row ps-3">
@@ -58,64 +58,22 @@
 
       <!-- Vsteps -->
       <div class="row mt-3 ps-3">
+        <div class="col" id="vstep-container">
+          {% include "steps.html" %}
+        </div>
+      </div>
+      <div class="row mt-3 ps-3">
         <div class="col">
-
-          {% for id, step in vsteps.items() %}
-            <div class="vstep input-group">
-
-              <form id="form_vstep_{{ id }}">
-
-                <!-- Velocity step ID -->
-                <input type="hidden" name="step_id" value="{{ id }}" />
-
-                <!-- Start/stop values -->
-                <div class="row g-2">
-
-                  <!-- Start value -->
-                  <div class="col-md-6">
-                    <label for="start" class="form-label">Start</label>
-                    <input type="number" inputmode="numeric" pattern="\d*" class="form-control" id="start" name="start" min="0" step="1" id="count" value="{{ step.start }}">
-                  </div>
-
-                  <!-- Stop value -->
-                  <div class="col-md-6">
-                    <label for="stop" class="form-label">Stop</label>
-                    <input type="number" class="form-control" id="stop" name="stop" min="0" step="1" value="{{ step.stop }}">
-                  </div>
-
-                </div>
-                <!-- End start/stop values -->
-
-                <!-- Update/delete buttons -->
-                <div class="row g-2">
-
-                  <div class="col-md-6">
-                    <button type="button" class="btn btn-success action-btn" data-action="update">
-                      <i class="bi bi-arrow-clockwise"></i> Update
-                    </button>
-                  </div>
-
-                  <div class="col-md-6">
-                    <button type="button" class="btn btn-warning action-btn" data-action="delete">
-                      <i class="bi bi-trash"></i> Delete
-                    </button>
-                  </div>
-                </div>
-                <!-- End update/delete buttons -->
-
-              </form>
-            </div>
-          {% endfor %}
-
+          <button type="button" class="btn btn-success" id="add-vstep">Add</button>
         </div>
       </div>
       <!-- End vsteps -->
     </section>
 
     <!-- Plots -->
-    <section class="col-6 flex-fill p-3">
+    <section class="col-6 p-3">
       <div id="bkapp">{{ bokeh_script | safe }}</div>
-      </div>
+    </section>
       <!-- End plots -->
 
   </main>

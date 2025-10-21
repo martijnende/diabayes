@@ -18,78 +18,93 @@ def index():
     vsteps = StepEvent.query.order_by(StepEvent.start.asc()).all()
     current_app.logger.debug(f"Got {len(vsteps)} events")
 
-    # If no steps are found, create a "default" step with
-    # ID -1 (will get replaced by assigned ID later)
-    if len(vsteps) == 0:
-        vstep_dict = {
-            "-1": {
-                "start": 0,
-                "stop": 100,
-                "v0": 1e-6,
-                "v1": 1e-5,
-            }
-        }
-    else:
-        # Return dict buffer
-        vstep_dict = {}
-        # Loop over steps
-        for step in vsteps:
-            # Create dict entry per step
-            vstep_dict[str(step.id)] = {
-                "start": step.start,
-                "stop": step.stop,
-                "v0": step.v0,
-                "v1": step.v1,
-            }
-
-    current_app.logger.debug(f"Velocity steps loaded")
-
-    return render_template("index.html", bokeh_script=bokeh_script, vsteps=vstep_dict)
+    return render_template("index.html", bokeh_script=bokeh_script, vsteps=vsteps)
 
 
 @bp.route("/update-step", methods=["POST"])
 def update_step():
 
-    action = request.form.get("action")
-    id = request.form.get("step_id", type=int)
+    # Get the form data and do some light validation
+    # Everything defaults to None if no value is found
+    # or if it fails to validate
+    action = request.form.get("action", type=str)
+    id = request.form.get("id", type=int)
+    start = request.form.get("start", type=int)
+    stop = request.form.get("stop", type=int)
+    v0 = request.form.get("v0", type=float)
+    v1 = request.form.get("v1", type=float)
 
     app = current_app
 
-    if action == "update":
-        if id == -1:
-            # New entry: insert into DB
-            # Debug log entry
-            ...
-        else:
-            # Attempt to update existing entry
+    # Action 1: add a new v-step
+    if action == "add":
+        try:
+            step = StepEvent(start=start, stop=stop, v0=v0, v1=v1)  # type: ignore
+            db.session.add(step)
+            db.session.commit()
+            app.logger.debug(f"Added v-step {id} {start} -> {stop}")
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error("Failed to insert v-step entry")
+            app.logger.error(e)
+            return jsonify({"status": "error", "message": e}), 500
 
-            # Check that the key exists in DB (otherwise return error)
-            if db.session.get(StepEvent, id) == None:
-                app.logger.error(f"Cannot find ID {id} in database")
-                return jsonify({"status": "error", "message": ""}), 500
+    # Action 2: update an existing v-step
+    elif action == "update":
 
-            # Update entry
-            # Debug log entry
-            ...
+        # Get the step based on the provided ID
+        # Will return None if id cannot be found
+        step = db.session.get(StepEvent, id)
 
-    if action == "delete":
-        # Skip blank row
-        if id == -1:
-            return jsonify({"status": "ok", "message": ""}), 200
+        # Check that the key exists in DB (otherwise return error)
+        if step == None:
+            app.logger.error(f"Cannot find ID {id} in database")
+            return jsonify({"status": "error", "message": ""}), 500
 
-        # Assert that ID exists
+        # Update entry
+        try:
+            step.start = start
+            step.stop = stop
+            step.v0 = v0
+            step.v1 = v1
+            db.session.commit()
+            app.logger.debug(f"Updated v-step {id}")
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Failed to update v-step {id}")
+            app.logger.error(e)
+            return jsonify({"status": "error", "message": e}), 500
+
+    # Action 3: delete a v-step
+    elif action == "delete":
+
+        # Get the step based on the provided ID
+        # Will return None if id cannot be found
+        step = db.session.get(StepEvent, id)
+
+        # Check that the key exists in DB (otherwise return error)
+        if step == None:
+            app.logger.error(f"Cannot find ID {id} in database")
+            return jsonify({"status": "error", "message": ""}), 500
+
         # Delete entry from DB
+        try:
+            StepEvent.query.filter_by(id=id).delete()
+            db.session.commit()
+            app.logger.debug(f"Deleted v-step {id}")
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error("Failed to delete v-step entry")
+            app.logger.error(e)
+
+    # Get all the current steps
+    steps = StepEvent.query.all()
+    # Render the HTML template
+    html = render_template("steps.html", vsteps=steps)
 
     # Run forward model (eventually)
-    # Return updated values to back-populate HTML
 
-    # Make sure to update ID when a new entry is created!
-    # Also automatically add new row in case of new entry
-
-    # In the case of deletion, AJAX delete #form_vstep_{{ id }}
-    # except if id == -1
-
-    return jsonify({"status": "ok", "message": ""}), 200
+    return jsonify({"status": "ok", "message": "", "html": html}), 200
 
 
 @bp.route("/upload", methods=["POST"])

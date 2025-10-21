@@ -28,9 +28,9 @@ class SQLiteHandler(logging.Handler):
 
         try:
             entry = LogEntry(
-                level=record.__dict__["levelname"],  # type:ignore
-                msg=record.__dict__["msg"],  # type:ignore
-                trace=trace,  # type:ignore
+                level=record.__dict__["levelname"],  # type: ignore
+                msg=record.__dict__["msg"],  # type: ignore
+                trace=trace,  # type: ignore
             )
             db.session.add(entry)
             # Potentially DANGEROUS caveat:

@@ -1,5 +1,3 @@
-// data_upload.js
-
 $(document).ready(function() {
 
   // When a file is selected
@@ -38,7 +36,6 @@ $(document).ready(function() {
       success: function() {
         $('#data-file').prop('disabled', false).val('');
         $('#clear-data').prop('disabled', true);
-        $('.vstep').addClass('hidden');
       }
     });
   });

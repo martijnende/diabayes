@@ -21,6 +21,14 @@
   color: white;
 }
 
+.btn-success {
+  background-color: var(--greenish);
+}
+
+.btn-success:hover {
+  background-color: var(--greenish-darker);
+}
+
 
 /* File upload */
 
@@ -47,11 +55,24 @@ div#bkapp {
 
 /* Vsteps */
 
-div.vstep {
+
+section.scroll-container {
+  contain: size;
+  overflow-y: auto;
+  overscroll-behavior-x: contain;
+}
+
+div.vstep, div.no-vstep {
   background-color: white;
   border-radius: 1em;
   padding: 2em;
   border: 1px solid var(--greenish-lighter);
+  margin-bottom: 1em;
+}
+
+div.no-vstep {
+  padding: 1em;
+  text-align: center;
 }
 
 div.vstep:hover {
