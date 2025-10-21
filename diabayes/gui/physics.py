@@ -1,0 +1,55 @@
+import diabayes as db
+from diabayes.forward_models import Forward, ageing_law, rsf, springblock
+from diabayes.solver import ODESolver
+
+
+def data_are_valid(start, stop, fields):
+
+    # At this point, fields["t"] must exist
+    assert fields.get("t") is not None
+
+    # Check start/stop criteria
+    valid_start = (start is not None) and (start >= 0)
+    valid_stop = (stop is not None) and (stop > start) and (stop < len(fields["t"]))
+    valid_start_stop = valid_start and valid_stop
+    if not valid_start_stop:
+        return False
+
+    # Check all fields are not None
+    if any(v is None for v in fields.values()):
+        return False
+
+    # Check all fields are positive
+    if any(v < 0 for k, v in fields.items() if k != "t"):
+        return False
+
+    return True
+
+
+def run_forward(start, stop, fields):
+
+    state_dict = {"theta": ageing_law}
+    forward = Forward(
+        friction_model=rsf, state_evolution=state_dict, stress_transfer=springblock
+    )
+    solver = ODESolver(forward_model=forward)
+
+    params = db.RSFParams(a=fields["a"], b=fields["b"], Dc=fields["Dc"])
+    constants = db.RSFConstants(v0=fields["v0"], mu0=fields["mu0"])
+    block_constants = db.SpringBlockConstants(k=fields["k"], v_lp=fields["v1"])
+
+    # Assume steady-state
+    # TODO: replace for SHS simulations
+    theta0 = fields["Dc"] / fields["v0"]
+
+    forward.set_initial_values(mu=fields["mu0"], theta=theta0)
+    y0 = forward.variables
+    result = solver.solve_forward(
+        t=fields["t"][start:stop],
+        y0=y0,
+        params=params,
+        friction_constants=constants,
+        block_constants=block_constants,
+    )
+    v = rsf(result, params, constants)
+    return result.mu, v

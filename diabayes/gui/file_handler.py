@@ -8,6 +8,7 @@ from flask import Flask
 class FileHandler:
 
     data_file: Path | None = None
+    data: np.ndarray | None = None
     app: Flask | None = None
 
     def __init__(self) -> None:
@@ -52,7 +53,8 @@ class FileHandler:
         assert self.app is not None
         assert self.data_file is not None
         self.app.logger.debug("Loading data...")
-        return np.load(self.data_file)
+        self.data = np.load(self.data_file)
+        return self.data
 
     def clear_all(self):
         assert self.app is not None

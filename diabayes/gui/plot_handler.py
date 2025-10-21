@@ -1,6 +1,6 @@
 import numpy as np
 from bokeh.layouts import column
-from bokeh.models import BoxZoomTool, ColumnDataSource, RangeTool
+from bokeh.models import ColumnDataSource, RangeTool
 from bokeh.plotting import figure
 from bokeh.server.server import Server
 from flask import Flask
@@ -86,6 +86,8 @@ class PlotHandler:
 
         doc.add_root(column([q, p, select], sizing_mode="stretch_width"))
         doc.add_next_tick_callback(lambda: print("Bokeh doc ready"))
+        doc._figures = {"friction": p, "velocity": q}
+        doc._renderers = {"friction": {}, "velocity": {}}
         doc._source = source
         doc._source2 = source2
         pass
@@ -116,6 +118,66 @@ class PlotHandler:
                 app.logger.debug("Slip rate data updated")
 
         app.logger.debug("Plot update done")
+        pass
+
+    def add_friction(self, id, data):
+        app = self.app
+        assert app is not None
+
+        if not self.server:
+            app.logger.debug("Server not initialised")
+            return
+
+        def add_curve(doc, id):
+            for fig, y in zip(("friction", "velocity"), (data["mu"], data["v"])):
+                p = doc._figures.get(fig)
+                renderers = doc._renderers.get(fig)
+                if p is not None:
+
+                    # If a curve with this ID already
+                    # exists, remove it first
+                    if id in renderers:
+                        renderer = renderers.pop(id)
+                        p.renderers.remove(renderer)
+
+                    source = ColumnDataSource(dict(x=data["t"], y=y))
+                    renderer = p.line(
+                        "x", "y", line_color="orange", source=source, line_width=2
+                    )
+                    doc._renderers[fig][id] = renderer
+
+        for ctx in self.server.get_sessions("/bkapp"):
+            doc = ctx.document
+            if hasattr(doc, "_figures"):
+                app.logger.debug(f"Creating callback for {id}")
+                doc.add_next_tick_callback(lambda: add_curve(doc, id))
+
+        app.logger.debug(f"Added friction curve {id}")
+
+        pass
+
+    def del_friction(self, id):
+        app = self.app
+        assert app is not None
+
+        if not self.server:
+            app.logger.debug("Server not initialised")
+            return
+
+        def remove_curve(doc, id):
+            for fig in ("friction", "velocity"):
+                p = doc._figures.get(fig)
+                renderer = doc._renderers[fig].pop(id, None)
+                if renderer is not None:
+                    p.renderers.remove(renderer)
+
+        for ctx in self.server.get_sessions("/bkapp"):
+            doc = ctx.document
+            if hasattr(doc, "_figures"):
+                doc.add_next_tick_callback(lambda: remove_curve(doc, id))
+
+        app.logger.debug(f"Removed friction curve {id}")
+
         pass
 
     def clear_plot(self):

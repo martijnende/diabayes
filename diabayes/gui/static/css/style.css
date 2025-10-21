@@ -55,6 +55,12 @@ div#bkapp {
 
 /* Vsteps */
 
+button#add-vstep {
+  width: 100%;
+  height: 2em;
+  padding: 0.2em;
+  border-radius: 1em;
+}
 
 section.scroll-container {
   contain: size;
@@ -65,8 +71,9 @@ section.scroll-container {
 div.vstep, div.no-vstep {
   background-color: white;
   border-radius: 1em;
-  padding: 2em;
-  border: 1px solid var(--greenish-lighter);
+  padding: 1em;
+  /* border: 1px solid var(--greenish-lighter); */
+  border: 1px solid lightgrey;
   margin-bottom: 1em;
 }
 
@@ -76,7 +83,8 @@ div.no-vstep {
 }
 
 div.vstep:hover {
-  box-shadow: 0 0 0.5em var(--greenish-lighter);
+  /* box-shadow: 0 0 0.5em var(--greenish-lighter); */
+  box-shadow: 0 0 0.5em lightgrey;
 }
 
 div.vstep.hidden {
@@ -169,6 +177,15 @@ div#log-container {
 .shrinkable {
   min-height: 0;
   min-width: 0;
+}
+
+.divider {
+  border-top: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  padding: 0;
+  height: 0.5em;
 }
 
 /* End other */

@@ -2,6 +2,7 @@ from bokeh.embed import server_document
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from .models import LogEntry, StepEvent, db
+from .physics import data_are_valid, run_forward
 
 bp = Blueprint("main", __name__)
 
@@ -31,17 +32,21 @@ def update_step():
     id = request.form.get("id", type=int)
     start = request.form.get("start", type=int)
     stop = request.form.get("stop", type=int)
-    v0 = request.form.get("v0", type=float)
-    v1 = request.form.get("v1", type=float)
+
+    # Instead of manually manipulating each quantity,
+    # loop over a dictionary instead
+    field_names = ("v0", "v1", "mu0", "k", "a", "b", "Dc")
+    fields = {key: request.form.get(key, type=float) for key in field_names}
 
     app = current_app
 
     # Action 1: add a new v-step
     if action == "add":
         try:
-            step = StepEvent(start=start, stop=stop, v0=v0, v1=v1)  # type: ignore
+            step = StepEvent(start=start, stop=stop, **fields)  # type: ignore
             db.session.add(step)
             db.session.commit()
+            id = step.id
             app.logger.debug(f"Added v-step {id} {start} -> {stop}")
         except Exception as e:
             db.session.rollback()
@@ -65,8 +70,8 @@ def update_step():
         try:
             step.start = start
             step.stop = stop
-            step.v0 = v0
-            step.v1 = v1
+            for key, val in fields.items():
+                setattr(step, key, val)
             db.session.commit()
             app.logger.debug(f"Updated v-step {id}")
         except Exception as e:
@@ -91,6 +96,8 @@ def update_step():
         try:
             StepEvent.query.filter_by(id=id).delete()
             db.session.commit()
+            # Remove any plot elements associated with id
+            app.extensions["plot_handler"].del_friction(id)
             app.logger.debug(f"Deleted v-step {id}")
         except Exception as e:
             db.session.rollback()
@@ -102,7 +109,34 @@ def update_step():
     # Render the HTML template
     html = render_template("steps.html", vsteps=steps)
 
-    # Run forward model (eventually)
+    # At this point, id cannot be None; either it was
+    # provided (update/delete), or it was created (add)
+    assert id is not None
+
+    # Check if data has been loaded
+    data = getattr(app.extensions["file_handler"], "data", None)
+
+    # Update model curves
+    if (action != "delete") and (data is not None):
+
+        assert len(data) > 0
+        fields["t"] = app.extensions["file_handler"].data[0]
+
+        # Check that all data are valid
+        if data_are_valid(start, stop, fields):
+            # Run forward model
+            friction, v = run_forward(start, stop, fields)
+            # Plot friction curves
+            plot_fields = {
+                "t": fields["t"][start:stop],
+                "mu": friction,
+                "v": v,
+            }
+            app.extensions["plot_handler"].add_friction(id, plot_fields)
+        # If any data are invalid: remove curves
+        else:
+            app.logger.debug(f"Validation for step {id} failed")
+            app.extensions["plot_handler"].del_friction(id)
 
     return jsonify({"status": "ok", "message": "", "html": html}), 200
 

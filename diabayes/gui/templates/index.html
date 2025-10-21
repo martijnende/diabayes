@@ -56,15 +56,23 @@
       </div>
       <!-- End data upload -->
 
+      <div class="row divider"></div>
+
       <!-- Vsteps -->
       <div class="row mt-3 ps-3">
         <div class="col" id="vstep-container">
           {% include "steps.html" %}
         </div>
       </div>
+
+      <!-- Add v-step button -->
       <div class="row mt-3 ps-3">
         <div class="col">
-          <button type="button" class="btn btn-success" id="add-vstep">Add</button>
+          <button type="button" class="btn btn-success" id="add-vstep">
+            <i class="bi bi-arrow-down"></i>
+            Add velocity step
+            <i class="bi bi-arrow-down"></i>
+          </button>
         </div>
       </div>
       <!-- End vsteps -->
@@ -74,7 +82,7 @@
     <section class="col-6 p-3">
       <div id="bkapp">{{ bokeh_script | safe }}</div>
     </section>
-      <!-- End plots -->
+    <!-- End plots -->
 
   </main>
   <!-- End main content-->
