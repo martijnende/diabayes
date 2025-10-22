@@ -44,7 +44,7 @@ class PlotHandler:
             height=300,
             x_range=p.x_range,
             y_axis_type="log",
-            tools="hover,pan,box_zoom",
+            tools="hover,pan,box_zoom,xwheel_zoom,ywheel_zoom,undo,redo,reset",
             sizing_mode="stretch_width",
             tooltips=[
                 ("index", "$index"),

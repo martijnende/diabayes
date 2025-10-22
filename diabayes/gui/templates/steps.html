@@ -7,21 +7,25 @@
     <input type="hidden" name="id" value="{{ step.id }}" />
 
     <!-- Start/stop values -->
-    <div class="row">
+    <div class="row desc">
+      <div class="col">Step properties</div>
+    </div>
+    <div class="row mt-1">
 
       <div class="col-md-12 d-flex justify-content-center gap-1">
 
         <!-- Start value -->
         <div class="input-group">
-          <!-- <label for="start" class="form-label">Start</label> -->
-          <div class="input-group-prepend"><span class="input-group-text">start</span></div>
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Start index of step">start</span></div>
           <input type="number" class="form-control" placeholder="index" id="start" name="start" min="0" step="1"
             value="{{ step.start }}">
         </div>
 
         <!-- Stop value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">stop</span></div>
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Stop index of step">stop</span></div>
           <input type="number" class="form-control" placeholder="index" id="stop" name="stop" min="0" step="1"
             value="{{ step.stop }}">
         </div>
@@ -37,13 +41,15 @@
 
         <!-- v0 -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">v<sub>0</sub></span></div>
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Initial (load-point) velocity [m/s]">v<sub>0</sub></span></div>
           <input type="number" class="form-control" placeholder="[m/s]" id="v0" name="v0" value="{{ step.v0 }}">
         </div>
 
         <!-- v1 -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">v<sub>1</sub></span></div>
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Final (load-point) velocity [m/s]">v<sub>1</sub></span></div>
           <input type="number" class="form-control" placeholder="[m/s]" id="v1" name="v1" value="{{ step.v1 }}">
         </div>
 
@@ -53,27 +59,33 @@
     <!-- End velocity values -->
 
     <!-- Friction values -->
+    <div class="row desc">
+      <div class="col">Friction parameters</div>
+    </div>
     <div class="row mt-1">
 
       <div class="col-md-12 d-flex justify-content-center gap-1">
 
         <!-- RSF a-value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">a</span></div>
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Direct effect [-]">a</span></div>
           <input type="number" class="form-control" placeholder="[-]" name="a" min="0" step="0.001"
             value="{{ step.a }}">
         </div>
 
         <!-- RSF b-value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">b</span></div>
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Evolution effect [-]">b</span></div>
           <input type="number" class="form-control" placeholder="[-]" name="b" min="0" step="0.001"
             value="{{ step.b }}">
         </div>
 
         <!-- RSF Dc-value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">D<sub>c</sub></span></div>
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Characteristic slip distance [m]">D<sub>c</sub></span></div>
           <input type="number" class="form-control" placeholder="[m]" name="Dc" min="0" step="0.00001"
             value="{{ step.Dc }}">
         </div>
@@ -83,29 +95,81 @@
     </div>
     <!-- End friction values -->
 
-    <!-- Other values -->
+    <!-- Friction/stiffness values -->
+    <div class="row desc">
+      <div class="col">Initial conditions</div>
+    </div>
     <div class="row mt-1">
 
       <div class="col-md-12 d-flex justify-content-center gap-1">
 
         <!-- mu0-value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">&#956;<sub>0</sub></span></div>
-          <input type="number" class="form-control" placeholder="[-]" name="mu0" min="0" step="0.01" value="{{ step.mu0 }}">
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Initial friction">&#956;<sub>0</sub></span></div>
+          <input type="number" class="form-control" placeholder="[-]" name="mu0" min="0" step="0.01"
+            value="{{ step.mu0 }}">
         </div>
 
         <!-- Stiffness value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text">k</span></div>
-          <input type="number" class="form-control" placeholder="[1/m]" id="k" name="k" min="0" step="100"
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Stiffness [1/m]">k</span></div>
+          <input type="number" class="form-control" placeholder="[1/m]" name="k" min="0" step="100"
             value="{{ step.k }}">
+        </div>
+
+        <!-- k/kc -->
+        <div class="input-group">
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Stable sliding for k/kc > 1">k/k<sub>c</sub></span></div>
+          <input type="text" class="form-control" placeholder="[-]" id="kkc" name="kkc" value="{{ step.kkc }}" disabled>
         </div>
 
       </div>
 
     </div>
-    <!-- End other values -->
+    <!-- End friction/stiffness values -->
 
+    <!-- Theta values -->
+    <div class="row mt-1">
+
+      <div class="col-md-12 d-flex justify-content-center gap-1">
+
+        <!-- steady-state selector -->
+        <div class="input-group">
+
+          <!-- Calculate theta from steady-state -->
+          <div class="input-group-text">
+            <input class="form-check-input" type="radio" name="theta_mode" id="theta_auto" value="auto" checked>
+            <label for="theta_auto" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
+              title="Calculate &#952; from steady-state">Steady-state</label>
+          </div>
+
+          <!-- Specify theta -->
+          <div class="input-group-text">
+            <input class="form-check-input" type="radio" name="theta_mode" id="theta_previous" value="previous">
+            <label for="theta_previous" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
+              title="Use the final value of &#952; of the previous step">Previous</label>
+          </div>
+          <!-- Specify theta -->
+          <div class="input-group-text">
+            <input class="form-check-input" type="radio" name="theta_mode" id="theta_custom" value="custom">
+            <label for="theta_custom" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
+              title="Specify custom initial &#952; [s]">Custom:</label>
+          </div>
+
+          <!-- Theta value -->
+          <div class="input-group-prepend"><span class="input-group-text">&#952;<sub>0</sub></span></div>
+          <input type="number" class="form-control" placeholder="[s]" id="theta0" name="theta0" min="0" step="1"
+            value="{{ step.theta0 }}" disabled>
+
+        </div>
+
+      </div>
+
+    </div>
+    <!-- End friction/stiffness values -->
     <!-- Update/delete buttons -->
     <div class="row mt-3">
 

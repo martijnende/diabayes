@@ -32,7 +32,7 @@
   <!-- Main content -->
   <main class="row vh-100">
 
-    <section class="col-6 bg-light p-3 scroll-container">
+    <section class="col-6 col-xxl-4 bg-light p-3 scroll-container">
 
       <!-- Data upload -->
       <div class="row ps-3">
@@ -79,7 +79,7 @@
     </section>
 
     <!-- Plots -->
-    <section class="col-6 p-3">
+    <section class="col-6 col-xxl-8 p-3">
       <div id="bkapp">{{ bokeh_script | safe }}</div>
     </section>
     <!-- End plots -->
@@ -101,5 +101,10 @@
 <script src="{{ url_for('static', filename='js/data_upload.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vsteps.js') }}"></script>
 {% endblock %}
+<script>
+  $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip();
+  });
+</script>
 
 </html>

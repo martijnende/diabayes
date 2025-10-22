@@ -38,6 +38,9 @@ def update_step():
     field_names = ("v0", "v1", "mu0", "k", "a", "b", "Dc")
     fields = {key: request.form.get(key, type=float) for key in field_names}
 
+    # Extract/calculate theta0
+    # Compute k/kc
+
     app = current_app
 
     # Action 1: add a new v-step
