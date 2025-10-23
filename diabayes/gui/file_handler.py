@@ -7,7 +7,7 @@ from flask import Flask
 
 class FileHandler:
 
-    data_file: Path | None = None
+    data_file: Path | str | None = None
     data: np.ndarray | None = None
     app: Flask | None = None
 
@@ -17,6 +17,7 @@ class FileHandler:
     def init_app(self, app: Flask) -> None:
         app.extensions["file_handler"] = self
         self.app = app
+        self.data_file = os.path.join(app.config["UPLOAD_FOLDER"], "data.npy")
 
     def save(self, file) -> bool:
 
@@ -24,15 +25,10 @@ class FileHandler:
         assert app is not None, "Flask app is not initialised"
 
         try:
-            # Get the upload folder from config
-            upload_folder = app.config["UPLOAD_FOLDER"]
             app.logger.debug(f"Received {file.filename}")
-            # Define absolute path
-            path = os.path.join(upload_folder, file.filename)
             # Save file to disk
-            file.save(path)
+            file.save(self.data_file)
             app.logger.debug("File saved")
-            self.data_file = path
             # Check that file contents are consistent
             if not self._check_before_save():
                 app.logger.error("Uploaded file does not meet criteria")
@@ -49,6 +45,11 @@ class FileHandler:
 
         return True
 
+    def check_data_exists(self):
+        if self.data_file == None:
+            return False
+        return os.path.isfile(self.data_file)
+
     def load_data(self):
         assert self.app is not None
         assert self.data_file is not None
@@ -57,13 +58,13 @@ class FileHandler:
         return self.data
 
     def clear_all(self):
+        data_file = self.data_file
         assert self.app is not None
-        assert self.data_file is not None
+        assert data_file is not None
         # Check that a file path is set and that the file exists
-        if self.data_file and os.path.isfile(self.data_file):
-            os.remove(self.data_file)
-            self.app.logger.debug(f"Deleted {self.data_file}")
-        self.data_file = None
+        if data_file and os.path.isfile(data_file):
+            os.remove(data_file)
+            self.app.logger.debug(f"Deleted {data_file}")
 
     def _check_before_save(self) -> bool:
         # TODO: expand initial checks

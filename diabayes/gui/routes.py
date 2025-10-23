@@ -1,4 +1,5 @@
-from bokeh.embed import server_document
+from bokeh.client import pull_session
+from bokeh.embed import server_session
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from .models import LogEntry, StepEvent, db
@@ -12,14 +13,26 @@ def index():
 
     # Get Bokeh canvas
     bokeh_url = "http://127.0.0.1:5006/bkapp"
-    bokeh_script = server_document(bokeh_url)
+    with pull_session(url=bokeh_url) as bokeh_session:
+        bokeh_script = server_session(session_id=bokeh_session.id, url=bokeh_url)
+
     current_app.logger.debug(f"Bokeh canvas loaded")
+
+    fhandler = current_app.extensions["file_handler"]
+    data_ready = fhandler.check_data_exists()
+    if data_ready:
+        data = fhandler.load_data()
+        current_app.logger.debug("Reloaded data")
+        current_app.extensions["plot_handler"].plot(data)
+        current_app.logger.debug("Reloaded plots")
 
     # Get velocity steps
     vsteps = StepEvent.query.order_by(StepEvent.start.asc()).all()
     current_app.logger.debug(f"Got {len(vsteps)} events")
 
-    return render_template("index.html", bokeh_script=bokeh_script, vsteps=vsteps)
+    return render_template(
+        "index.html", bokeh_script=bokeh_script, vsteps=vsteps, data_ready=data_ready
+    )
 
 
 @bp.route("/update-step", methods=["POST"])

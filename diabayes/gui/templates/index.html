@@ -37,7 +37,7 @@
       <!-- Data upload -->
       <div class="row ps-3">
         <div class="col input-group" id="file-upload-group">
-          <input type="file" class="form-control" id="data-file">
+          <input type="file" class="form-control" id="data-file" {% if data_ready %}disabled{% endif %}>
           <label class="input-group-text" for="data-file">Import data (.npy) or project (.dbproj)</label>
         </div>
       </div>
@@ -49,7 +49,7 @@
             <i class="bi bi-file-earmark-x"></i> Clear logs
           </button>
           <!-- Clear data button -->
-          <button class="btn btn-warning" id="clear-data" disabled>
+          <button class="btn btn-warning" id="clear-data" {% if not data_ready %}disabled{% endif %}>
             <i class="bi bi-trash"></i> Clear data
           </button>
         </div>

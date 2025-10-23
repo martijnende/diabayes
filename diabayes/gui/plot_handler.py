@@ -1,4 +1,3 @@
-import numpy as np
 from bokeh.layouts import column
 from bokeh.models import ColumnDataSource, RangeTool
 from bokeh.plotting import figure
@@ -79,17 +78,15 @@ class PlotHandler:
         # select.ygrid.grid_line_color = None
         select.add_tools(range_tool)
 
-        doc._mode = None
-
-        def set_marker_mode(attr, old, new):
-            doc._mode = new
-
         doc.add_root(column([q, p, select], sizing_mode="stretch_width"))
         doc.add_next_tick_callback(lambda: print("Bokeh doc ready"))
-        doc._figures = {"friction": p, "velocity": q}
-        doc._renderers = {"friction": {}, "velocity": {}}
-        doc._source = source
-        doc._source2 = source2
+        doc.context = {
+            "figures": {"friction": p, "velocity": q},
+            "renderers": {"friction": {}, "velocity": {}},
+            "source": source,
+            "source2": source2,
+        }
+
         pass
 
     def plot(self, data):
@@ -103,17 +100,20 @@ class PlotHandler:
         app.logger.debug("Attempting to get plotting session")
 
         for ctx in self.server.get_sessions("/bkapp"):
-            doc = ctx.document
+            app.logger.debug("Attempting to update plot")
 
-            if hasattr(doc, "_source"):
+            doc = ctx.document
+            context = getattr(doc, "context", None)
+
+            if context and "source" in context:
                 doc.add_next_tick_callback(
-                    lambda: doc._source.data.update(x=data[0], y=data[1])  # type: ignore
+                    lambda: context["source"].data.update(x=data[0], y=data[1])  # type: ignore
                 )
                 app.logger.debug("Friction data updated")
 
-            if hasattr(doc, "_source2"):
+            if context and "source2" in context:
                 doc.add_next_tick_callback(
-                    lambda: doc._source2.data.update(x=data[0], y=data[2])  # type: ignore
+                    lambda: context["source2"].data.update(x=data[0], y=data[2])  # type: ignore
                 )
                 app.logger.debug("Slip rate data updated")
 
@@ -130,8 +130,8 @@ class PlotHandler:
 
         def add_curve(doc, id):
             for fig, y in zip(("friction", "velocity"), (data["mu"], data["v"])):
-                p = doc._figures.get(fig)
-                renderers = doc._renderers.get(fig)
+                p = doc.context["figures"].get(fig)
+                renderers = doc.context["renderers"].get(fig)
                 if p is not None:
 
                     # If a curve with this ID already
@@ -144,11 +144,12 @@ class PlotHandler:
                     renderer = p.line(
                         "x", "y", line_color="orange", source=source, line_width=2
                     )
-                    doc._renderers[fig][id] = renderer
+                    doc.context["renderers"][fig][id] = renderer
 
         for ctx in self.server.get_sessions("/bkapp"):
             doc = ctx.document
-            if hasattr(doc, "_figures"):
+            context = getattr(doc, "context", None)
+            if context and "figures" in context:
                 app.logger.debug(f"Creating callback for {id}")
                 doc.add_next_tick_callback(lambda: add_curve(doc, id))
 
@@ -166,14 +167,15 @@ class PlotHandler:
 
         def remove_curve(doc, id):
             for fig in ("friction", "velocity"):
-                p = doc._figures.get(fig)
-                renderer = doc._renderers[fig].pop(id, None)
+                p = doc.context["figures"].get(fig)
+                renderer = doc.context["renderers"][fig].pop(id, None)
                 if renderer is not None:
                     p.renderers.remove(renderer)
 
         for ctx in self.server.get_sessions("/bkapp"):
             doc = ctx.document
-            if hasattr(doc, "_figures"):
+            context = getattr(doc, "context", None)
+            if context and "figures" in context:
                 doc.add_next_tick_callback(lambda: remove_curve(doc, id))
 
         app.logger.debug(f"Removed friction curve {id}")
