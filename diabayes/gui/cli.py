@@ -61,7 +61,6 @@ def run():
         bokeh_server = Server(
             {"/bkapp": app.extensions["plot_handler"].make_bokeh_doc},
             allow_websocket_origin=["localhost:5000"],
-            # allow_websocket_origin=["*"],
             port=5006,
         )
         app.extensions["plot_handler"].server = bokeh_server

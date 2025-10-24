@@ -1,14 +1,19 @@
+from bokeh.io import curdoc
 from bokeh.layouts import column
 from bokeh.models import ColumnDataSource, RangeTool
 from bokeh.plotting import figure
 from bokeh.server.server import Server
 from flask import Flask
 
+bokeh_url = "http://127.0.0.1:5006/bkapp"
+
 
 class PlotHandler:
 
     app: Flask | None = None
     server: Server | None = None
+    source = ColumnDataSource(dict(x=[], y=[]))
+    source2 = ColumnDataSource(dict(x=[], y=[]))
 
     def __init__(self) -> None:
         pass
@@ -19,8 +24,6 @@ class PlotHandler:
 
     def make_bokeh_doc(self, doc):
 
-        source = ColumnDataSource(dict(x=[], y=[]))
-        source2 = ColumnDataSource(dict(x=[], y=[]))
         line_colour = "#3cb371"
         overlay_colour = "#f5deb3"
 
@@ -34,7 +37,7 @@ class PlotHandler:
                 ("friction", "$snap_y"),
             ],
         )
-        p.line("x", "y", line_color=line_colour, source=source)
+        p.line("x", "y", line_color=line_colour, source=self.source)
         p.yaxis.axis_label = "Friction [-]"
         p.toolbar.logo = None
         p.toolbar.active_drag = None
@@ -51,7 +54,7 @@ class PlotHandler:
                 ("velocity", "$snap_y"),
             ],
         )
-        q.line("x", "y", line_color=line_colour, source=source2)
+        q.line("x", "y", line_color=line_colour, source=self.source2)
         q.yaxis.axis_label = "Velocty [m/s]"
         q.toolbar.logo = None
         q.toolbar.active_drag = None
@@ -74,22 +77,27 @@ class PlotHandler:
         range_tool.overlay.fill_color = overlay_colour
         range_tool.overlay.fill_alpha = 0.3
 
-        select.line("x", "y", line_color=line_colour, line_width=3, source=source)
+        select.line("x", "y", line_color=line_colour, line_width=3, source=self.source)
         # select.ygrid.grid_line_color = None
         select.add_tools(range_tool)
 
         doc.add_root(column([q, p, select], sizing_mode="stretch_width"))
-        doc.add_next_tick_callback(lambda: print("Bokeh doc ready"))
         doc.context = {
             "figures": {"friction": p, "velocity": q},
             "renderers": {"friction": {}, "velocity": {}},
-            "source": source,
-            "source2": source2,
         }
 
         pass
 
     def plot(self, data):
+        def update():
+            self.source.data = dict(x=data[0], y=data[1])
+            self.source2.data = dict(x=data[0], y=data[2])
+
+        self.server.io_loop.add_callback(update)
+        # self.source2.data = dict(x=data[0], y=data[2])
+        return True
+        pass
         app = self.app
         assert app is not None
 
@@ -99,23 +107,24 @@ class PlotHandler:
 
         app.logger.debug("Attempting to get plotting session")
 
-        for ctx in self.server.get_sessions("/bkapp"):
-            app.logger.debug("Attempting to update plot")
+        # for ctx in self.server.get_sessions("/bkapp"):
+        doc = curdoc()
+        app.logger.debug("Attempting to update plot")
 
-            doc = ctx.document
-            context = getattr(doc, "context", None)
+        # doc = ctx.document
+        context = getattr(doc, "context", None)
 
-            if context and "source" in context:
-                doc.add_next_tick_callback(
-                    lambda: context["source"].data.update(x=data[0], y=data[1])  # type: ignore
-                )
-                app.logger.debug("Friction data updated")
+        if context and "source" in context:
+            doc.add_next_tick_callback(
+                lambda: context["source"].data.update(x=data[0], y=data[1])  # type: ignore
+            )
+            app.logger.debug("Friction data updated")
 
-            if context and "source2" in context:
-                doc.add_next_tick_callback(
-                    lambda: context["source2"].data.update(x=data[0], y=data[2])  # type: ignore
-                )
-                app.logger.debug("Slip rate data updated")
+        if context and "source2" in context:
+            doc.add_next_tick_callback(
+                lambda: context["source2"].data.update(x=data[0], y=data[2])  # type: ignore
+            )
+            app.logger.debug("Slip rate data updated")
 
         app.logger.debug("Plot update done")
         pass
@@ -183,6 +192,18 @@ class PlotHandler:
         pass
 
     def clear_plot(self):
-        self.plot([[], [], []])
         assert self.app is not None
+        if not self.server:
+            self.app.logger.debug("Server not initialised")
+            return
+
+        self.plot([[], [], []])
+        # for ctx in self.server.get_sessions("/bkapp"):
+        #     doc = ctx.document
+        #     context = getattr(doc, "context", None)
+        #     if context and "renderers" in context:
+        #         ids = list(context["renderers"]["friction"].keys())
+        #         for renderer_id in ids:
+        #             self.del_friction(renderer_id)
+
         self.app.logger.debug("Plot cleared")

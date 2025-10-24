@@ -36,8 +36,9 @@ class FileHandler:
             # Thumbs up in log
             app.logger.info("File upload successful")
 
-        except Exception:
+        except Exception as e:
             # Thumbs down in log
+            print(e)
             app.logger.error("File upload failed")
             # Remove uploaded file
             self.clear_all()
@@ -72,6 +73,7 @@ class FileHandler:
             data = self.load_data()
             assert isinstance(data, np.ndarray)
             return True
-        except Exception:
+        except Exception as e:
+            print(e)
             return False
         return False

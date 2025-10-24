@@ -1,5 +1,5 @@
 from bokeh.client import pull_session
-from bokeh.embed import server_session
+from bokeh.embed import server_document, server_session
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from .models import LogEntry, StepEvent, db
@@ -13,6 +13,8 @@ def index():
 
     # Get Bokeh canvas
     bokeh_url = "http://127.0.0.1:5006/bkapp"
+    # bokeh_script = server_document(bokeh_url)
+    # Need to change back to server_document
     with pull_session(url=bokeh_url) as bokeh_session:
         bokeh_script = server_session(session_id=bokeh_session.id, url=bokeh_url)
 
@@ -188,10 +190,10 @@ def clear_logs():
         db.session.commit()
         current_app.logger.info(f"{rows_deleted} entries deleted")
         return jsonify({"status": "ok", "message": ""}), 200
-    except Exception:
+    except Exception as e:
         db.session.rollback()
         current_app.logger.error("Failed to clear log entries")
-        return jsonify({"status": "error", "message": f"{Exception}"}), 500
+        return jsonify({"status": "error", "message": f"{e}"}), 500
 
 
 @bp.route("/clear_data", methods=["POST"])
@@ -200,9 +202,10 @@ def clear_data():
         current_app.extensions["plot_handler"].clear_plot()
         current_app.extensions["file_handler"].clear_all()
         return jsonify({"status": "ok", "message": ""}), 200
-    except Exception:
+    except Exception as e:
+        print(f"{e}")
         current_app.logger.error("Failed to clear data")
-        return jsonify({"status": "error", "message": f"{Exception}"}), 500
+        return jsonify({"status": "error", "message": f"{e}"}), 500
 
 
 @bp.route("/logs/all")
