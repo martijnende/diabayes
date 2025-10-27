@@ -99,6 +99,10 @@ div.vstep div.row.desc {
   color: gray;
 }
 
+div.vstep-hidden {
+  display: none;
+}
+
 /* End vsteps */
 
 

@@ -1,6 +1,23 @@
 $(document).ready(function () {
 
-  // Update request
+  // Insert request
+  $(document).on('click', 'button#add-vstep', function () {
+    $.ajax({
+      url: '/update-step',
+      type: 'POST',
+      data: 'action=add',
+      success: function (response) {
+        if (response.html) {
+          $("div#vstep-container").html(response.html);
+        }
+      },
+      error: function (err) {
+        console.error(err);
+      }
+    });
+  });
+
+  // Update/invert/delete request
   $('#vstep-container').on('click', 'button.action-btn', function () {
     const action = $(this).data('action');
     const form = $(this).closest('form');
@@ -25,23 +42,6 @@ $(document).ready(function () {
       }
     });
 
-  });
-
-  // Insert request
-  $(document).on('click', 'button#add-vstep', function () {
-    $.ajax({
-      url: '/update-step',
-      type: 'POST',
-      data: 'action=add',
-      success: function (response) {
-        if (response.html) {
-          $("div#vstep-container").html(response.html);
-        }
-      },
-      error: function (err) {
-        console.error(err);
-      }
-    });
   });
 
   // Switch theta mode

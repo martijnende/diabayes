@@ -3,7 +3,7 @@ from bokeh.embed import server_session
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from .models import LogEntry, StepEvent, db
-from .physics import data_are_valid, run_forward
+from .physics import data_are_valid, run_forward, run_inversion
 
 bp = Blueprint("main", __name__)
 
@@ -131,6 +131,18 @@ def update_step():
             app.logger.error("Failed to delete v-step entry")
             app.logger.error(e)
 
+    # Action 4: do maximum-likelihood inversion
+    elif action == "lm-inversion":
+
+        # Get the step based on the provided ID
+        # Will return None if id cannot be found
+        step = db.session.get(StepEvent, id)
+
+        # Check that the key exists in DB (otherwise return error)
+        if step == None:
+            app.logger.error(f"Cannot find ID {id} in database")
+            return jsonify({"status": "error", "message": ""}), 500
+
     # Get all the current steps
     steps = StepEvent.query.all()
     # Render the HTML template
@@ -148,11 +160,18 @@ def update_step():
 
         assert len(data) > 0
         fields["t"] = app.extensions["file_handler"].data[0]
+        fields["mu"] = app.extensions["file_handler"].data[1]
 
         # Check that all data are valid
         if data_are_valid(start, stop, fields):
+
+            # Run max-likelihood inversion
+            if action == "lm-inversion":
+                friction, v, result_inv = run_inversion(start, stop, fields)
             # Run forward model
-            friction, v = run_forward(start, stop, fields)
+            else:
+                friction, v = run_forward(start, stop, fields)
+
             # Plot friction curves
             plot_fields = {
                 "t": fields["t"][start:stop],

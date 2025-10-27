@@ -7,6 +7,7 @@ def data_are_valid(start, stop, fields):
 
     # At this point, fields["t"] must exist
     assert fields.get("t") is not None
+    assert fields.get("mu") is not None
 
     # Check start/stop criteria
     valid_start = (start is not None) and (start >= 0)
@@ -20,7 +21,7 @@ def data_are_valid(start, stop, fields):
         return False
 
     # Check all fields are positive
-    if any(v < 0 for k, v in fields.items() if k != "t"):
+    if any(v < 0 for k, v in fields.items() if k not in ("t", "mu")):
         return False
 
     return True
@@ -53,3 +54,42 @@ def run_forward(start, stop, fields):
     )
     v = rsf(result, params, constants)
     return result.mu, v
+
+
+def run_inversion(start, stop, fields):
+
+    state_dict = {"theta": ageing_law}
+    forward = Forward(
+        friction_model=rsf, state_evolution=state_dict, stress_transfer=springblock
+    )
+    solver = ODESolver(forward_model=forward)
+
+    params = db.RSFParams(a=fields["a"], b=fields["b"], Dc=fields["Dc"])
+    constants = db.RSFConstants(v0=fields["v0"], mu0=fields["mu0"])
+    block_constants = db.SpringBlockConstants(k=fields["k"], v_lp=fields["v1"])
+
+    # Assume steady-state
+    # TODO: replace for SHS simulations
+    theta0 = fields["Dc"] / fields["v0"]
+
+    forward.set_initial_values(mu=fields["mu0"], theta=theta0)
+    y0 = forward.variables
+    inv_result = solver.max_likelihood_inversion(
+        t=fields["t"][start:stop],
+        mu=fields["mu"][start:stop],
+        y0=y0,
+        params=params,
+        friction_constants=constants,
+        block_constants=block_constants,
+    )
+    params_inv = inv_result.value
+    result = solver.solve_forward(
+        t=fields["t"][start:stop],
+        y0=y0,
+        params=params_inv,
+        friction_constants=constants,
+        block_constants=block_constants,
+    )
+    v = rsf(result, params_inv, constants)
+
+    return result.mu, v, params_inv

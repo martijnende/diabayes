@@ -4,6 +4,7 @@ from bokeh.models import ColumnDataSource, RangeTool
 from bokeh.plotting import figure
 from bokeh.server.server import Server
 from flask import Flask
+from tornado.ioloop import IOLoop
 
 bokeh_url = "http://127.0.0.1:5006/bkapp"
 
@@ -27,6 +28,7 @@ class PlotHandler:
         line_colour = "#3cb371"
         overlay_colour = "#f5deb3"
 
+        # Figure showing friction data
         p = figure(
             height=300,
             tools="hover,pan,box_zoom,xwheel_zoom,ywheel_zoom,undo,redo,reset",
@@ -42,6 +44,7 @@ class PlotHandler:
         p.toolbar.logo = None
         p.toolbar.active_drag = None
 
+        # Figure showing velocity data
         q = figure(
             height=300,
             x_range=p.x_range,
@@ -59,6 +62,7 @@ class PlotHandler:
         q.toolbar.logo = None
         q.toolbar.active_drag = None
 
+        # Overview panel (friction only)
         select = figure(
             height=100,
             y_axis_type=None,
@@ -106,12 +110,15 @@ class PlotHandler:
         doc = self._get_doc()
 
         # Update data sources
-        def update():
+        def update_friction():
             self.source.data = dict(x=data[0], y=data[1])
+
+        def update_velocity():
             self.source2.data = dict(x=data[0], y=data[2])
 
         # Add callback
-        doc.add_next_tick_callback(update)
+        doc.add_next_tick_callback(update_friction)
+        doc.add_next_tick_callback(update_velocity)
         pass
 
     def add_friction(self, id, data):

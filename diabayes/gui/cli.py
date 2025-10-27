@@ -1,6 +1,7 @@
+import signal
 import sys
 from pathlib import Path
-from threading import Thread
+from threading import Event, Thread
 
 import click
 from bokeh.server.server import Server
@@ -8,9 +9,12 @@ from flask_migrate import downgrade as mig_downgrade
 from flask_migrate import init as mig_init
 from flask_migrate import migrate as mig_migrate
 from flask_migrate import upgrade as mig_upgrade
+from tornado.ioloop import IOLoop
 
 from . import create_app, socketio
 from .workspace import create_workspace, find_workspace
+
+stop_event = Event()
 
 
 def _create_app():
@@ -57,26 +61,63 @@ def run():
     app = _create_app()
 
     def _bk_worker():
+        io_loop = IOLoop()
+        IOLoop.make_current(io_loop)
         # Create a Bokeh rendering server bound to port 5006
         bokeh_server = Server(
             {"/bkapp": app.extensions["plot_handler"].make_bokeh_doc},
             allow_websocket_origin=["localhost:5000"],
             port=5006,
+            io_loop=io_loop,
         )
         app.extensions["plot_handler"].server = bokeh_server
         bokeh_server.start()
-        bokeh_server.io_loop.start()
 
-    Thread(target=_bk_worker).start()
+        try:
+            io_loop.start()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            try:
+                print("Stopping Bokeh server...")
+                bokeh_server.unlisten()
+                bokeh_server.stop()
+            except Exception:
+                pass
 
-    # Run the main application on port 5000
-    socketio.run(
-        app,
-        host="127.0.0.1",
-        port=5000,
-        debug=bool(app.config["DEBUG"]),
-        use_reloader=False,
-    )
+    bk_thread = Thread(target=_bk_worker, daemon=True)
+    bk_thread.start()
+
+    def handle_signal(signum, frame):
+        print("Received shutdown signal. Wrapping up...")
+        stop_event.set()
+        try:
+            bokeh_server = app.extensions["plot_handler"].server
+            if bokeh_server is not None and hasattr(bokeh_server, "io_loop"):
+                bokeh_server.io_loop.add_callback(bokeh_server.io_loop.stop)
+        except Exception as e:
+            print("Failed to schedule Bokeh stop:")
+            print(e)
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+
+    try:
+        # Run the main application on port 5000
+        socketio.run(
+            app,
+            host="127.0.0.1",
+            port=5000,
+            debug=bool(app.config["DEBUG"]),
+            use_reloader=False,
+        )
+    except KeyboardInterrupt:
+        print("Stopping Flask server...")
+    finally:
+        IOLoop.current().add_callback(IOLoop.current().stop)
+        bk_thread.join(timeout=0)
+        print("Application stopped cleanly")
 
 
 """

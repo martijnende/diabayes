@@ -18,7 +18,7 @@ $(document).ready(function() {
       contentType: false,
       success: function(response) {
         $('#clear-data').prop('disabled', false);
-        $('.vstep').removeClass('hidden');
+        $('.vstep-row').removeClass('vstep-hidden');
       },
       error: function(err) {
         console.error(err);
@@ -36,6 +36,7 @@ $(document).ready(function() {
       success: function() {
         $('#data-file').prop('disabled', false).val('');
         $('#clear-data').prop('disabled', true);
+        $('.vstep-row').addClass('vstep-hidden');
       }
     });
   });
