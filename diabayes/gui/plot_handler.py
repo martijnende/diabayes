@@ -6,7 +6,7 @@ from bokeh.server.server import Server
 from flask import Flask
 from tornado.ioloop import IOLoop
 
-bokeh_url = "http://127.0.0.1:5006/bkapp"
+bokeh_url = "http://127.0.0.1:5006/"
 
 
 class PlotHandler:
@@ -97,7 +97,7 @@ class PlotHandler:
         assert self.server is not None, "Server not initialised"
 
         # Grab the current sessions (there should be at least 1)
-        current_sessions = self.server.get_sessions("/bkapp")
+        current_sessions = self.server.get_sessions("/")
         assert len(current_sessions) > 0, "Session not initialised"
         session = current_sessions[0]
         # Get the session document
@@ -119,6 +119,8 @@ class PlotHandler:
         # Add callback
         doc.add_next_tick_callback(update_friction)
         doc.add_next_tick_callback(update_velocity)
+        assert self.server is not None
+        self.server.io_loop.add_callback(lambda: None)  # Trick to "wake up" thread
         pass
 
     def add_friction(self, id, data):
@@ -144,6 +146,8 @@ class PlotHandler:
                     doc.context["renderers"][fig][id] = renderer
 
         doc.add_next_tick_callback(lambda: add_curve(doc, id))
+        assert self.server is not None
+        self.server.io_loop.add_callback(lambda: None)  # Trick to "wake up" thread
 
         assert self.app is not None
         self.app.logger.debug(f"Added friction curve {id}")
@@ -162,6 +166,8 @@ class PlotHandler:
                     p.renderers.remove(renderer)
 
         doc.add_next_tick_callback(lambda: remove_curve(doc, id))
+        assert self.server is not None
+        self.server.io_loop.add_callback(lambda: None)  # Trick to "wake up" thread
 
         assert self.app is not None
         self.app.logger.debug(f"Removed friction curve {id}")

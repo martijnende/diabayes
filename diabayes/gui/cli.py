@@ -65,10 +65,11 @@ def run():
         IOLoop.make_current(io_loop)
         # Create a Bokeh rendering server bound to port 5006
         bokeh_server = Server(
-            {"/bkapp": app.extensions["plot_handler"].make_bokeh_doc},
+            app.extensions["plot_handler"].make_bokeh_doc,
             allow_websocket_origin=["localhost:5000"],
             port=5006,
             io_loop=io_loop,
+            session_token_expiration=3600,
         )
         app.extensions["plot_handler"].server = bokeh_server
         bokeh_server.start()

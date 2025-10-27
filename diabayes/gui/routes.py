@@ -1,5 +1,6 @@
 from bokeh.client import pull_session
 from bokeh.embed import server_session
+from bokeh.io import curdoc
 from flask import Blueprint, current_app, jsonify, render_template, request
 
 from .models import LogEntry, StepEvent, db
@@ -7,7 +8,7 @@ from .physics import data_are_valid, run_forward, run_inversion
 
 bp = Blueprint("main", __name__)
 
-BOKEH_URL = "http://127.0.0.1:5006/bkapp"
+BOKEH_URL = "http://127.0.0.1:5006/"
 
 
 @bp.route("/")
@@ -16,34 +17,40 @@ def index():
     fhandler = current_app.extensions["file_handler"]
     phandler = current_app.extensions["plot_handler"]
 
-    current_sessions = phandler.server.get_sessions("/bkapp")
-    if len(current_sessions) == 0:
-        bokeh_session = pull_session(url=BOKEH_URL)
-    else:
-        if len(current_sessions) > 1:
-            current_app.logger.warning(
-                "Found more than one Bokeh session, which is not expected"
-            )
-        bokeh_session = current_sessions[0]
+    with pull_session(url=BOKEH_URL) as bokeh_session:
 
-    data_ready = fhandler.check_data_exists()
-    if data_ready:
-        data = fhandler.load_data()
-        current_app.logger.debug("Reloaded data")
-        phandler.plot(data)
-        current_app.logger.debug("Reloaded plots")
+        # current_sessions = phandler.server.get_sessions("/")
+        # if len(current_sessions) == 0:
+        #     print("PULLING SESSION")
+        #     bokeh_session = pull_session(url=BOKEH_URL)
+        # else:
+        #     if len(current_sessions) > 1:
+        #         current_app.logger.warning(
+        #             "Found more than one Bokeh session, which is not expected"
+        #         )
+        #     bokeh_session = current_sessions[0]
 
-    # Get velocity steps
-    vsteps = StepEvent.query.order_by(StepEvent.start.asc()).all()
-    current_app.logger.debug(f"Got {len(vsteps)} events")
+        data_ready = fhandler.check_data_exists()
+        if data_ready:
+            data = fhandler.load_data()
+            current_app.logger.debug("Reloaded data")
+            phandler.plot(data)
+            current_app.logger.debug("Reloaded plots")
 
-    # Get Bokeh canvas
-    bokeh_script = server_session(session_id=bokeh_session.id, url=BOKEH_URL)
-    current_app.logger.debug(f"Bokeh canvas loaded")
+        # Get velocity steps
+        vsteps = StepEvent.query.order_by(StepEvent.start.asc()).all()
+        current_app.logger.debug(f"Got {len(vsteps)} events")
 
-    return render_template(
-        "index.html", bokeh_script=bokeh_script, vsteps=vsteps, data_ready=data_ready
-    )
+        # Get Bokeh canvas
+        bokeh_script = server_session(session_id=bokeh_session.id, url=BOKEH_URL)
+        current_app.logger.debug(f"Bokeh canvas loaded")
+
+        return render_template(
+            "index.html",
+            bokeh_script=bokeh_script,
+            vsteps=vsteps,
+            data_ready=data_ready,
+        )
 
 
 @bp.route("/update-step", methods=["POST"])
@@ -56,6 +63,9 @@ def update_step():
     id = request.form.get("id", type=int)
     start = request.form.get("start", type=int)
     stop = request.form.get("stop", type=int)
+    # Get theta_mode, which should never be None...
+    theta_mode = request.form.get("theta_mode")
+    assert theta_mode is not None
 
     # Instead of manually manipulating each quantity,
     # loop over a dictionary instead
@@ -81,8 +91,8 @@ def update_step():
             app.logger.error(e)
             return jsonify({"status": "error", "message": e}), 500
 
-    # Action 2: update an existing v-step
-    elif action == "update":
+    # Action 2: update an existing v-step (including inversion)
+    elif action in ("update", "lm-inversion"):
 
         # Get the step based on the provided ID
         # Will return None if id cannot be found
@@ -99,6 +109,41 @@ def update_step():
             step.stop = stop
             for key, val in fields.items():
                 setattr(step, key, val)
+
+            # Calculate theta0 based on requested mode
+            theta0 = None
+
+            # Mode 1: assume steady-state
+            # NOTE: the potential caveat is that the value of
+            # theta0 depends on Dc, which can be inverted for.
+            # theta0 may therefore not be fully consistent...
+            if theta_mode == "auto":
+                v_ok = step.v0 is not None and (step.v0 > 0)
+                Dc_ok = step.Dc is not None and (step.Dc > 0)
+                if v_ok and Dc_ok:
+                    theta0 = step.Dc / step.v0  # type: ignore
+                    app.logger.debug(f"Steady-state theta0: {theta0:.2e}")
+
+            # Mode 2: take the value from the previous step
+            # This would be useful for slide-hold-slide sequences
+            elif theta_mode == "previous":
+                app.logger.error(
+                    "Calculating theta0 from the previous step is not implemented..."
+                )
+
+            # Mode 3: set a custom value
+            elif theta_mode == "custom":
+                theta0 = request.form.get("theta0", type=float)
+
+            # No other mode should exist...
+            else:
+                app.logger.error("theta_mode not recognised")
+                return jsonify({"status": "error", "message": ""}), 500
+
+            # Set theta0
+            step.theta0 = theta0
+            fields["theta0"] = theta0
+
             db.session.commit()
             app.logger.debug(f"Updated v-step {id}")
         except Exception as e:
@@ -131,22 +176,10 @@ def update_step():
             app.logger.error("Failed to delete v-step entry")
             app.logger.error(e)
 
-    # Action 4: do maximum-likelihood inversion
-    elif action == "lm-inversion":
-
-        # Get the step based on the provided ID
-        # Will return None if id cannot be found
-        step = db.session.get(StepEvent, id)
-
-        # Check that the key exists in DB (otherwise return error)
-        if step == None:
-            app.logger.error(f"Cannot find ID {id} in database")
-            return jsonify({"status": "error", "message": ""}), 500
-
     # Get all the current steps
     steps = StepEvent.query.all()
     # Render the HTML template
-    html = render_template("steps.html", vsteps=steps)
+    html = render_template("steps.html", vsteps=steps, theta_mode=theta_mode)
 
     # At this point, id cannot be None; either it was
     # provided (update/delete), or it was created (add)

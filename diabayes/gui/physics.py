@@ -39,11 +39,7 @@ def run_forward(start, stop, fields):
     constants = db.RSFConstants(v0=fields["v0"], mu0=fields["mu0"])
     block_constants = db.SpringBlockConstants(k=fields["k"], v_lp=fields["v1"])
 
-    # Assume steady-state
-    # TODO: replace for SHS simulations
-    theta0 = fields["Dc"] / fields["v0"]
-
-    forward.set_initial_values(mu=fields["mu0"], theta=theta0)
+    forward.set_initial_values(mu=fields["mu0"], theta=fields["theta0"])
     y0 = forward.variables
     result = solver.solve_forward(
         t=fields["t"][start:stop],
@@ -68,11 +64,7 @@ def run_inversion(start, stop, fields):
     constants = db.RSFConstants(v0=fields["v0"], mu0=fields["mu0"])
     block_constants = db.SpringBlockConstants(k=fields["k"], v_lp=fields["v1"])
 
-    # Assume steady-state
-    # TODO: replace for SHS simulations
-    theta0 = fields["Dc"] / fields["v0"]
-
-    forward.set_initial_values(mu=fields["mu0"], theta=theta0)
+    forward.set_initial_values(mu=fields["mu0"], theta=fields["theta0"])
     y0 = forward.variables
     inv_result = solver.max_likelihood_inversion(
         t=fields["t"][start:stop],

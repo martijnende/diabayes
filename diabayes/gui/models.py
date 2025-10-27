@@ -46,6 +46,7 @@ class StepEvent(db.Model):
     v0: Mapped[Optional[float]]
     v1: Mapped[Optional[float]]
     mu0: Mapped[Optional[float]]
+    theta0: Mapped[Optional[float]]
     k: Mapped[Optional[float]]
     a: Mapped[Optional[float]]
     b: Mapped[Optional[float]]
