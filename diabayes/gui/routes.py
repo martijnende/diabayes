@@ -2,8 +2,9 @@ from bokeh.client import pull_session
 from bokeh.embed import server_session
 from bokeh.io import curdoc
 from flask import Blueprint, current_app, jsonify, render_template, request
+from sqlalchemy.orm import selectinload, with_loader_criteria
 
-from .models import LogEntry, StepEvent, db
+from .models import InversionResult, LogEntry, StepEvent, db
 from .physics import data_are_valid, run_forward, run_inversion
 
 bp = Blueprint("main", __name__)
@@ -38,8 +39,19 @@ def index():
             current_app.logger.debug("Reloaded plots")
 
         # Get velocity steps
-        vsteps = StepEvent.query.order_by(StepEvent.start.asc()).all()
-        current_app.logger.debug(f"Got {len(vsteps)} events")
+        with db.session() as session:
+            vsteps = (
+                session.query(StepEvent)
+                .options(
+                    selectinload(StepEvent.inversion_results),
+                    with_loader_criteria(
+                        InversionResult, InversionResult.bayesian.is_(False)
+                    ),
+                )
+                .all()
+            )
+            current_app.logger.debug(f"Got {len(vsteps)} events")
+            print(vsteps)
 
         # Get Bokeh canvas
         bokeh_script = server_session(session_id=bokeh_session.id, url=BOKEH_URL)
@@ -176,11 +188,6 @@ def update_step():
             app.logger.error("Failed to delete v-step entry")
             app.logger.error(e)
 
-    # Get all the current steps
-    steps = StepEvent.query.all()
-    # Render the HTML template
-    html = render_template("steps.html", vsteps=steps, theta_mode=theta_mode)
-
     # At this point, id cannot be None; either it was
     # provided (update/delete), or it was created (add)
     assert id is not None
@@ -201,6 +208,34 @@ def update_step():
             # Run max-likelihood inversion
             if action == "lm-inversion":
                 friction, v, result_inv = run_inversion(start, stop, fields)
+
+                with db.session() as session:
+                    inv = (
+                        session.query(InversionResult)
+                        .filter_by(step_id=id, bayesian=False)
+                        .one_or_none()
+                    )
+
+                    try:
+                        if inv:
+                            inv.a = float(result_inv.a)
+                            inv.b = float(result_inv.b)
+                            inv.Dc = float(result_inv.Dc)
+                        else:
+                            inv = InversionResult(
+                                step_id=id,
+                                bayesian=False,
+                                a=result_inv.a,
+                                b=result_inv.b,
+                                Dc=result_inv.Dc,
+                            )
+                            session.add(inv)
+                        session.commit()
+                    except Exception as e:
+                        db.session.rollback()
+                        app.logger.error("Failed to store inverted parameters")
+                        app.logger.error(e)
+
             # Run forward model
             else:
                 friction, v = run_forward(start, stop, fields)
@@ -212,10 +247,16 @@ def update_step():
                 "v": v,
             }
             app.extensions["plot_handler"].add_friction(id, plot_fields)
+
         # If any data are invalid: remove curves
         else:
             app.logger.debug(f"Validation for step {id} failed")
             app.extensions["plot_handler"].del_friction(id)
+
+    # Get all the current steps
+    steps = StepEvent.query.all()
+    # Render the HTML template
+    html = render_template("steps.html", vsteps=steps, theta_mode=theta_mode)
 
     return jsonify({"status": "ok", "message": "", "html": html}), 200
 

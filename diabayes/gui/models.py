@@ -1,9 +1,15 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import DateTime, String, Text, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
+from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    MappedAsDataclass,
+    mapped_column,
+    relationship,
+)
 
 """
 NOTE: pyright is broken as fuck with SQLAlchemy's v2.0 ORM declarations.
@@ -48,6 +54,32 @@ class StepEvent(db.Model):
     mu0: Mapped[Optional[float]]
     theta0: Mapped[Optional[float]]
     k: Mapped[Optional[float]]
+    a: Mapped[Optional[float]]
+    b: Mapped[Optional[float]]
+    Dc: Mapped[Optional[float]]
+
+    inversion_results: Mapped[List["InversionResult"]] = relationship(
+        back_populates="step", cascade="all, delete-orphan"
+    )
+
+
+"""
+NOTE / TODO:
+
+An SVI particle can be represented as a single InversionResult.
+Create relationships for easy querying of particle swarms.
+"""
+
+
+class InversionResult(db.Model):
+    __tablename__ = "inversion_results"
+
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    step_id: Mapped[int] = mapped_column(ForeignKey("vsteps.id"))
+    step: Mapped["StepEvent"] = relationship(
+        back_populates="inversion_results", init=False
+    )
+    bayesian: Mapped[bool] = mapped_column(nullable=False)
     a: Mapped[Optional[float]]
     b: Mapped[Optional[float]]
     Dc: Mapped[Optional[float]]

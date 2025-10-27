@@ -95,6 +95,39 @@
     </div>
     <!-- End friction values -->
 
+    <!-- Inverted friction values -->
+    {% for inv in step.inversion_results %}
+    <div class="row mt-1">
+
+      <div class="col-md-12 d-flex justify-content-center gap-1">
+
+        <!-- RSF a-value -->
+        <div class="input-group">
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Direct effect [-]">a</span></div>
+          <input type="text" class="form-control" value="{{ '%.3e' % inv.a if inv.a != '' }}" disabled>
+        </div>
+
+        <!-- RSF b-value -->
+        <div class="input-group">
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Evolution effect [-]">b</span></div>
+          <input type="text" class="form-control" value="{{ '%.5f' % inv.b if inv.b != '' }}" disabled>
+        </div>
+
+        <!-- RSF Dc-value -->
+        <div class="input-group">
+          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Characteristic slip distance [m]">D<sub>c</sub></span></div>
+          <input type="text" class="form-control" value="{{ '%.3e' % inv.Dc if inv.Dc != '' }}" disabled>
+        </div>
+
+      </div>
+
+    </div>
+    {% endfor %}
+    <!-- End inverted friction values -->
+
     <!-- Friction/stiffness values -->
     <div class="row desc">
       <div class="col">Initial conditions</div>
@@ -141,7 +174,7 @@
 
           <!-- Calculate theta from steady-state -->
           <div class="input-group-text">
-            <input class="form-check-input" type="radio" name="theta_mode" id="theta_auto" value="auto"{% if (theta_mode == "auto") or (theta_mode == "") %} checked{% endif %}>
+            <input class="form-check-input" type="radio" name="theta_mode" id="theta_auto" value="auto"{% if (theta_mode != "previous") or (theta_mode != "custom") %} checked{% endif %}>
             <label for="theta_auto" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
               title="Calculate &#952; from steady-state">Steady-state</label>
           </div>
@@ -162,7 +195,7 @@
           <!-- Theta value -->
           <div class="input-group-prepend"><span class="input-group-text">&#952;<sub>0</sub></span></div>
           <input type="number" class="form-control" placeholder="[s]" id="theta0" name="theta0" min="0" step="1"
-            value="{{ step.theta0 }}"{% if theta_mode != "custom" %} disabled{% endif %}>
+            value="{% if step.theta0 is not none %}{{ '%.5f' % step.theta0 }}{% endif %}"{% if theta_mode != "custom" %} disabled{% endif %}>
 
         </div>
 
