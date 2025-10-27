@@ -89,60 +89,41 @@ class PlotHandler:
 
         pass
 
+    def _get_doc(self):
+        assert self.server is not None, "Server not initialised"
+
+        # Grab the current sessions (there should be at least 1)
+        current_sessions = self.server.get_sessions("/bkapp")
+        assert len(current_sessions) > 0, "Session not initialised"
+        session = current_sessions[0]
+        # Get the session document
+        doc = session.document
+        return doc
+
     def plot(self, data):
+
+        # Get the session document
+        doc = self._get_doc()
+
+        # Update data sources
         def update():
             self.source.data = dict(x=data[0], y=data[1])
             self.source2.data = dict(x=data[0], y=data[2])
 
-        self.server.io_loop.add_callback(update)
-        # self.source2.data = dict(x=data[0], y=data[2])
-        return True
-        pass
-        app = self.app
-        assert app is not None
-
-        if not self.server:
-            app.logger.debug("Server not initialised")
-            return
-
-        app.logger.debug("Attempting to get plotting session")
-
-        # for ctx in self.server.get_sessions("/bkapp"):
-        doc = curdoc()
-        app.logger.debug("Attempting to update plot")
-
-        # doc = ctx.document
-        context = getattr(doc, "context", None)
-
-        if context and "source" in context:
-            doc.add_next_tick_callback(
-                lambda: context["source"].data.update(x=data[0], y=data[1])  # type: ignore
-            )
-            app.logger.debug("Friction data updated")
-
-        if context and "source2" in context:
-            doc.add_next_tick_callback(
-                lambda: context["source2"].data.update(x=data[0], y=data[2])  # type: ignore
-            )
-            app.logger.debug("Slip rate data updated")
-
-        app.logger.debug("Plot update done")
+        # Add callback
+        doc.add_next_tick_callback(update)
         pass
 
     def add_friction(self, id, data):
-        app = self.app
-        assert app is not None
 
-        if not self.server:
-            app.logger.debug("Server not initialised")
-            return
+        # Get the session document
+        doc = self._get_doc()
 
         def add_curve(doc, id):
             for fig, y in zip(("friction", "velocity"), (data["mu"], data["v"])):
                 p = doc.context["figures"].get(fig)
                 renderers = doc.context["renderers"].get(fig)
                 if p is not None:
-
                     # If a curve with this ID already
                     # exists, remove it first
                     if id in renderers:
@@ -155,24 +136,16 @@ class PlotHandler:
                     )
                     doc.context["renderers"][fig][id] = renderer
 
-        for ctx in self.server.get_sessions("/bkapp"):
-            doc = ctx.document
-            context = getattr(doc, "context", None)
-            if context and "figures" in context:
-                app.logger.debug(f"Creating callback for {id}")
-                doc.add_next_tick_callback(lambda: add_curve(doc, id))
+        doc.add_next_tick_callback(lambda: add_curve(doc, id))
 
-        app.logger.debug(f"Added friction curve {id}")
+        assert self.app is not None
+        self.app.logger.debug(f"Added friction curve {id}")
 
         pass
 
     def del_friction(self, id):
-        app = self.app
-        assert app is not None
 
-        if not self.server:
-            app.logger.debug("Server not initialised")
-            return
+        doc = self._get_doc()
 
         def remove_curve(doc, id):
             for fig in ("friction", "velocity"):
@@ -181,13 +154,10 @@ class PlotHandler:
                 if renderer is not None:
                     p.renderers.remove(renderer)
 
-        for ctx in self.server.get_sessions("/bkapp"):
-            doc = ctx.document
-            context = getattr(doc, "context", None)
-            if context and "figures" in context:
-                doc.add_next_tick_callback(lambda: remove_curve(doc, id))
+        doc.add_next_tick_callback(lambda: remove_curve(doc, id))
 
-        app.logger.debug(f"Removed friction curve {id}")
+        assert self.app is not None
+        self.app.logger.debug(f"Removed friction curve {id}")
 
         pass
 
@@ -198,12 +168,12 @@ class PlotHandler:
             return
 
         self.plot([[], [], []])
-        # for ctx in self.server.get_sessions("/bkapp"):
-        #     doc = ctx.document
-        #     context = getattr(doc, "context", None)
-        #     if context and "renderers" in context:
-        #         ids = list(context["renderers"]["friction"].keys())
-        #         for renderer_id in ids:
-        #             self.del_friction(renderer_id)
+
+        doc = self._get_doc()
+        context = getattr(doc, "context", None)
+        if context and "renderers" in context:
+            ids = list(context["renderers"]["friction"].keys())
+            for renderer_id in ids:
+                self.del_friction(renderer_id)
 
         self.app.logger.debug("Plot cleared")
