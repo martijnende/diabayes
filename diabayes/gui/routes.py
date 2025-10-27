@@ -209,7 +209,9 @@ def update_step():
             if action == "lm-inversion":
                 friction, v, result_inv = run_inversion(start, stop, fields)
 
+                # Upsert inversion results
                 with db.session() as session:
+                    # Check if at least one result exists
                     inv = (
                         session.query(InversionResult)
                         .filter_by(step_id=id, bayesian=False)
@@ -217,10 +219,12 @@ def update_step():
                     )
 
                     try:
+                        # Result exists: update
                         if inv:
                             inv.a = float(result_inv.a)
                             inv.b = float(result_inv.b)
                             inv.Dc = float(result_inv.Dc)
+                        # Result does not exist: insert
                         else:
                             inv = InversionResult(
                                 step_id=id,
@@ -231,6 +235,7 @@ def update_step():
                             )
                             session.add(inv)
                         session.commit()
+                    # We failed: roll back
                     except Exception as e:
                         db.session.rollback()
                         app.logger.error("Failed to store inverted parameters")

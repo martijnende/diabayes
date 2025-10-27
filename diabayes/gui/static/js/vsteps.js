@@ -75,10 +75,23 @@ $(document).ready(function () {
   });
 
   // Calculate k/kc
-  // TODO: fix disappearing k/kc value upon adding new v-step etc.
   $(document).on('input change', '.vstep input[name="a"], .vstep input[name="b"], .vstep input[name="Dc"], .vstep input[name="k"]', function () {
     const $step = $(this).closest('.vstep');
     compute_kc($step);
+  });
+
+  // Copy inverted value
+  $(document).on('click', 'i.bi-clipboard', function () {
+    const $icon = $(this);
+    const $field = $icon.closest('.input-group').find('input');
+    const value = $field.val();
+    navigator.clipboard.writeText(value).then(() => {
+      $icon.removeClass('bi-clipboard').addClass('bi-clipboard-check');
+      // Revert after 2 sec
+      setTimeout(() => {
+        $icon.removeClass('bi-clipboard-check').addClass('bi-clipboard');
+      }, 2000);
+    });
   });
 
 });

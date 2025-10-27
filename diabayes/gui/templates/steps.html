@@ -97,29 +97,53 @@
 
     <!-- Inverted friction values -->
     {% for inv in step.inversion_results %}
-    <div class="row mt-1">
+    <div class="row mt-0">
 
       <div class="col-md-12 d-flex justify-content-center gap-1">
 
         <!-- RSF a-value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
-              data-bs-placement="top" title="Direct effect [-]">a</span></div>
-          <input type="text" class="form-control" value="{{ '%.3e' % inv.a if inv.a != '' }}" disabled>
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="bi bi-arrow-return-right"></i>
+            </span>
+          </div>
+          <input type="text" class="form-control" value="{{ '%.5f' % inv.a if inv.a != '' }}" disabled>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="bi bi-clipboard"></i>
+            </span>
+          </div>
         </div>
 
         <!-- RSF b-value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
-              data-bs-placement="top" title="Evolution effect [-]">b</span></div>
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="bi bi-arrow-return-right"></i>
+            </span>
+          </div>
           <input type="text" class="form-control" value="{{ '%.5f' % inv.b if inv.b != '' }}" disabled>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="bi bi-clipboard"></i>
+            </span>
+          </div>
         </div>
 
         <!-- RSF Dc-value -->
         <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
-              data-bs-placement="top" title="Characteristic slip distance [m]">D<sub>c</sub></span></div>
-          <input type="text" class="form-control" value="{{ '%.3e' % inv.Dc if inv.Dc != '' }}" disabled>
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="bi bi-arrow-return-right"></i>
+            </span>
+          </div>
+          <input type="text" class="form-control" value="{{ '%.2e' % inv.Dc if inv.Dc != '' }}" disabled>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="bi bi-clipboard"></i>
+            </span>
+          </div>
         </div>
 
       </div>
@@ -149,14 +173,14 @@
           <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
               data-bs-placement="top" title="Stiffness [1/m]">k</span></div>
           <input type="number" class="form-control" placeholder="[1/m]" name="k" min="0" step="100"
-            value="{{ step.k }}">
+            value="{{ '%.2e' % step.k }}">
         </div>
 
         <!-- k/kc -->
         <div class="input-group">
           <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
               data-bs-placement="top" title="Stable sliding for k/kc > 1">k/k<sub>c</sub></span></div>
-          <input type="text" class="form-control" placeholder="[-]" id="kkc" name="kkc" value="{{ step.kkc }}" disabled>
+          <input type="text" class="form-control" placeholder="[-]" id="kkc" name="kkc" value="{{ '%.3f' % step.kkc if 'kkc' in step.attributes }}" disabled>
         </div>
 
       </div>
@@ -195,7 +219,7 @@
           <!-- Theta value -->
           <div class="input-group-prepend"><span class="input-group-text">&#952;<sub>0</sub></span></div>
           <input type="number" class="form-control" placeholder="[s]" id="theta0" name="theta0" min="0" step="1"
-            value="{% if step.theta0 is not none %}{{ '%.5f' % step.theta0 }}{% endif %}"{% if theta_mode != "custom" %} disabled{% endif %}>
+            value="{{ '%.2e' % step.theta0 if step.theta0 is not none }}"{% if theta_mode != "custom" %} disabled{% endif %}>
 
         </div>
 
