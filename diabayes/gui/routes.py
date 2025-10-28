@@ -58,6 +58,26 @@ def index():
         )
 
 
+def _delete_step(id):
+    """
+    A reusable routine to delete a velocity step
+    and its associated friction curves. The inversion
+    results are automatically deleted thanks to the
+    "delete-orphan" relationship property.
+
+    This routine does not invoke a session commit!
+
+    """
+    step = StepEvent.query.get(id)
+    # Delete the step. This should delete the
+    # associated inversion results too
+    if step:
+        db.session.delete(step)
+    # Remove any plot elements associated with id
+    current_app.extensions["plot_handler"].del_friction(id)
+    pass
+
+
 @bp.route("/update-step", methods=["POST"])
 def update_step():
 
@@ -93,7 +113,7 @@ def update_step():
         except Exception as e:
             db.session.rollback()
             app.logger.error("Failed to insert v-step entry")
-            app.logger.error(e)
+            app.logger.debug(f"{e}")
             return jsonify({"status": "error", "message": e}), 500
 
     # Action 2: update an existing v-step (including inversion)
@@ -162,7 +182,7 @@ def update_step():
         except Exception as e:
             db.session.rollback()
             app.logger.error(f"Failed to update v-step {id}")
-            app.logger.error(e)
+            app.logger.debug(f"{e}")
             return jsonify({"status": "error", "message": e}), 500
 
     # Action 3: delete a v-step
@@ -179,21 +199,15 @@ def update_step():
 
         # Delete entries from DB
         try:
-            # Remove inversion results (if any)
-            for result in step.inversion_results:
-                InversionResult.query.filter_by(id=result.id).delete()
-            # Remove the step itself
-            StepEvent.query.filter_by(id=id).delete()
+            _delete_step(id)
             db.session.commit()
-            # Remove any plot elements associated with id
-            app.extensions["plot_handler"].del_friction(id)
             app.logger.debug(f"Deleted v-step {id}")
 
         # If something went wrong: revert
         except Exception as e:
             db.session.rollback()
             app.logger.error("Failed to delete v-step entry")
-            app.logger.error(e)
+            app.logger.debug(f"{e}")
 
     # Check if data have been loaded
     data = getattr(app.extensions["file_handler"], "data", None)
@@ -325,6 +339,7 @@ def clear_logs():
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Failed to clear log entries")
+        current_app.logger.debug(f"{e}")
         return jsonify({"status": "error", "message": f"{e}"}), 500
 
 
@@ -337,18 +352,25 @@ def clear_data():
     except Exception as e:
         print(f"{e}")
         current_app.logger.error("Failed to clear data")
+        current_app.logger.debug(f"{e}")
         return jsonify({"status": "error", "message": f"{e}"}), 500
 
 
 @bp.route("/clear_db", methods=["POST"])
 def clear_db():
+    from sqlalchemy import select
+
     try:
-        steps_deleted = db.session.query(StepEvent).delete()
+        step_ids = db.session.scalars(select(StepEvent.id)).all()
+        for id in step_ids:
+            _delete_step(id)
+        steps_deleted = len(step_ids)
+        db.session.commit()  # Commit to clear non-orphan inversion results
         inv_results_deleted = db.session.query(InversionResult).delete()
         logs_deleted = db.session.query(LogEntry).delete()
         db.session.commit()
         current_app.logger.info(
-            f"Deleted {steps_deleted} velocity steps, {inv_results_deleted} inversion results, and {logs_deleted} log entries"
+            f"Deleted {steps_deleted} velocity steps, {inv_results_deleted} orphan inversion results, and {logs_deleted} log entries"
         )
         # Render the HTML template
         html = render_template("steps.html", vsteps=[])
@@ -356,6 +378,7 @@ def clear_db():
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Failed to clear database")
+        current_app.logger.debug(f"{e}")
         return jsonify({"status": "error", "message": f"{e}"}), 500
 
 
