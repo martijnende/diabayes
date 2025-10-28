@@ -102,6 +102,8 @@
 <script src="{{ url_for('static', filename='js/vsteps.js') }}"></script>
 {% endblock %}
 <script>
+  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
   $(function () {
     $('[data-bs-toggle="tooltip"]').tooltip();
   });

@@ -1,6 +1,7 @@
+from time import time
+
 from bokeh.client import pull_session
 from bokeh.embed import server_session
-from bokeh.io import curdoc
 from flask import Blueprint, current_app, jsonify, render_template, request
 from sqlalchemy.orm import selectinload, with_loader_criteria
 
@@ -18,19 +19,10 @@ def index():
     fhandler = current_app.extensions["file_handler"]
     phandler = current_app.extensions["plot_handler"]
 
+    # Create a new session
     with pull_session(url=BOKEH_URL) as bokeh_session:
 
-        # current_sessions = phandler.server.get_sessions("/")
-        # if len(current_sessions) == 0:
-        #     print("PULLING SESSION")
-        #     bokeh_session = pull_session(url=BOKEH_URL)
-        # else:
-        #     if len(current_sessions) > 1:
-        #         current_app.logger.warning(
-        #             "Found more than one Bokeh session, which is not expected"
-        #         )
-        #     bokeh_session = current_sessions[0]
-
+        # Check if we already have data
         data_ready = fhandler.check_data_exists()
         if data_ready:
             data = fhandler.load_data()
@@ -39,24 +31,25 @@ def index():
             current_app.logger.debug("Reloaded plots")
 
         # Get velocity steps
-        with db.session() as session:
-            vsteps = (
-                session.query(StepEvent)
-                .options(
-                    selectinload(StepEvent.inversion_results),
-                    with_loader_criteria(
-                        InversionResult, InversionResult.bayesian.is_(False)
-                    ),
-                )
-                .all()
+        # Get the velocity steps and associated
+        # max-likelihood inversion results (if any)
+        vsteps = (
+            db.session.query(StepEvent)
+            .options(
+                selectinload(StepEvent.inversion_results),
+                with_loader_criteria(
+                    InversionResult, InversionResult.bayesian.is_(False)
+                ),
             )
-            current_app.logger.debug(f"Got {len(vsteps)} events")
-            print(vsteps)
+            .all()
+        )
+        current_app.logger.debug(f"Got {len(vsteps)} events")
 
-        # Get Bokeh canvas
+        # Draw the Bokeh canvas
         bokeh_script = server_session(session_id=bokeh_session.id, url=BOKEH_URL)
         current_app.logger.debug(f"Bokeh canvas loaded")
 
+        # Render the HTML template
         return render_template(
             "index.html",
             bokeh_script=bokeh_script,
@@ -68,6 +61,8 @@ def index():
 @bp.route("/update-step", methods=["POST"])
 def update_step():
 
+    app = current_app
+
     # Get the form data and do some light validation
     # Everything defaults to None if no value is found
     # or if it fails to validate
@@ -75,22 +70,20 @@ def update_step():
     id = request.form.get("id", type=int)
     start = request.form.get("start", type=int)
     stop = request.form.get("stop", type=int)
-    # Get theta_mode, which should never be None...
+    # Get theta_mode, which should never be None
+    # unless adding a new step
     theta_mode = request.form.get("theta_mode")
-    assert theta_mode is not None
+    if action != "add":
+        assert theta_mode is not None
 
     # Instead of manually manipulating each quantity,
     # loop over a dictionary instead
     field_names = ("v0", "v1", "mu0", "k", "a", "b", "Dc")
     fields = {key: request.form.get(key, type=float) for key in field_names}
 
-    # Extract/calculate theta0
-    # Compute k/kc
-
-    app = current_app
-
     # Action 1: add a new v-step
     if action == "add":
+        fields["theta0"] = None
         try:
             step = StepEvent(start=start, stop=stop, **fields)  # type: ignore
             db.session.add(step)
@@ -130,8 +123,11 @@ def update_step():
             # theta0 depends on Dc, which can be inverted for.
             # theta0 may therefore not be fully consistent...
             if theta_mode == "auto":
+                # Check that v0 is provided
                 v_ok = step.v0 is not None and (step.v0 > 0)
+                # Check that Dc is provided
                 Dc_ok = step.Dc is not None and (step.Dc > 0)
+                # Both ok? Continue
                 if v_ok and Dc_ok:
                     theta0 = step.Dc / step.v0  # type: ignore
                     app.logger.debug(f"Steady-state theta0: {theta0:.2e}")
@@ -142,6 +138,7 @@ def update_step():
                 app.logger.error(
                     "Calculating theta0 from the previous step is not implemented..."
                 )
+                return jsonify({"status": "error", "message": ""}), 500
 
             # Mode 3: set a custom value
             elif theta_mode == "custom":
@@ -156,8 +153,11 @@ def update_step():
             step.theta0 = theta0
             fields["theta0"] = theta0
 
+            # Write to database
             db.session.commit()
             app.logger.debug(f"Updated v-step {id}")
+
+        # If something went wrong: revert
         except Exception as e:
             db.session.rollback()
             app.logger.error(f"Failed to update v-step {id}")
@@ -183,6 +183,8 @@ def update_step():
             # Remove any plot elements associated with id
             app.extensions["plot_handler"].del_friction(id)
             app.logger.debug(f"Deleted v-step {id}")
+
+        # If something went wrong: revert
         except Exception as e:
             db.session.rollback()
             app.logger.error("Failed to delete v-step entry")
@@ -192,12 +194,13 @@ def update_step():
     # provided (update/delete), or it was created (add)
     assert id is not None
 
-    # Check if data has been loaded
+    # Check if data have been loaded
     data = getattr(app.extensions["file_handler"], "data", None)
 
     # Update model curves
-    if (action != "delete") and (data is not None):
+    if (action not in ("add", "delete")) and (data is not None):
 
+        # If data is not None, then it must be of len > 0
         assert len(data) > 0
         fields["t"] = app.extensions["file_handler"].data[0]
         fields["mu"] = app.extensions["file_handler"].data[1]
@@ -207,7 +210,11 @@ def update_step():
 
             # Run max-likelihood inversion
             if action == "lm-inversion":
+                t_start = time()
                 friction, v, result_inv = run_inversion(start, stop, fields)
+                t_end = time()
+                dt = t_end - t_start
+                app.logger.debug(f"Ran inversion in {dt:.2f} seconds")
 
                 # Upsert inversion results
                 with db.session() as session:
@@ -227,11 +234,11 @@ def update_step():
                         # Result does not exist: insert
                         else:
                             inv = InversionResult(
-                                step_id=id,
-                                bayesian=False,
-                                a=result_inv.a,
-                                b=result_inv.b,
-                                Dc=result_inv.Dc,
+                                step_id=id,  # type: ignore
+                                bayesian=False,  # type: ignore
+                                a=result_inv.a,  # type: ignore
+                                b=result_inv.b,  # type: ignore
+                                Dc=result_inv.Dc,  # type: ignore
                             )
                             session.add(inv)
                         session.commit()
@@ -243,7 +250,11 @@ def update_step():
 
             # Run forward model
             else:
+                t_start = time()
                 friction, v = run_forward(start, stop, fields)
+                t_end = time()
+                dt = t_end - t_start
+                app.logger.debug(f"Ran forward model in {dt:.2f} seconds")
 
             # Plot friction curves
             plot_fields = {
@@ -259,7 +270,18 @@ def update_step():
             app.extensions["plot_handler"].del_friction(id)
 
     # Get all the current steps
-    steps = StepEvent.query.all()
+    # steps = StepEvent.query.all()
+    # Get velocity steps
+    # Get the velocity steps and associated
+    # max-likelihood inversion results (if any)
+    steps = (
+        db.session.query(StepEvent)
+        .options(
+            selectinload(StepEvent.inversion_results),
+            with_loader_criteria(InversionResult, InversionResult.bayesian.is_(False)),
+        )
+        .all()
+    )
     # Render the HTML template
     html = render_template("steps.html", vsteps=steps, theta_mode=theta_mode)
 

@@ -110,7 +110,7 @@
           </div>
           <input type="text" class="form-control" value="{{ '%.5f' % inv.a if inv.a != '' }}" disabled>
           <div class="input-group-append">
-            <span class="input-group-text">
+            <span class="input-group-text" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy">
               <i class="bi bi-clipboard"></i>
             </span>
           </div>
@@ -125,7 +125,7 @@
           </div>
           <input type="text" class="form-control" value="{{ '%.5f' % inv.b if inv.b != '' }}" disabled>
           <div class="input-group-append">
-            <span class="input-group-text">
+            <span class="input-group-text" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy">
               <i class="bi bi-clipboard"></i>
             </span>
           </div>
@@ -140,7 +140,7 @@
           </div>
           <input type="text" class="form-control" value="{{ '%.2e' % inv.Dc if inv.Dc != '' }}" disabled>
           <div class="input-group-append">
-            <span class="input-group-text">
+            <span class="input-group-text" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy">
               <i class="bi bi-clipboard"></i>
             </span>
           </div>
@@ -165,7 +165,7 @@
           <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
               data-bs-placement="top" title="Initial friction">&#956;<sub>0</sub></span></div>
           <input type="number" class="form-control" placeholder="[-]" name="mu0" min="0" step="0.01"
-            value="{{ step.mu0 }}">
+            value="{{ step.mu0 if step.mu0 is not none }}">
         </div>
 
         <!-- Stiffness value -->
@@ -173,7 +173,7 @@
           <div class="input-group-prepend"><span class="input-group-text" data-bs-toggle="tooltip"
               data-bs-placement="top" title="Stiffness [1/m]">k</span></div>
           <input type="number" class="form-control" placeholder="[1/m]" name="k" min="0" step="100"
-            value="{{ '%.2e' % step.k }}">
+            value="{{ '%.2e' % step.k if step.k is not none }}">
         </div>
 
         <!-- k/kc -->
@@ -203,11 +203,11 @@
               title="Calculate &#952; from steady-state">Steady-state</label>
           </div>
 
-          <!-- Specify theta -->
+          <!-- Use previous theta -->
           <div class="input-group-text">
             <input class="form-check-input" type="radio" name="theta_mode" id="theta_previous" value="previous"{% if theta_mode == "previous" %} checked{% endif %} disabled>
             <label for="theta_previous" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
-              title="Use the final value of &#952; of the previous step">Previous</label>
+              title="Use the final value of &#952; of the previous step [not implemented]">Previous</label>
           </div>
           <!-- Specify theta -->
           <div class="input-group-text">

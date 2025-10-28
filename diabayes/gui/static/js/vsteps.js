@@ -28,6 +28,7 @@ $(document).ready(function () {
             const $step = $(this);
             compute_kc($step);
           });
+          $('[data-bs-toggle="tooltip"]').tooltip();
         }
       },
       error: function (err) {
@@ -57,6 +58,7 @@ $(document).ready(function () {
             const $step = $(this);
             compute_kc($step);
           });
+          $('[data-bs-toggle="tooltip"]').tooltip();
         }
       },
       error: function (err) {

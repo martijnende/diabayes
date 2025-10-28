@@ -59,7 +59,7 @@ class StepEvent(db.Model):
     Dc: Mapped[Optional[float]]
 
     inversion_results: Mapped[List["InversionResult"]] = relationship(
-        back_populates="step", cascade="all, delete-orphan"
+        back_populates="step", cascade="all, delete-orphan", init=False
     )
 
 
