@@ -72,9 +72,9 @@ def update_step():
     stop = request.form.get("stop", type=int)
     # Get theta_mode, which should never be None
     # unless adding a new step
-    theta_mode = request.form.get("theta_mode")
-    if action != "add":
-        assert theta_mode is not None
+    theta_mode = request.form.get("theta_mode", type=str)
+    if action not in (None, "add"):
+        assert theta_mode is not None, f"{action=}, {theta_mode=}"
 
     # Instead of manually manipulating each quantity,
     # loop over a dictionary instead
@@ -151,6 +151,7 @@ def update_step():
 
             # Set theta0
             step.theta0 = theta0
+            step.theta_mode = theta_mode
             fields["theta0"] = theta0
 
             # Write to database
@@ -176,8 +177,12 @@ def update_step():
             app.logger.error(f"Cannot find ID {id} in database")
             return jsonify({"status": "error", "message": ""}), 500
 
-        # Delete entry from DB
+        # Delete entries from DB
         try:
+            # Remove inversion results (if any)
+            for result in step.inversion_results:
+                InversionResult.query.filter_by(id=result.id).delete()
+            # Remove the step itself
             StepEvent.query.filter_by(id=id).delete()
             db.session.commit()
             # Remove any plot elements associated with id
@@ -190,15 +195,15 @@ def update_step():
             app.logger.error("Failed to delete v-step entry")
             app.logger.error(e)
 
-    # At this point, id cannot be None; either it was
-    # provided (update/delete), or it was created (add)
-    assert id is not None
-
     # Check if data have been loaded
     data = getattr(app.extensions["file_handler"], "data", None)
 
     # Update model curves
-    if (action not in ("add", "delete")) and (data is not None):
+    if (action in ("update", "lm-inversion")) and (data is not None):
+
+        # At this point, id cannot be None. If it is,
+        # something is wrong...
+        assert id is not None
 
         # If data is not None, then it must be of len > 0
         assert len(data) > 0
@@ -269,8 +274,6 @@ def update_step():
             app.logger.debug(f"Validation for step {id} failed")
             app.extensions["plot_handler"].del_friction(id)
 
-    # Get all the current steps
-    # steps = StepEvent.query.all()
     # Get velocity steps
     # Get the velocity steps and associated
     # max-likelihood inversion results (if any)
@@ -283,7 +286,7 @@ def update_step():
         .all()
     )
     # Render the HTML template
-    html = render_template("steps.html", vsteps=steps, theta_mode=theta_mode)
+    html = render_template("steps.html", vsteps=steps)
 
     return jsonify({"status": "ok", "message": "", "html": html}), 200
 
@@ -317,7 +320,7 @@ def clear_logs():
     try:
         rows_deleted = db.session.query(LogEntry).delete()
         db.session.commit()
-        current_app.logger.info(f"{rows_deleted} entries deleted")
+        current_app.logger.info(f"Deleted {rows_deleted} log entries")
         return jsonify({"status": "ok", "message": ""}), 200
     except Exception as e:
         db.session.rollback()
@@ -334,6 +337,25 @@ def clear_data():
     except Exception as e:
         print(f"{e}")
         current_app.logger.error("Failed to clear data")
+        return jsonify({"status": "error", "message": f"{e}"}), 500
+
+
+@bp.route("/clear_db", methods=["POST"])
+def clear_db():
+    try:
+        steps_deleted = db.session.query(StepEvent).delete()
+        inv_results_deleted = db.session.query(InversionResult).delete()
+        logs_deleted = db.session.query(LogEntry).delete()
+        db.session.commit()
+        current_app.logger.info(
+            f"Deleted {steps_deleted} velocity steps, {inv_results_deleted} inversion results, and {logs_deleted} log entries"
+        )
+        # Render the HTML template
+        html = render_template("steps.html", vsteps=[])
+        return jsonify({"status": "ok", "message": "", "html": html}), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Failed to clear database")
         return jsonify({"status": "error", "message": f"{e}"}), 500
 
 

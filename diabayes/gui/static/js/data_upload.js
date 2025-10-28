@@ -41,5 +41,19 @@ $(document).ready(function() {
     });
   });
 
+  // Clear database
+  $('#clear-db').on('click', function() {
+    $.ajax({
+      url: '/clear_db',
+      type: 'POST',
+      success: function(response) {
+        if (response.html) {
+          $("div#vstep-container").html(response.html);
+        };
+        $('#log-container div.log-entry').remove();
+        window.loadLogs();
+      }
+    });
+  });
 });
 

@@ -2,11 +2,11 @@ $(document).ready(function() {
 
   var socket = io("/logs");
 
-  function renderLogEntry(entry) {
+  window.renderLogEntry = function(entry) {
     return `<div class="log-entry">[${entry.timestamp}] ${entry.level}: ${entry.msg}</div>`;
   }
 
-  function loadLogs() {
+  window.loadLogs = function() {
     $.getJSON("/logs/all", function(data) {
         const container = $("#log-container");
         container.empty();
@@ -17,7 +17,7 @@ $(document).ready(function() {
   }
 
   // Request logs when the page loads
-  loadLogs();
+  window.loadLogs();
 
   socket.on("connect", () => {
       console.log("Connected to /logs namespace");
@@ -36,7 +36,7 @@ $(document).ready(function() {
       type: 'POST',
       success: function() {
         $('#log-container div.log-entry').remove();
-        loadLogs();
+        window.loadLogs();
       }
     });
   });

@@ -45,6 +45,9 @@ class StepEvent(db.Model):
     __tablename__ = "vsteps"
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    theta_mode: Mapped[Optional[str]] = mapped_column(
+        Text, nullable=True, init=False, default="auto"
+    )
     # Columns are `nullable` by default, so no need to
     # explicitly specify `mapped_column(nullable=True)`
     start: Mapped[Optional[int]]

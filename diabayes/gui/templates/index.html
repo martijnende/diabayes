@@ -45,12 +45,16 @@
       <div class="row mt-2 ps-3" id="data-controls">
         <div class="col d-flex justify-content-end gap-2">
           <!-- Clear logs button -->
-          <button class="btn btn-warning" id="clear-logs">
+          <button class="btn btn-warning" id="clear-logs" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Remove all log entries">
             <i class="bi bi-file-earmark-x"></i> Clear logs
           </button>
           <!-- Clear data button -->
-          <button class="btn btn-warning" id="clear-data" {% if not data_ready %}disabled{% endif %}>
-            <i class="bi bi-trash"></i> Clear data
+          <button class="btn btn-warning" id="clear-data" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Remove lab data (not v-steps)"{% if not data_ready %}disabled{% endif %}>
+            <i class="bi bi-graph-up"></i> Clear data
+          </button>
+          <!-- Clear database button -->
+          <button class="btn btn-warning" id="clear-db" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Remove logs and v-steps (not data)">
+            <i class="bi bi-database-exclamation"></i> Clear database
           </button>
         </div>
       </div>

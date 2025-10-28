@@ -198,20 +198,20 @@
 
           <!-- Calculate theta from steady-state -->
           <div class="input-group-text">
-            <input class="form-check-input" type="radio" name="theta_mode" id="theta_auto" value="auto"{% if (theta_mode != "previous") or (theta_mode != "custom") %} checked{% endif %}>
+            <input class="form-check-input" type="radio" name="theta_mode" id="theta_auto" value="auto"{% if step.theta_mode == "auto" %} checked{% endif %}>
             <label for="theta_auto" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
               title="Calculate &#952; from steady-state">Steady-state</label>
           </div>
 
           <!-- Use previous theta -->
           <div class="input-group-text">
-            <input class="form-check-input" type="radio" name="theta_mode" id="theta_previous" value="previous"{% if theta_mode == "previous" %} checked{% endif %} disabled>
+            <input class="form-check-input" type="radio" name="theta_mode" id="theta_previous" value="previous"{% if step.theta_mode == "previous" %} checked{% endif %} disabled>
             <label for="theta_previous" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
               title="Use the final value of &#952; of the previous step [not implemented]">Previous</label>
           </div>
           <!-- Specify theta -->
           <div class="input-group-text">
-            <input class="form-check-input" type="radio" name="theta_mode" id="theta_custom" value="custom"{% if theta_mode == "custom" %} checked{% endif %}>
+            <input class="form-check-input" type="radio" name="theta_mode" id="theta_custom" value="custom"{% if step.theta_mode == "custom" %} checked{% endif %}>
             <label for="theta_custom" class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
               title="Specify custom initial &#952; [s]">Custom:</label>
           </div>
@@ -219,7 +219,7 @@
           <!-- Theta value -->
           <div class="input-group-prepend"><span class="input-group-text">&#952;<sub>0</sub></span></div>
           <input type="number" class="form-control" placeholder="[s]" id="theta0" name="theta0" min="0" step="1"
-            value="{{ '%.2e' % step.theta0 if step.theta0 is not none }}"{% if theta_mode != "custom" %} disabled{% endif %}>
+            value="{{ '%.2e' % step.theta0 if step.theta0 is not none }}"{% if step.theta_mode != "custom" %} disabled{% endif %}>
 
         </div>
 
