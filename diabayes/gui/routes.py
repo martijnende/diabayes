@@ -118,7 +118,7 @@ def update_step():
             return jsonify({"status": "error", "message": e}), 500
 
     # Action 2: update an existing v-step (including inversion)
-    elif action in ("update", "lm-inversion"):
+    elif action in ("update", "lm-inversion", "bayesian-inversion"):
 
         # Get the step based on the provided ID
         # Will return None if id cannot be found
@@ -214,7 +214,9 @@ def update_step():
     data = getattr(app.extensions["file_handler"], "data", None)
 
     # Update model curves
-    if (action in ("update", "lm-inversion")) and (data is not None):
+    if (action in ("update", "lm-inversion", "bayesian-inversion")) and (
+        data is not None
+    ):
 
         # At this point, id cannot be None. If it is,
         # something is wrong...
