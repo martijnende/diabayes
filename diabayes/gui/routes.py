@@ -1,5 +1,6 @@
 from time import time
 
+import numpy as np
 from bokeh.client import pull_session
 from bokeh.embed import server_session
 from flask import Blueprint, current_app, jsonify, render_template, request
@@ -222,7 +223,8 @@ def update_step():
         # If data is not None, then it must be of len > 0
         assert len(data) > 0
         fields["t"] = app.extensions["file_handler"].data[0]
-        fields["mu"] = app.extensions["file_handler"].data[1]
+        fields["x"] = app.extensions["file_handler"].data[1]
+        fields["mu"] = app.extensions["file_handler"].data[2]
 
         # Check that all data are valid
         if data_are_valid(start, stop, fields):
@@ -230,7 +232,7 @@ def update_step():
             # Run max-likelihood inversion
             if action == "lm-inversion":
                 t_start = time()
-                friction, v, result_inv = run_inversion(start, stop, fields)
+                friction, v, x, result_inv = run_inversion(start, stop, fields)
                 t_end = time()
                 dt = t_end - t_start
                 app.logger.debug(f"Ran inversion in {dt:.2f} seconds")
@@ -270,7 +272,7 @@ def update_step():
             # Run forward model
             else:
                 t_start = time()
-                friction, v = run_forward(start, stop, fields)
+                friction, v, x = run_forward(start, stop, fields)
                 t_end = time()
                 dt = t_end - t_start
                 app.logger.debug(f"Ran forward model in {dt:.2f} seconds")
@@ -278,6 +280,7 @@ def update_step():
             # Plot friction curves
             plot_fields = {
                 "t": fields["t"][start:stop],
+                "x": fields["x"][start] + x * 1e3,
                 "mu": friction,
                 "v": v,
             }

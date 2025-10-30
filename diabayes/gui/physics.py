@@ -1,5 +1,5 @@
 import diabayes as db
-from diabayes.forward_models import Forward, ageing_law, rsf, springblock
+from diabayes.forward_models import Forward, ageing_law, rsf, slip_rate, springblock
 from diabayes.solver import ODESolver
 
 
@@ -21,7 +21,7 @@ def data_are_valid(start, stop, fields):
         return False
 
     # Check all fields are positive
-    if any(v < 0 for k, v in fields.items() if k not in ("t", "mu")):
+    if any(v < 0 for k, v in fields.items() if k not in ("t", "x", "mu", "v")):
         return False
 
     return True
@@ -29,7 +29,7 @@ def data_are_valid(start, stop, fields):
 
 def run_forward(start, stop, fields):
 
-    state_dict = {"theta": ageing_law}
+    state_dict = {"theta": ageing_law, "x": slip_rate}
     forward = Forward(
         friction_model=rsf, state_evolution=state_dict, stress_transfer=springblock
     )
@@ -39,7 +39,7 @@ def run_forward(start, stop, fields):
     constants = db.RSFConstants(v0=fields["v0"], mu0=fields["mu0"])
     block_constants = db.SpringBlockConstants(k=fields["k"], v_lp=fields["v1"])
 
-    forward.set_initial_values(mu=fields["mu0"], theta=fields["theta0"])
+    forward.set_initial_values(mu=fields["mu0"], theta=fields["theta0"], x=0.0)
     y0 = forward.variables
     result = solver.solve_forward(
         t=fields["t"][start:stop],
@@ -49,12 +49,12 @@ def run_forward(start, stop, fields):
         block_constants=block_constants,
     )
     v = rsf(result, params, constants)
-    return result.mu, v
+    return result.mu, v, result.x
 
 
 def run_inversion(start, stop, fields):
 
-    state_dict = {"theta": ageing_law}
+    state_dict = {"theta": ageing_law, "x": slip_rate}
     forward = Forward(
         friction_model=rsf, state_evolution=state_dict, stress_transfer=springblock
     )
@@ -64,7 +64,7 @@ def run_inversion(start, stop, fields):
     constants = db.RSFConstants(v0=fields["v0"], mu0=fields["mu0"])
     block_constants = db.SpringBlockConstants(k=fields["k"], v_lp=fields["v1"])
 
-    forward.set_initial_values(mu=fields["mu0"], theta=fields["theta0"])
+    forward.set_initial_values(mu=fields["mu0"], theta=fields["theta0"], x=0.0)
     y0 = forward.variables
     inv_result = solver.max_likelihood_inversion(
         t=fields["t"][start:stop],
@@ -84,4 +84,4 @@ def run_inversion(start, stop, fields):
     )
     v = rsf(result, params_inv, constants)
 
-    return result.mu, v, params_inv
+    return result.mu, v, result.x, params_inv

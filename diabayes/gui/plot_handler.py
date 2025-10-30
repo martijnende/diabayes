@@ -35,11 +35,12 @@ class PlotHandler:
             sizing_mode="stretch_width",
             tooltips=[
                 ("index", "$index"),
-                ("time", "$snap_x"),
+                ("displacement", "$snap_x"),
                 ("friction", "$snap_y"),
             ],
         )
         p.line("x", "y", line_color=line_colour, source=self.source)
+        p.x_range.range_padding = 0.0  # type: ignore
         p.yaxis.axis_label = "Friction [-]"
         p.toolbar.logo = None
         p.toolbar.active_drag = None
@@ -53,12 +54,13 @@ class PlotHandler:
             sizing_mode="stretch_width",
             tooltips=[
                 ("index", "$index"),
-                ("time", "$snap_x"),
+                ("displacement", "$snap_x"),
                 ("velocity", "$snap_y"),
             ],
         )
         q.line("x", "y", line_color=line_colour, source=self.source2)
-        q.yaxis.axis_label = "Velocty [m/s]"
+        q.x_range.range_padding = 0.0  # type: ignore
+        q.yaxis.axis_label = "Velocity [m/s]"
         q.toolbar.logo = None
         q.toolbar.active_drag = None
 
@@ -71,9 +73,9 @@ class PlotHandler:
             toolbar_location=None,
             sizing_mode="stretch_width",
         )
-        # select.x_range.range_padding = 0.1
+        select.x_range.range_padding = 0.0  # type: ignore
         select.x_range.bounds = "auto"  # type: ignore
-        select.xaxis.axis_label = "Time [s]"
+        select.xaxis.axis_label = "Load-point displacement [mm]"
 
         range_tool = RangeTool(
             x_range=p.x_range, y_range=p.y_range, start_gesture="pan"
@@ -111,10 +113,10 @@ class PlotHandler:
 
         # Update data sources
         def update_friction():
-            self.source.data = dict(x=data[0], y=data[1])
+            self.source.data = dict(x=data[1], y=data[2])
 
         def update_velocity():
-            self.source2.data = dict(x=data[0], y=data[2])
+            self.source2.data = dict(x=data[1], y=data[3])
 
         # Add callback
         doc.add_next_tick_callback(update_friction)
@@ -139,7 +141,7 @@ class PlotHandler:
                         renderer = renderers.pop(id)
                         p.renderers.remove(renderer)
 
-                    source = ColumnDataSource(dict(x=data["t"], y=y))
+                    source = ColumnDataSource(dict(x=data["x"], y=y))
                     renderer = p.line(
                         "x", "y", line_color="orange", source=source, line_width=2
                     )
@@ -180,7 +182,7 @@ class PlotHandler:
             self.app.logger.debug("Server not initialised")
             return
 
-        self.plot([[], [], []])
+        self.plot([[]] * 4)
 
         doc = self._get_doc()
         context = getattr(doc, "context", None)
