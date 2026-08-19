@@ -1,3 +1,4 @@
+import pytest
 import jax.numpy as jnp
 
 from diabayes.typedefs import RSFParams, StateDict, Variables
@@ -87,6 +88,13 @@ class TestTypedefs:
         assert jnp.allclose(variables2.mu, mu[slc])
         for key, val in x.items():
             assert jnp.allclose(variables2[key], val[slc])
+
+        # Verify that anything else triggers an IndexError
+        with pytest.raises(IndexError):
+            variables[[0]]  # type: ignore
+            variables[jnp.arange(3)]  # type: ignore
+            variables[True]  # type: ignore
+            variables[None]  # type: ignore
 
     def test_SVI_containers(self):
 
