@@ -34,7 +34,7 @@ class TestTypedefs:
 
         # Appending time-series
         N = 100
-        mu = jnp.zeros(N, dtype=jnp.float32)
+        mu = jnp.arange(N, dtype=jnp.float32)
         x = {
             "a": jnp.ones_like(mu),
             "b": 2 * jnp.ones_like(mu),
@@ -47,6 +47,46 @@ class TestTypedefs:
         array = jnp.array([mu, *x.values()])
         double_array = jnp.hstack([array, array])
         assert jnp.allclose(double_array, variables3.to_array())
+
+    def test_container_slicing(self):
+
+        N = 100
+        mu = jnp.arange(N, dtype=jnp.float32)
+        x = {
+            "a": jnp.ones_like(mu),
+            "b": 2 * jnp.ones_like(mu),
+            "c": 3 * jnp.ones_like(mu),
+        }
+        state_obj = StateDict(keys=tuple(x.keys()), vals=jnp.array(list(x.values())))
+        variables = Variables(mu=mu, state=state_obj)
+
+        # Get item by name (returns a specific variable)
+        mu2 = variables["mu"]
+        assert jnp.allclose(mu, mu2)
+        for key, val in x.items():
+            assert jnp.allclose(variables[key], val)
+
+        # Get item by index (returns a specific time value)
+        for i in (0, 1, -1):
+            variables2 = variables[i]
+            assert jnp.isclose(variables2.mu, mu[i])
+            for key, val in x.items():
+                assert jnp.isclose(variables2[key], val[i])
+
+        # Check that an index selection of scalars yields identity
+        # regardless of the index value
+        variables2 = variables[0]
+        variables3 = variables2[999]
+        assert jnp.isclose(variables2.mu, variables3.mu)
+        for key, val in x.items():
+            assert jnp.allclose(variables2[key], variables3[key])
+
+        # Get items by slice
+        slc = slice(0, min(10, N))
+        variables2 = variables[slc]
+        assert jnp.allclose(variables2.mu, mu[slc])
+        for key, val in x.items():
+            assert jnp.allclose(variables2[key], val[slc])
 
     def test_SVI_containers(self):
 

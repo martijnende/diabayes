@@ -79,6 +79,9 @@ class Variables(eqx.Module):
     Users would typically not instantiate a ``Variables`` object
     directly; instead, it is created through the ``Forward.set_initial_values``
     method and retreived as ``Forward.variables``.
+
+    ``Variables`` supports item selection and slicing in various ways
+    (see ``Variables.__getitem__``).
     """
 
     mu: jax.Array
@@ -93,6 +96,48 @@ class Variables(eqx.Module):
         if name in self.state.keys:
             return self.state[name]
         raise AttributeError(f"{type(self).__name__} has no attribute {name!r}")
+
+    def __getitem__(self, key: str | int | slice) -> "Float[Array, '...'] | Variables":
+        """
+        Select an item from the container. The behaviour changes depending on
+        the type of ``key``. For a string, ``__getitem__`` behaves as ``getattr``
+        and returns a specific variable as an array. For an integer or slice, it
+        returns a portion of the values of each variable as a new ``Variables``
+        object.
+
+        Examples
+        --------
+        >>> container = Variables(...)
+        >>> mu = container["mu"]
+        >>> init_vars = container[0]
+        >>> final_vars = container[-1]
+        >>> some_vars = container[slice(0, 10)]
+        >>> theta_mean = some_vars["theta].mean()
+        """
+
+        # If this method is used as a dict __getattr__, refer to
+        # the __getattribute__ method (which later redirects to __getattr__)
+        if isinstance(key, str):
+            return getattr(self, key)
+
+        # The other option is to select by integer or slice
+        if isinstance(key, int) or isinstance(key, slice):
+            mu = jnp.squeeze(self.mu)
+            state = self.state
+            # If mu is one-dimensional: only one value to select, so
+            # return everything as-is
+            if mu.ndim == 0:
+                return self
+
+            # If mu is a time series, select the requested values
+            mu = mu[key]
+            state_keys = state.keys
+            state_vals = jnp.squeeze(jnp.atleast_2d(state.vals)[:, key])
+            state_dict = StateDict(keys=state_keys, vals=state_vals)
+
+            return type(self)(mu=mu, state=state_dict)
+
+        raise IndexError
 
     def set_values(self, **kwargs) -> "Variables":
         """
