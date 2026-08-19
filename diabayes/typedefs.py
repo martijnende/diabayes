@@ -97,7 +97,7 @@ class Variables(eqx.Module):
             return self.state[name]
         raise AttributeError(f"{type(self).__name__} has no attribute {name!r}")
 
-    def __getitem__(self, key: str | int | slice) -> "Float[Array, '...'] | Variables":
+    def __getitem__(self, key: str | int | slice) -> Any:
         """
         Select an item from the container. The behaviour changes depending on
         the type of ``key``. For a string, ``__getitem__`` behaves as ``getattr``
@@ -130,9 +130,9 @@ class Variables(eqx.Module):
                 return self
 
             # If mu is a time series, select the requested values
-            mu = mu[key]
+            mu = jnp.atleast_1d(mu[key])
             state_keys = state.keys
-            state_vals = jnp.squeeze(jnp.atleast_2d(state.vals)[:, key])
+            state_vals = jnp.atleast_1d(jnp.atleast_2d(state.vals)[:, key])
             state_dict = StateDict(keys=state_keys, vals=state_vals)
 
             return type(self)(mu=mu, state=state_dict)
