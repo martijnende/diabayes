@@ -48,7 +48,7 @@ def cli():
 
 @cli.command()
 @click.argument("dirname", required=False, default="workspace")
-def init(dirname):  # type:ignore
+def init(dirname):  # type: ignore
     """Initialize a new workspace in the current directory."""
     path = Path.cwd() / dirname
     # Create workspace dir including default config file
