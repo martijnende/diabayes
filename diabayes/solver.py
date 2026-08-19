@@ -10,7 +10,7 @@ import jax.random as jr
 import optax
 import optimistix as optx
 from jax import lax
-from jax_tqdm import scan_tqdm  # type:ignore
+from jax_tqdm import scan_tqdm  # type: ignore
 from jaxtyping import Array, Float
 from scipy.integrate import solve_ivp
 
@@ -220,7 +220,7 @@ class ODESolver:
         result = self._solve_forward(
             t, y0, params, friction_constants, block_constants, adjoint
         )
-        mu_hat = jnp.squeeze(result.ys.mu)  # type:ignore
+        mu_hat = jnp.squeeze(result.ys.mu)  # type: ignore
         return mu - mu_hat
 
     def max_likelihood_inversion(
@@ -277,18 +277,13 @@ class ODESolver:
         is recommended.
         """
 
-        if verbose:
-            verbose_opts = frozenset(["step", "loss"])
-        else:
-            verbose_opts = frozenset([])
-
         options = {"autodiff_mode": "fwd"}
 
         _residuals = lambda params, mu: self._residuals(
             params, t, mu, y0, friction_constants, block_constants
         )
 
-        lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose_opts)
+        lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose)
         sol = optx.least_squares(
             _residuals,
             lm_solver,
@@ -395,7 +390,7 @@ class ODESolver:
 
         # Instantiate optimiser
         opt = optax.adam(learning_rate=self.learning_rate)
-        opt_state = opt.init(log_particles)  # type:ignore
+        opt_state = opt.init(log_particles)  # type: ignore
 
         forward_fn = partial(
             self._forward_wrapper_SVI,
@@ -431,7 +426,7 @@ class ODESolver:
 
         carry = (log_particles, opt_state)
         _, (loss, nan_count, states) = lax.scan(
-            body_fun, carry, jnp.arange(Nsteps)  # type:ignore
+            body_fun, carry, jnp.arange(Nsteps)  # type: ignore
         )
 
         return BayesianSolution(states, loss, nan_count)

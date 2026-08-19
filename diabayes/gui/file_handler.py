@@ -2,13 +2,14 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 from flask import Flask
 
 
 class FileHandler:
 
-    data_file: Path | str | None = None
-    data: np.ndarray | None = None
+    data_file: Path | None = None
+    data: pd.DataFrame | None = None
     app: Flask | None = None
 
     def __init__(self) -> None:
@@ -17,7 +18,16 @@ class FileHandler:
     def init_app(self, app: Flask) -> None:
         app.extensions["file_handler"] = self
         self.app = app
-        self.data_file = os.path.join(app.config["UPLOAD_FOLDER"], "data.npy")
+        upload_dir = app.config["UPLOAD_FOLDER"]
+        assert (upload_dir is not None) and len(upload_dir) > 0
+        try:
+            data_file = Path(upload_dir) / "data.csv"
+            if data_file.is_file():
+                self.data_file = data_file
+        except Exception as e:
+            # Unfortunately, the logger is not yet initialised at this point...
+            print(e)
+            pass
 
     def save(self, file) -> bool:
 
@@ -49,13 +59,13 @@ class FileHandler:
     def check_data_exists(self):
         if self.data_file == None:
             return False
-        return os.path.isfile(self.data_file)
+        return self.data_file.is_file()
 
     def load_data(self):
         assert self.app is not None
         assert self.data_file is not None
         self.app.logger.debug("Loading data...")
-        self.data = np.load(self.data_file)
+        self.data = pd.read_csv(self.data_file)
         return self.data
 
     def clear_all(self):
@@ -63,7 +73,7 @@ class FileHandler:
         assert self.app is not None
         assert data_file is not None
         # Check that a file path is set and that the file exists
-        if data_file and os.path.isfile(data_file):
+        if data_file and data_file.is_file():
             os.remove(data_file)
             self.app.logger.debug(f"Deleted {data_file}")
 
@@ -71,7 +81,7 @@ class FileHandler:
         # TODO: expand initial checks
         try:
             data = self.load_data()
-            assert isinstance(data, np.ndarray)
+            assert isinstance(data, pd.DataFrame)
             return True
         except Exception as e:
             print(e)

@@ -12,7 +12,26 @@ https://colab.research.google.com/github/martijnende/diabayes/blob/main/examples
 
 ## Example usage
 
+### Jupyter notebooks
+
 See `examples/simple_example.ipynb` for a self-contained Jupyter notebook that illustrates forward and inverse modelling.
+
+### Using the GUI
+
+DiaBayes comes with a web-based GUI that exposes a number of basic features, like data visualisation, forward modelling, and inversion, using the more conventional friction models.
+This GUI persistently stores its environment state so that you can resume the analysis over consecutive sessions.
+You can also export and share this environment state, for example as a supplementary material to a publication.
+
+To enable the GUI, make sure to install it first (see the next section).
+Then, to initialise a workspace, execute:
+```bash
+cd /path/to/workspace
+diabayes init .  # Initialise the environment (run only once per environment)
+diabayes run     # Start the GUI server
+```
+Point your browser at the URL printed after the `run` command (default: `http://127.0.0.1:5000`).
+
+The `init` command will produce a default `workspace.toml` file with settings that can be adjusted by the user (requires relaunching the server to take effect).
 
 ## Installation
 
@@ -52,6 +71,12 @@ When working from a different workspace directory, you can instruct UV to use a 
 ```bash
 export VIRTUAL_ENV="/path/to/diabayes/.venv/"   # For bash, zsh, ...
 set -gx VIRTUAL_ENV "/path/to/diabayes/.venv/"  # For fish
+```
+You can then run the DiaBayes GUI from a different workspace directory as:
+```bash
+cd /path/to/workspace
+uv run diabayes init .
+uv run diabayes run
 ```
 
 ### A note on GPU support
