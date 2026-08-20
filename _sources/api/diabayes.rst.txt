@@ -1,6 +1,14 @@
 diabayes package
 ================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   diabayes.gui
+
 Submodules
 ----------
 
@@ -9,37 +17,37 @@ diabayes.SVI module
 
 .. automodule:: diabayes.SVI
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 diabayes.forward\_models module
 -------------------------------
 
 .. automodule:: diabayes.forward_models
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 diabayes.solver module
 ----------------------
 
 .. automodule:: diabayes.solver
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 diabayes.typedefs module
 ------------------------
 
 .. automodule:: diabayes.typedefs
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: diabayes
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
