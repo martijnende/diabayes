@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiaBayes</title>
+  <link href="{{ url_for('static', filename='css/bootstrap-5.3.3.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/bootstrap-icons-1.11.3.min.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/bootstrap-5.3.3.bundle.min.js') }}" charset="utf-8"></script>
+  <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}" charset="utf-8"></script>
+  <script src="{{ url_for('static', filename='js/socket.io-4.8.3.min.js') }}" charset="utf-8"></script>
+  <script src="{{ url_for('static', filename='js/bokeh-3.10.0.min.js') }}" charset="utf-8"></script>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+
+<body class="d-flex flex-column vh-100 overflow-hidden">
+
+  <!-- Main navigation -->
+  <header>
+    <div class="logo">DiaBayes</div>
+    <nav class="navbar">
+      <ul class="nav-links">
+        <li><i class="bi bi-bookmark-check-fill"></i><a href="https://docs.diabayes.science">Documentation</a></li>
+        <li><i class="bi bi-bug-fill"></i><a href="https://github.com/martijnende/diabayes/issues">Report a bug</a></li>
+        <li><i class="bi bi-github"></i><a href="https://github.com/martijnende/diabayes">GitHub</a></li>
+      </ul>
+    </nav>
+  </header>
+  <!-- End main navigation -->
+
+  <!-- Main content -->
+  <main class="row vh-100">
+
+    <section class="col-6 col-xxl-4 bg-light p-3 scroll-container">
+
+      <!-- Data upload -->
+      <div class="row ps-3">
+        <div class="col input-group" id="file-upload-group">
+          <input type="file" class="form-control" id="data-file" {% if data_ready %}disabled{% endif %}>
+          <label class="input-group-text" for="data-file">Import data (.npy) or project (.dbproj)</label>
+        </div>
+      </div>
+
+      <div class="row mt-2 ps-3" id="data-controls">
+        <div class="col d-flex justify-content-end gap-2">
+          <!-- Clear logs button -->
+          <button class="btn btn-warning" id="clear-logs" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Remove all log entries">
+            <i class="bi bi-file-earmark-x"></i> Clear logs
+          </button>
+          <!-- Clear data button -->
+          <button class="btn btn-warning" id="clear-data" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Remove lab data (not v-steps)"{% if not data_ready %}disabled{% endif %}>
+            <i class="bi bi-graph-up"></i> Clear data
+          </button>
+          <!-- Clear database button -->
+          <button class="btn btn-warning" id="clear-db" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Remove logs and v-steps (not data)">
+            <i class="bi bi-database-exclamation"></i> Clear database
+          </button>
+        </div>
+      </div>
+      <!-- End data upload -->
+
+      <div class="row divider"></div>
+
+      <!-- Vsteps -->
+      <div class="row mt-3 ps-3 vstep-row{% if not data_ready %} vstep-hidden{% endif %}">
+        <div class="col" id="vstep-container">
+          {% include "steps.html" %}
+        </div>
+      </div>
+
+      <!-- Add v-step button -->
+      <div class="row mt-3 ps-3 vstep-row{% if not data_ready %} vstep-hidden{% endif %}">
+        <div class="col">
+          <button type="button" class="btn btn-success" id="add-vstep">
+            <i class="bi bi-arrow-down"></i>
+            Add velocity step
+            <i class="bi bi-arrow-down"></i>
+          </button>
+        </div>
+      </div>
+      <!-- End vsteps -->
+    </section>
+
+    <!-- Plots -->
+    <section class="col-6 col-xxl-8 p-3">
+      <div id="bkapp">{{ bokeh_script | safe }}</div>
+    </section>
+    <!-- End plots -->
+
+  </main>
+  <!-- End main content-->
+
+  <!-- Footer -->
+  <footer class="row">
+    <!-- Logs -->
+    <div class="col-12 overflow-auto" id="log-container"></div>
+    <!-- End logs -->
+  </footer>
+  <!-- End footer -->
+
+</body>
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/logs.js') }}" charset="utf-8"></script>
+<script src="{{ url_for('static', filename='js/data_upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vsteps.js') }}"></script>
+{% endblock %}
+<script>
+  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+  $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip();
+  });
+</script>
+
+</html>

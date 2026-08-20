@@ -46,6 +46,30 @@ class TestSolvers:
         state_pred = params.Dc / block_constants.v_lp
         assert jnp.allclose(state_final, state_pred)
 
+    def test_forward_sequence(self):
+        """Test for a multi-step sequence simulation"""
+
+        variables, params, constants, block_constants = init_params()
+        forward = Forward(rsf, {"theta": ageing_law}, springblock)
+        solver = ODESolver(forward)
+
+        dt = 0.01
+        v0 = constants.v0
+        # Three steps at t = 10, 20, 35 seconds
+        t_steps = jnp.array([300.0, 600.0, 1000.0])
+        # v_steps = jnp.array([10 * v0, 0.1 * v0, v0])
+        v_steps = jnp.array([1.1 * v0, 0.9 * v0, v0])
+
+        result, t = solver.generate_sequence(
+            t_steps, v_steps, dt, variables, params, constants, block_constants
+        )
+        # Check that time vector is ok
+        assert jnp.isclose(t.min(), 0)
+        assert jnp.isclose(t.max(), t_steps[-1] - dt)
+        assert jnp.allclose(jnp.diff(t), dt)
+        # Friction should have returned to (initial) steady-state
+        assert jnp.isclose(result[-1].mu, variables.mu)
+
     def test_levenberg_marquardt(self):
         """
         Test for the Levenberg-Marquardt maximum-likelihood
@@ -84,8 +108,8 @@ class TestSolvers:
 
         assert result2 is not None
 
-        params_array = jax.flatten_util.ravel_pytree(params)[0]  # type:ignore
-        params_inv_array = jax.flatten_util.ravel_pytree(params_inv)[0]  # type:ignore
+        params_array = jax.flatten_util.ravel_pytree(params)[0]  # type: ignore
+        params_inv_array = jax.flatten_util.ravel_pytree(params_inv)[0]  # type: ignore
 
         # Check that inverted parameters and resulting friction
         # curves are identical to the original ones
