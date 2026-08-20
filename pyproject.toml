@@ -1,15 +1,15 @@
 [project]
 name = "diabayes"
-version = "0.1.0"
-requires-python = "> 3.0"
+version = "0.2.0"
+requires-python = ">= 3.12"
 authors = [
     { name = "Martijn van den Ende", email = "martijnende@gmail.com" },
 ]
 dependencies = [
-    "jax<=0.7.0",
+    "jax==0.10.0",
     "jax_tqdm",
     "jaxtyping",
-    "equinox",
+    "equinox==0.13.8",
     "diffrax",
     "optax",
     "optimistix",
@@ -18,11 +18,21 @@ dependencies = [
     "ipython",
     "jupyter",
     "pytest",
+    "pandas>=2.3.3",
 ]
 
 [project.optional-dependencies]
 dev = ["black", "isort", "twine"]
-gpu = ["jax[cuda12]<=0.7.0"]
+gpu = ["jax[cuda12]==0.10.0"]
+gui = [
+    "click",
+    "flask",
+    "Flask-Migrate",
+    "flask-sqlalchemy",
+    "flask-socketio",
+    "python-dotenv",
+    "bokeh==3.10.0",
+]
 docs = [
     "make",
     "myst-nb",
@@ -34,12 +44,15 @@ docs = [
     "sphinxcontrib-bibtex",
 ]
 
+[project.scripts]
+diabayes = "diabayes.gui.cli:cli"
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["diabayes"]
+packages = ["diabayes", "diabayes.gui"]
 
 [tool.isort]
 profile = "black"

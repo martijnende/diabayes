@@ -79,6 +79,9 @@ class Variables(eqx.Module):
     Users would typically not instantiate a ``Variables`` object
     directly; instead, it is created through the ``Forward.set_initial_values``
     method and retreived as ``Forward.variables``.
+
+    ``Variables`` supports item selection and slicing in various ways
+    (see ``Variables.__getitem__``).
     """
 
     mu: jax.Array
@@ -93,6 +96,48 @@ class Variables(eqx.Module):
         if name in self.state.keys:
             return self.state[name]
         raise AttributeError(f"{type(self).__name__} has no attribute {name!r}")
+
+    def __getitem__(self, key: str | int | slice) -> Any:
+        """
+        Select an item from the container. The behaviour changes depending on
+        the type of ``key``. For a string, ``__getitem__`` behaves as ``getattr``
+        and returns a specific variable as an array. For an integer or slice, it
+        returns a portion of the values of each variable as a new ``Variables``
+        object.
+
+        Examples
+        --------
+        >>> container = Variables(...)
+        >>> mu = container["mu"]
+        >>> init_vars = container[0]
+        >>> final_vars = container[-1]
+        >>> some_vars = container[slice(0, 10)]
+        >>> theta_mean = some_vars["theta].mean()
+        """
+
+        # If this method is used as a dict __getattr__, refer to
+        # the __getattribute__ method (which later redirects to __getattr__)
+        if isinstance(key, str):
+            return getattr(self, key)
+
+        # The other option is to select by integer or slice
+        if isinstance(key, int) or isinstance(key, slice):
+            mu = jnp.squeeze(self.mu)
+            state = self.state
+            # If mu is one-dimensional: only one value to select, so
+            # return everything as-is
+            if mu.ndim == 0:
+                return self
+
+            # If mu is a time series, select the requested values
+            mu = jnp.atleast_1d(mu[key])
+            state_keys = state.keys
+            state_vals = jnp.atleast_1d(jnp.atleast_2d(state.vals)[:, key])
+            state_dict = StateDict(keys=state_keys, vals=state_vals)
+
+            return type(self)(mu=mu, state=state_dict)
+
+        raise IndexError
 
     def set_values(self, **kwargs) -> "Variables":
         """
@@ -121,7 +166,7 @@ class Variables(eqx.Module):
         Convert the container values to a JAX array. The order of the output
         follows the order of `StateDict.keys`, with the first item being
         the friction coefficient. For ``n`` state variables, the output is
-        an array of shape ``(1+n,)`` for scalars, and ``(t, 1+n)`` for
+        an array of shape ``(1+n,)`` for scalars, and ``(1+n, t)`` for
         time series.
 
         Examples
@@ -152,7 +197,7 @@ class Variables(eqx.Module):
         elif mu.ndim == state.ndim == 1:
             return jnp.vstack([mu[None, :], state[None, :]])
         # Fourth case: mu is time series of scalars,
-        # state is time series of vectors (t, n)
+        # state is time series of vectors (n, t)
         # Result shape: (1+n, t)
         elif mu.ndim == 1 and state.ndim == 2:
             return jnp.vstack([mu[None, :], state])
@@ -180,6 +225,42 @@ class Variables(eqx.Module):
         # Map `state` to `keys`
         state_obj = StateDict(keys=keys, vals=state)
         return cls(mu=mu, state=state_obj)
+
+    def append(self, other: "Variables") -> "Variables":
+        """
+        Concatenate a second container object to the current one.
+        Since JAX arrays are immutable, it must return a new container object.
+
+        Examples
+        --------
+        >>> vars1 = Variables(...)
+        >>> vars2 = Variables(...)
+        >>> vars3 = vars1.append(vars2)
+        """
+
+        # Check that both containers share the same state variables
+        assert sorted(self.state.keys) == sorted(other.state.keys)
+
+        # Force the friction coefficients to be at least 1D arrays
+        mu1 = jnp.atleast_1d(self.mu)
+        mu2 = jnp.atleast_1d(other.mu)
+        mu = jnp.concatenate([mu1, mu2])
+
+        # Force the state arrays to be at least 2D arrays
+        state_vals = []
+
+        for key in self.state.keys:
+            state1 = jnp.atleast_1d(getattr(self, key))
+            state2 = jnp.atleast_1d(getattr(other, key))
+            state_vals.append(jnp.concatenate([state1, state2]))
+
+        state_vals = jnp.array(state_vals)
+
+        # Create the new StateDict
+        state_dict = StateDict(keys=self.state.keys, vals=state_vals)
+
+        # Return the new Variables object
+        return type(self)(mu=mu, state=state_dict)
 
 
 class Params(eqx.Module):
@@ -323,7 +404,7 @@ class ParamStatistics(eqx.Module):
     def from_state(cls, state):
         cov = jnp.cov(state.T)
         stats = tuple(Statistics.from_array(param) for param in state.T)
-        return cls(*(stats + (cov,)))  # type:ignore
+        return cls(*(stats + (cov,)))  # type: ignore
 
     def get(self, x: str) -> Statistics:
         return getattr(self, x)

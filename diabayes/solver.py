@@ -10,7 +10,7 @@ import jax.random as jr
 import optax
 import optimistix as optx
 from jax import lax
-from jax_tqdm import scan_tqdm  # type:ignore
+from jax_tqdm import scan_tqdm  # type: ignore
 from jaxtyping import Array, Float
 from scipy.integrate import solve_ivp
 
@@ -78,7 +78,7 @@ class ODESolver:
         friction_constants: _Constants,
         block_constants: _BlockConstants,
         method: str = "RK45",
-    ) -> Any:
+    ) -> Variables:
         """
         Solve a forward problem using SciPy's ``solve_ivp`` routine.
         While this routine doesn't propagate any gradients, it is
@@ -127,6 +127,85 @@ class ODESolver:
         assert result.y is not None
 
         return Variables.from_array(result.y, keys)
+
+    def generate_sequence(
+        self,
+        t_steps: Float[Array, "Nsteps"],
+        v_steps: Float[Array, "Nsteps"],
+        dt: Float,
+        y0: Variables,
+        params: _Params,
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
+        method: str = "RK45",
+    ) -> Tuple[Variables, Float[Array, "Nt"]]:
+        """
+        Solve the forward problem for a sequence of velocity steps.
+        For each load-point velocity in `v_steps`, a forward simulation
+        is run using the previous step's final state as the initial state.
+
+        This routine can be used to generate a sequence of (up/down)
+        velocity steps, or a slide-hold-slide sequence (by setting a given
+        v_step to zero).
+
+        Parameters
+        ----------
+        t_steps : Float[Array, "Nsteps"]
+            A vector of change point times of each step in the sequence
+        v_steps : Float[Array, "Nsteps"]
+            A vector of the load-point velocity values for each step
+            in the sequence
+        dt : Float
+            The desired time sample spacing of the solution
+        y0 : Variables
+            The initial values (fricton and state) wrapped in a
+            `Variables` container.
+        params : _Params
+            The (invertible) parameters that govern the dynamics,
+            wrapped in a `Params` container.
+        friction_constants : _Constants
+            A container object containing the friction constants
+        block_constants : _BlockConstants
+            A container object containing the block constants. Note
+            that the load-point velocity will be updated for each step
+
+        Returns
+        -------
+        result : Variables
+            Solution time series of friction and state
+        t : Float[Array, "Nt"]
+            Solution time samples
+        """
+
+        t_start = 0.0
+
+        # Loop over velocity-steps
+        for i, (t_stop, v) in enumerate(zip(t_steps, v_steps)):
+            # Update load-point velocity
+            block_dict = block_constants.__dict__
+            block_dict["v_lp"] = float(v)
+            block_constants = type(block_constants)(**block_dict)
+            # Define time vector
+            t_i = jnp.arange(t_start, t_stop, dt)
+            # Solve forward problem
+            result_i = self.solve_forward(
+                t_i, y0, params, friction_constants, block_constants, method
+            )
+            # Append results
+            if i == 0:
+                result = result_i
+                t = t_i
+            else:
+                result = result.append(result_i)
+                t = jnp.concatenate([t, t_i])
+
+            # Increment start time
+            t_start = t_stop
+
+            # Update initial state
+            y0 = result_i[-1]
+
+        return result, t
 
     @eqx.filter_jit
     def _forward_wrapper(
@@ -220,7 +299,7 @@ class ODESolver:
         result = self._solve_forward(
             t, y0, params, friction_constants, block_constants, adjoint
         )
-        mu_hat = jnp.squeeze(result.ys.mu)  # type:ignore
+        mu_hat = jnp.squeeze(result.ys.mu)  # type: ignore
         return mu - mu_hat
 
     def max_likelihood_inversion(
@@ -277,18 +356,13 @@ class ODESolver:
         is recommended.
         """
 
-        if verbose:
-            verbose_opts = frozenset(["step", "loss"])
-        else:
-            verbose_opts = frozenset([])
-
         options = {"autodiff_mode": "fwd"}
 
         _residuals = lambda params, mu: self._residuals(
             params, t, mu, y0, friction_constants, block_constants
         )
 
-        lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose_opts)
+        lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose)
         sol = optx.least_squares(
             _residuals,
             lm_solver,
@@ -395,7 +469,7 @@ class ODESolver:
 
         # Instantiate optimiser
         opt = optax.adam(learning_rate=self.learning_rate)
-        opt_state = opt.init(log_particles)  # type:ignore
+        opt_state = opt.init(log_particles)  # type: ignore
 
         forward_fn = partial(
             self._forward_wrapper_SVI,
@@ -431,7 +505,7 @@ class ODESolver:
 
         carry = (log_particles, opt_state)
         _, (loss, nan_count, states) = lax.scan(
-            body_fun, carry, jnp.arange(Nsteps)  # type:ignore
+            body_fun, carry, jnp.arange(Nsteps)  # type: ignore
         )
 
         return BayesianSolution(states, loss, nan_count)
