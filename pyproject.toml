@@ -6,10 +6,10 @@ authors = [
     { name = "Martijn van den Ende", email = "martijnende@gmail.com" },
 ]
 dependencies = [
-    "jax<=0.7.0",
+    "jax==0.10.0",
     "jax_tqdm",
     "jaxtyping",
-    "equinox",
+    "equinox==0.13.8",
     "diffrax",
     "optax",
     "optimistix",
@@ -23,7 +23,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["black", "isort", "twine"]
-gpu = ["jax[cuda12]<=0.7.0"]
+gpu = ["jax[cuda12]==0.10.0"]
 gui = [
     "click",
     "flask",
