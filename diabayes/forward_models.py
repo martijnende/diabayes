@@ -90,7 +90,7 @@ def aging_law(*args, **kwargs):
 
 
 @eqx.filter_jit
-def porosity_func(
+def _porosity_func(
     variables: Variables, params: CNSParams, constants: CNSConstants
 ) -> Float:
     r"""
@@ -133,9 +133,13 @@ def cns(variables: Variables, params: CNSParams, constants: CNSConstants) -> Flo
     .. math::
 
         v(\mu, \phi) = v_{\text{gr}}(\mu, \phi) + v_{\text{creep}}(\mu, \phi)
+
         v_{\text{gr}} = v_0 \exp \left( \frac{\mu \left[1 - \mu_0 \tan \psi \right] - \mu_0 - \tan \psi}{a \left[ 1 + \mu \tan \psi \right]} \right)
+
         v_{\text{creep}} = h z \mu f(\phi)
+
         \tan \psi = 2 \alpha \left( \phi_c - \phi \right)
+
         f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
 
 
@@ -161,7 +165,7 @@ def cns(variables: Variables, params: CNSParams, constants: CNSConstants) -> Flo
     v_gr = params.v0 * jnp.exp(A / B)
 
     # Creep components
-    f_phi = porosity_func(variables, params, constants)
+    f_phi = _porosity_func(variables, params, constants)
     v_creep = constants.h * params.z * variables.mu * f_phi
 
     # Assembly
@@ -180,10 +184,15 @@ def cns_porosity(
     .. math::
 
         \frac{\mathrm{d}\phi}{\mathrm{d}t} = - \left(1 - \phi \right) \left(\dot{\varepsilon}_{\text{gr}} + \dot{\varepsilon}_{\text{creep}} \right)
+
         \dot{\varepsilon}_{\text{gr}} = - \frac{\tan \psi}{h} \left(v - v_{\text{creep}} \right)
+
         \dot{\varepsilon}_{\text{creep}} = z f(\phi)
+
         v_{\text{creep}} = h z f(\phi) \mu
+
         \tan \psi = 2 \alpha \left( \phi_c - \phi \right)
+
         f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
 
 
@@ -205,7 +214,7 @@ def cns_porosity(
     """
 
     # Creep components
-    f_phi = porosity_func(variables, params, constants)
+    f_phi = _porosity_func(variables, params, constants)
     e_creep = params.z * f_phi
     v_creep = constants.h * e_creep * variables.mu
 
