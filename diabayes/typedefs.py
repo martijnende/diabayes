@@ -314,14 +314,26 @@ class RSFConstants:
 
 
 class CNSParams(Params):
+    alpha: Float
+    """Geometric factor that controls dilatation by granular flow [-]"""
     phi_c: Float
-    Z: Float
+    """Critical-state (maximum) porosity [-]"""
+    z: Float
+    """Rate parameter of the creep process (divided by the normal stress) [1/s]"""
+    mu0: Float
+    """Reference friction for the granular flow process [-]"""
+    v0: Float
+    """Reference velocity for the granular flow process [m/s]"""
+    a: Float
+    """Direct effect parameter for the granular flow process [-]"""
 
 
 @dcs.dataclass(frozen=True)
 class CNSConstants:
-    phi_c: Float
-    Z: Float
+    h: Float
+    """Gouge layer thickness (ignoring localisation) [m]"""
+    phi0: Float
+    """Lower cut-off porosity [-]"""
 
 
 @dcs.dataclass(frozen=True)
