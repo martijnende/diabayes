@@ -1,7 +1,7 @@
 [project]
 name = "diabayes"
 version = "0.1.0"
-requires-python = ">= 3.9"
+requires-python = ">= 3.12"
 authors = [
     { name = "Martijn van den Ende", email = "martijnende@gmail.com" },
 ]
@@ -31,7 +31,7 @@ gui = [
     "flask-sqlalchemy",
     "flask-socketio",
     "python-dotenv",
-    "bokeh",
+    "bokeh==3.10.0",
 ]
 docs = [
     "make",

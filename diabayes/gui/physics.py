@@ -5,6 +5,8 @@ from diabayes.solver import ODESolver
 
 def data_are_valid(start, stop, fields):
 
+    assert fields is not None
+
     # At this point, fields["t"] must exist
     assert fields.get("t") is not None
     assert fields.get("mu") is not None

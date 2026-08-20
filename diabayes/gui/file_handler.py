@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 from flask import Flask
 
@@ -20,14 +19,7 @@ class FileHandler:
         self.app = app
         upload_dir = app.config["UPLOAD_FOLDER"]
         assert (upload_dir is not None) and len(upload_dir) > 0
-        try:
-            data_file = Path(upload_dir) / "data.csv"
-            if data_file.is_file():
-                self.data_file = data_file
-        except Exception as e:
-            # Unfortunately, the logger is not yet initialised at this point...
-            print(e)
-            pass
+        self.data_file = Path(upload_dir) / "data.csv"
 
     def save(self, file) -> bool:
 
@@ -78,10 +70,17 @@ class FileHandler:
             self.app.logger.debug(f"Deleted {data_file}")
 
     def _check_before_save(self) -> bool:
-        # TODO: expand initial checks
         try:
             data = self.load_data()
-            assert isinstance(data, pd.DataFrame)
+            assert isinstance(data, pd.DataFrame), "Not a Pandas DataFrame"
+            # Make sure that at least these quantities exist
+            assert set(
+                (
+                    "t",
+                    "mu",
+                    "v_lp",
+                )
+            ).issubset(set(data.columns)), f"Incorrect columns: {data.columns}"
             return True
         except Exception as e:
             print(e)

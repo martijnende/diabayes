@@ -70,6 +70,9 @@ def run():
             port=5006,
             io_loop=io_loop,
             session_token_expiration=3600,
+            # Prevent stale sessions from piling up...
+            check_unused_sessions_milliseconds=17000,
+            unused_session_lifetime_milliseconds=15000,
         )
         app.extensions["plot_handler"].server = bokeh_server
         bokeh_server.start()

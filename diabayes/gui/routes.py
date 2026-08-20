@@ -1,6 +1,8 @@
 from time import time
 
 import numpy as np
+from scipy.integrate import cumulative_simpson
+from typing import Dict, Any
 from bokeh.client import pull_session
 from bokeh.embed import server_session
 from flask import Blueprint, current_app, jsonify, render_template, request
@@ -100,7 +102,9 @@ def update_step():
     # Instead of manually manipulating each quantity,
     # loop over a dictionary instead
     field_names = ("v0", "v1", "mu0", "k", "a", "b", "Dc")
-    fields = {key: request.form.get(key, type=float) for key in field_names}
+    fields: Dict[str, float | np.ndarray | Any] | None = {
+        key: request.form.get(key, type=float) for key in field_names
+    }
 
     # Action 1: add a new v-step
     if action == "add":
@@ -224,9 +228,19 @@ def update_step():
 
         # If data is not None, then it must be of len > 0
         assert len(data) > 0
-        fields["t"] = app.extensions["file_handler"].data[0]
-        fields["x"] = app.extensions["file_handler"].data[1]
-        fields["mu"] = app.extensions["file_handler"].data[2]
+        fields["t"] = np.array(data.t)
+        fields["mu"] = np.array(data.mu)
+        # Check if the DataFrame has a displacement column
+        if hasattr(data, "x"):
+            fields["x"] = np.array(data.x)
+        # If not, integrate from velocity
+        elif hasattr(data, "v"):
+            fields["x"] = cumulative_simpson(y=data.v, x=data.t, initial=0)
+        else:
+            app.logger.error(
+                "Either displacement (`x`) or sample velocity (`v`) need to be provided"
+            )
+            fields = None
 
         # Check that all data are valid
         if data_are_valid(start, stop, fields):
@@ -280,9 +294,11 @@ def update_step():
                 app.logger.debug(f"Ran forward model in {dt:.2f} seconds")
 
             # Plot friction curves
+            # Types are ignored because data_are_valid already checks that
+            # fields["t"] and fields["x"] are not None
             plot_fields = {
-                "t": fields["t"][start:stop],
-                "x": fields["x"][start] + x * 1e3,
+                "t": fields["t"][start:stop],  # type: ignore
+                "x": fields["x"][start] + x * 1e3,  # type: ignore
                 "mu": friction,
                 "v": v,
             }
