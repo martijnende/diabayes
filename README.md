@@ -1,6 +1,6 @@
 # DiaBayes: rock friction inversion tools
 
-[![GitHub Release](https://img.shields.io/github/release/martijnende/diabase.svg?style=flat)]() 
+[![GitHub Release](https://img.shields.io/github/v/release/martijnende/diabayes)]() 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
 https://colab.research.google.com/github/martijnende/diabayes/blob/main/examples/google_colab.ipynb)
 [![tests](https://github.com/martijnende/diabayes/actions/workflows/python-test.yml/badge.svg)](https://github.com/martijnende/diabayes/actions/workflows/python-test.yml)
