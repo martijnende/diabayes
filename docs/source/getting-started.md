@@ -50,7 +50,7 @@ Here is an example of a classical rate-and-state friction model combined with th
 ```python
 from diabayes.forward_models import Forward, rsf, ageing_law, springblock
 state_dict = {"theta": ageing_law}
-forward = Forward(friction_model=rsf, state_evolution=state_dict, block_type=springblock)
+forward = Forward(friction_model=rsf, state_evolution=state_dict, stress_transfer=springblock)
 ```
 The `rsf` friction model uses only a single state variable (`theta`), but other friction models could accept several. The structure of the `state_dict` is `{"variable_name1": variable_evolution1, "variable_name2": variable_evolution2, ...}`. In other words, every state variable has a unique name and exactly one function that describes the evolution of this variable. The variable names need to correspond with what is expected by the friction law; see the documentation of each friction law for a description.
 
