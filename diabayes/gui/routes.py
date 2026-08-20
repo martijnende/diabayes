@@ -298,7 +298,7 @@ def update_step():
             # fields["t"] and fields["x"] are not None
             plot_fields = {
                 "t": fields["t"][start:stop],  # type: ignore
-                "x": fields["x"][start] + x * 1e3,  # type: ignore
+                "x": fields["x"][start] + x,  # type: ignore
                 "mu": friction,
                 "v": v,
             }

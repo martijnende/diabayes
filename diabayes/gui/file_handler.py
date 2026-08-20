@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from scipy.integrate import cumulative_simpson
+
 import pandas as pd
 from flask import Flask
 
@@ -58,6 +60,11 @@ class FileHandler:
         assert self.data_file is not None
         self.app.logger.debug("Loading data...")
         self.data = pd.read_csv(self.data_file)
+        if "x" not in self.data.columns:
+            # If no sample displacement, integrate sample displacement rate
+            self.data["x"] = cumulative_simpson(
+                y=self.data.v, x=self.data.t, initial=0.0
+            )
         return self.data
 
     def clear_all(self):
@@ -70,6 +77,11 @@ class FileHandler:
             self.app.logger.debug(f"Deleted {data_file}")
 
     def _check_before_save(self) -> bool:
+        """
+        TODO:
+        - Do more extensive checking for columns
+        - Sample displacement is optional?
+        """
         try:
             data = self.load_data()
             assert isinstance(data, pd.DataFrame), "Not a Pandas DataFrame"
@@ -81,6 +93,9 @@ class FileHandler:
                     "v_lp",
                 )
             ).issubset(set(data.columns)), f"Incorrect columns: {data.columns}"
+            if "x" not in data.columns:
+                # If no sample displacement, integrate sample displacement rate
+                assert "v" in data.columns
             return True
         except Exception as e:
             print(e)

@@ -124,10 +124,10 @@ class PlotHandler:
 
                 # Update data sources
                 def update_friction():
-                    src1.data = dict(x=np.array(data.t), y=np.array(data.mu))
+                    src1.data = dict(x=np.array(data.x), y=np.array(data.mu))
 
                 def update_velocity():
-                    src2.data = dict(x=np.array(data.t), y=np.array(data.v_lp))
+                    src2.data = dict(x=np.array(data.x), y=np.array(data.v_lp))
 
                 return update_friction, update_velocity
 
@@ -231,9 +231,9 @@ class PlotHandler:
         current_sessions = self.server.get_sessions("/")
         assert len(current_sessions) > 0, "Session not initialised"
 
-        empty_data = namedtuple("empty", ("t", "mu", "v_lp"))
+        empty_data = namedtuple("empty", ("x", "mu", "v_lp"))
         empty = np.array([], dtype=float)
-        self.plot(empty_data(mu=empty.copy(), t=empty.copy(), v_lp=empty.copy()))
+        self.plot(empty_data(mu=empty.copy(), x=empty.copy(), v_lp=empty.copy()))
 
         curve_ids = set()
 
