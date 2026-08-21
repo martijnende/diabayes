@@ -1,12 +1,15 @@
 from functools import partial
 
+import jax
+
+jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 
 import diabayes as db
 import diabayes.forward_models as db_models
 from diabayes.typedefs import StateDict
 
-from .aux import init_params
+from .aux import init_params, init_params_cns
 
 
 class TestForwardModels:
@@ -37,6 +40,34 @@ class TestForwardModels:
         variables2 = db.Variables(mu=variables.mu, state=state_obj)
         v = db_models.rsf(variables2, params, constants)
         assert jnp.allclose(v, 0.0)
+
+    def test_cns(self):
+
+        variables, params, constants, block_constants = init_params_cns()
+
+        mu = variables.mu
+        phi = variables.phi
+        keys = ("mu",) + variables.state.keys
+
+        # Steady-state tests
+
+        # Steady-state porosity
+        for i, v in enumerate(10 ** jnp.linspace(-20, 5, 10)):
+
+            # Analytic solution for steady-state porosity
+            Z = constants.h * params.z / v
+            A = 2 * params.alpha * (params.phi_c - constants.phi0)
+            B = (A * mu - 1) * Z / (1 + mu * Z)
+            tan_psi_ss = 0.5 * B * (1 - jnp.sqrt(1 + 4 * A / (B * (A * mu - 1))))
+            phi_ss = params.phi_c - tan_psi_ss / (2 * params.alpha)
+
+            variables2 = db.Variables.from_array(jnp.array([mu, phi_ss]), keys=keys)
+
+            # Compare steady-state phi (i.e., dphi = 0) with analytical benchmark
+            phi_dot = db_models.cns_porosity(v, variables2, params, constants)
+            assert jnp.isclose(
+                phi_dot, 0.0, atol=1e-6, rtol=constants.h / v
+            ), f"{phi_dot=}, tol={1e-6 / (1 + constants.h / v)}, {phi_ss=}"
 
     def test_spring_block(self):
 
