@@ -29,7 +29,7 @@ def init_params():
 
 def init_params_cns():
 
-    h = 1e-2
+    h = 1e-3
     phi0 = 0.03
 
     k = 1e3

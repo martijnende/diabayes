@@ -285,6 +285,11 @@ class Params(eqx.Module):
         key = dcs.fields(self)[0].name
         return len(getattr(self, key))
 
+    def __repr__(self):
+        return ", ".join(
+            f"{key.name}={float(getattr(self, key.name))}" for key in dcs.fields(self)
+        )
+
     def to_array(self):
         return jnp.squeeze(jnp.array(jax.tree_util.tree_flatten(self)[0]))
 
@@ -352,7 +357,7 @@ class InertialSpringBlockConstants:
 # These typedefs should only be used for type checking,
 # and should not be instantiated.
 _Params = Union[RSFParams, CNSParams]
-_Constants = Union[RSFConstants]
+_Constants = Union[RSFConstants, CNSConstants]
 _BlockConstants = Union[SpringBlockConstants, InertialSpringBlockConstants]
 BC = TypeVar("BC", bound=_BlockConstants, contravariant=True)
 

@@ -225,7 +225,7 @@ def cns_porosity(
     # Assembly
     dphi = -(1 - variables.phi) * (e_gr + e_creep)
 
-    return dphi
+    return jnp.squeeze(dphi)
 
 
 @eqx.filter_jit
@@ -421,7 +421,7 @@ class Forward(Generic[BC]):
             Key-value pairs of variable names and corresponding values
 
         """
-        scalars = {k: float(jnp.asarray(v).item()) for k, v in kwargs.items()}
+        scalars = {k: float(jnp.atleast_1d(v).item()) for k, v in kwargs.items()}
         self.variables = self.variables.set_values(**scalars)
 
     @eqx.filter_jit
