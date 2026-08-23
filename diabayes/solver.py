@@ -279,6 +279,7 @@ class ODESolver:
             args=args,
             stepsize_controller=controller,
             adjoint=adjoint,
+            throw=False,  # Essential for Bayesian (batch) optimisation
         )
 
         assert sol is not None
@@ -470,9 +471,9 @@ class ODESolver:
         friction models.
         """
 
-        assert isinstance(
-            params, RSFParams
-        ), "Bayesian inversion is only implemented for RSF"
+        # assert isinstance(
+        #     params, RSFParams
+        # ), "Bayesian inversion is only implemented for RSF"
 
         if rng is None:
             key = jr.PRNGKey(time_ns())
@@ -490,7 +491,7 @@ class ODESolver:
         log_params = jnp.log(params.to_array())
 
         # Sample particles from a log-normal distribution
-        log_particles = RSFParams.generate(
+        log_particles = type(params).generate(
             N=Nparticles, loc=log_params, scale=scale, key=split_key
         )
 
