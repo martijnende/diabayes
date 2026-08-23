@@ -311,7 +311,9 @@ class ODESolver:
         friction_constants: _Constants,
         block_constants: _BlockConstants,
         verbose: bool = False,
-    ) -> optx.Solution:
+        retries: int = 3,
+        seed: int = 42,
+    ) -> optx.Solution | None:
         r"""
         Minimises the least-squares residuals between the observed friction
         curve and the parameterised one, using the Levenberg-Marquardt
@@ -339,21 +341,20 @@ class ODESolver:
         verbose : bool
             Whether or not to output detailed progress of the inversion.
             Defaults to ``False``
+        retries : int
+            The maximum number of inversion attempts. When the inversion fails
+            to converge, it will retry up to ``retries`` times with randomly
+            perturbed initial parameters.
+        seed : int
+            Seed for the random number generator. This is only used when the
+            initial inversion attempt fails, and the initial parameters are
+            randomly perturbed before the next attempt.
 
         Returns
         -------
         sol : optimistix.Solution
             The inversion result, including various diagnostics. The
             inverted parameter values can be accessed as ``sol.values``
-
-        Notes
-        -----
-        If an error is produced in the first iteration step, it is quite
-        possible that the initial guess parameters were too far off from
-        the "true" values (i.e., the mismatch between the observed and
-        modelled friction curves is too large), breaking the Gauss-Newton
-        step of the Levenberg-Marquardt algorithm. Initial manual tuning
-        is recommended.
         """
 
         options = {"autodiff_mode": "fwd"}
@@ -363,13 +364,39 @@ class ODESolver:
         )
 
         lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose)
-        sol = optx.least_squares(
-            _residuals,
-            lm_solver,
-            params,
-            args=mu,
-            options=options,
-        )
+
+        key = jr.PRNGKey(seed)
+
+        sol = None
+
+        for i in range(retries):
+
+            try:
+                sol = optx.least_squares(
+                    _residuals,
+                    lm_solver,
+                    params,
+                    args=mu,
+                    options=options,
+                )
+            except eqx.EquinoxRuntimeError:
+                print(
+                    f"[Attempt {(i+1)}/{retries}] Inversion failed. Retrying with randomised initial parameters..."
+                )
+                key, split_key = jr.split(key)
+                param_vals = params.to_array()
+                jitter = jr.normal(split_key, shape=param_vals.shape)
+                scale = (
+                    0.1 * param_vals
+                )  # Standard deviation equal to 10% of current value
+                param_vals = param_vals + scale * jitter
+                # Recreate params and retry
+                params = type(params).from_array(param_vals)
+
+        if sol is None:
+            print(
+                f"Inversion failed {retries} attempts. Increase the value of `retries` or check the stability of the forward model"
+            )
 
         return sol
 
