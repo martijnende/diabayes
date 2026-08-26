@@ -1,5 +1,93 @@
 # Chen-Niemeijer-Spiers
 
-```{admonition} Future work
-To be written
+One major limitation of the rate-and-state friction (RSF) model, is that it is a purely empirical framework.
+There have been numerous efforts to explain the origins of the (logarithmic) dependencies on time, slip rate, and slip as originally proposed, and yet it has proven difficult to come up with a physical mechanism that correctly describes the wide range of frictional phenomena.
+For example, the RSF parameters $a$, $b$, and $D_c$ are presumed to be independent of the instantaneous slip rate, which would give a constant value of the rate dependence $(a - b)$, even though steady-state experiments show that this is far from true (see e.g. Fig. 1 in the section on [friction experiments](../friction_experiments)).
+
+Since this kind of behaviour is essential for the dynamics of earthquake nucleation and rupture, a model based on physical principles would give us much more confidence when trying to extrapolate laboratory observations to natural faults.
+This is, in a nutshell, the motivation for the models proposed by _Niemeijer & Spiers_{footcite}`niemeijer2006` and _Chen & Spiers_{footcite}`chen2016`, denoted collectively as the _Chen-Niemeijer-Spiers_ (CNS) model. The remainder of this section will focus on the mathematical formulations rather than the physical processes. For an extensive summary of these models and the experimental observations that preceded them, see _Verberne et al._{footcite}`verberne2020`.
+
+## Original formulation
+
+Just like for the RSF model, the original CNS formulation comprises a friction law (i.e., fault slip rate as a function of stress and other variables) and a state evolution law. While for the RSF model the "state" is a somewhat nebulous concept, in the CNS framework the state is taken as the fault gouge porosity.
+This is one of the main advantages of the CNS model: since porosity is a well-defined observable, we can directly see and measure the "state" of a fault in the lab and in rock samples, and we have a clear sense for what controls the evolution of it.
+
+Without going into the derivations, the friction law of the CNS model is written as resulting from the added (parallel) shear rate contributions of granular flow ($\dot{\gamma}_{\text{gr}}$) and a creep process ($\dot{\gamma}_{\text{creep}}$) operating within a gouge layer of thickness $h$:
+```{math}
+\begin{split}
+v(\tau, \phi) = h \left( \dot{\gamma}_{\text{gr}} + \dot{\gamma}_{\text{creep}} \right) \\
+\dot{\gamma}_{\text{gr}} = \dot{\gamma}_0 \exp \left( \frac{\tau \left[ 1 - \mu_0 \tan \psi \right] - \sigma \left[ \mu_0 + \tan \psi \right]}{\alpha \left[\sigma + \tau \tan \psi \right]} \right) \\
+\dot{\gamma}_{\text{creep}} = Z \tau f(\phi)
+\end{split}
+```
+In these equations, $\tau$ denotes the instantaneous shear stress, $\sigma$ the effective normal stress, $\phi$ the gouge porosity, $\alpha$ a parameter that is similar to the RSF parameter $a$, $\dot{\gamma}_0$ and $\mu_0$ co-dependent parameters similarly defined as the RSF $v_0$ and $\mu_0$, and $Z$ the rate parameter of the creep process.
+The two remaining terms are defined as:
+```{math}
+\begin{split}
+\tan \psi = 2 \beta \left( \phi_c - \phi \right) \\
+f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
+\end{split}
+```
+The first equation is known in the soil mechanics literature as the _dilatancy angle_, and it controls how much an over-consolidated gouge dilates for an increment of shear strain. It introduces two new parameters, $\beta$ being a geometric constant of order 1, and $\phi_c$ the _critical state porosity_ (the highest possible porosity that a granular gouge can support).
+The second equation describes how the nominally imposed stress ($\tau, \sigma$) translates into the average stress supported by individual grain contacts, and can therefore be seen as a porosity-dependent stress amplification factor.
+The parameter $\phi_0$ determines the lowest possible porosity (typically ~3%), such that $\phi_0 < \phi < \phi_c$ at all times.
+There exist variations to these equations, but these are the ones that are quite convenient for numerical modelling.
+
+Lastly, the state (porosity) evolution law captures the competition of slip-dependent dilatancy caused by granular flow versus time-dependent compaction caused by creep, resulting in both slip and time-dependent state evolution:
+```{math}
+\begin{split}
+\frac{\mathrm{d} \phi}{\mathrm{d} t} = -\left( 1 - \phi \right) \left( \dot{\varepsilon}_{\text{gr}} + \dot{\varepsilon}_{\text{creep}} \right) \\
+\dot{\varepsilon}_{\text{gr}} = - \tan \psi \dot{\gamma}_{\text{gr}} \\
+\dot{\varepsilon}_{\text{creep}} = Z \sigma f(\phi)
+\end{split}
+```
+Admittedly, these equations seem a lot more complicated than the original RSF formulation, but in return, the CNS model produces a wealth of frictional sliding behaviours that RSF cannot reproduce, which makes the extra effort worth it.
+Moreover, there are a few more tweaks that can be applied to obtain a more digestible set of equations and parameters.
+
+## DiaBayes modifications
+
+Without loss of generality, _DiaBayes_ makes several symbolic adjustments to simplify the numerical implementation and to reduce the number of unconstrained parameters for inversion.
+Firstly, all stresses are normalised by $\sigma$, distances by $h$, and time is normalised as $t' = \dot{\gamma}_0 t = t v_0 h^{-1}$, which gives:
+```{math}
+\begin{split}
+v'(\mu, \phi) = \exp \left( \frac{\mu \left[ 1 - \mu_0 \tan \psi \right] - \left[ \mu_0 + \tan \psi \right]}{\alpha \left[1 + \mu \tan \psi \right]} \right) + \xi \mu f(\phi) \\
+\frac{\mathrm{d} \phi}{\mathrm{d} t'} = -\left( 1 - \phi \right) \left(- \tan \psi \left[ v' - \xi \mu f(\phi) \right] + \xi f(\phi) \right)
+\end{split}
+```
+with $\xi = h Z \left(v_0 \sigma \right)^{-1}$.
+
+From this normalisation exercise, we can easily count the number of invertible (non-dimensional) parameters: $\alpha$, $\beta$, $\mu_0$, $\xi$, and $\phi_c$, assuming that $\phi_0$ is a known constant that is sufficiently small (a few per cent) to not matter.
+Comparing this to RSF, which has the governing parameters $a$, $b$, and $D_c$, the symbolic complexity of the CNS model doesn't seem excessive, especially considering that RSF also requires $\mu_0$ and $v_0$ to be determined for absolute friction values.
+However, in contrast to typical RSF inversion practice, $\mu_0$ cannot generally be interpreted as the "initial" friction, e.g. at the start of a velocity step.
+This is because the CNS model considers two independent physical processes (granular flow and viscous creep) that both contribute to the slip rate, and correspondingly friction, while $\mu_0$ is exclusively a property of granular flow.
+However, for the range of fault slip rates in which granular flow dominates ($\dot{\gamma}_{\text{gr}} \gg \dot{\gamma}_{\text{creep}}$), $\mu_0$ can reasonably be interpreted as an initial or reference friction value.
+
+## Numerical solution strategy
+
+In addition to the normalisation described above, _DiaBayes_ has another trick up its sleeve to improve numerical stability of the numerical integration of the ODE.
+Due to the functional form of $f(\phi) \propto \left(\phi_c - \phi \right)^{-1}$, having a singularity at $\phi = \phi_c$, numerical integrators tend to struggle to correctly resolve the ODE when $\phi$ approaches $\phi_c$ (from below).
+In other words, the conventional CNS formulation is [numerically stiff](https://en.wikipedia.org/wiki/Stiff_equation).
+Fortunately, a simple change of variables eliminates the singularity; define $t' = \left(\phi_c - \phi \right) r$ giving:
+```{math}
+\begin{split}
+\frac{\mathrm{d} \phi}{\mathrm{d} r} &= \frac{\mathrm{d} t'}{\mathrm{d} r} \frac{\mathrm{d} \phi}{\mathrm{d} t'} \\
+&= -\left( 1 - \phi \right) \left(- \tan \psi \left[ v' \left(\phi_c - \phi \right) - \xi \mu \left( \phi - \phi_0 \right) \right] + \xi \left[ \phi - \phi_0 \right] \right)
+\end{split}
+```
+Let it be clear that this expression no longer has any singularities.
+Such a manipulation is known as a _Sundman transformation_, and it is commonly used when dealing with planetary orbits to avoid the gravity singularity.
+The flip-side is that the ODE is now expressed as a function of $r$ and not $t$, and so it is not immediately obvious what the integration bounds are (_which range of_ $r = t \left( \phi_c - \phi(t) \right)$ _corresponds with_ $t \in [t_0, t_1 )$?).
+_DiaBayes_ solves this conundrum by adding an additional equation to the ODE:
+```{math}
+\frac{\mathrm{d} t'}{\mathrm{d} r} = \left( \phi_c - \phi \right)
+```
+As the integration marches forward, it continuously tracks $t'$ integrated over $r$ until it exceeds $t_1$, at which point the integrator stops.
+The final results of the integration are then interpolated onto the user-requested time grid, so that the results can be correctly interpreted as varying with (physical) time and compared with measurements.
+Both the normalisation logic and Sundman transformations are abstracted away from the user, so that the overall user experience is no different between the RSF and CNS formulations.
+
+## Example usage
+
+```{rubric} References
+```
+```{footbibliography}
 ```
