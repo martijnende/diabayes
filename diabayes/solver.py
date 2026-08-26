@@ -148,12 +148,12 @@ class ODESolver:
             ind_t = keys.index("t") + 1
             result_t = result.y[ind_t]
             # Instantiate interpolator
-            intp = PchipInterpolator(x=result_t, y=result.y, axis=1)
+            intp = PchipInterpolator(x=result_t, y=result.y.T, axis=0)
             # Interpolate to requested time base
             result_int = intp(t)
             return Variables.from_array(result_int, keys)
 
-        return Variables.from_array(result.y, keys)
+        return Variables.from_array(result.y.T, keys)
 
     def generate_sequence(
         self,

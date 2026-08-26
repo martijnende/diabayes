@@ -156,7 +156,7 @@ class Variables(eqx.Module):
 
     def __repr__(self) -> str:
         state_str = ", ".join(
-            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals)
+            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals.T)
         )
         return f"Variables(mu={self.mu}, {state_str})"
 
