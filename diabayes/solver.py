@@ -13,6 +13,7 @@ from jax import lax
 from jax_tqdm import scan_tqdm  # type: ignore
 from jaxtyping import Array, Float
 from scipy.integrate import solve_ivp
+from scipy.interpolate import PchipInterpolator
 
 from diabayes.forward_models import Forward
 from diabayes.SVI import compute_phi, mapped_log_likelihood
@@ -113,11 +114,27 @@ class ODESolver:
             t, Variables.from_array(y, keys), *args
         ).to_array()
 
+        # If a Sundman transformation is requested, add
+        # termination events based on time
+        if self.forward_model.sundman is not None:
+            ind_t = keys.index("t") + 1
+            t_stop = t.max()
+            events = lambda t, y, *args: y[ind_t] - t_stop
+            events.terminal = True
+            t_eval = None
+            # TODO: set initial condition based on Sundman transformation!
+            t_span = (t.min(), jnp.inf)
+        else:
+            events = None
+            t_eval = t
+            t_span = (t.min(), t.max())
+
         result = solve_ivp(
             fun=_forward,
-            t_span=(t.min(), t.max()),
+            t_span=t_span,
             y0=y0.to_array(),
-            t_eval=t,
+            t_eval=t_eval,
+            events=events,
             args=(params, friction_constants, block_constants),
             rtol=self.rtol,
             atol=self.atol,
@@ -125,6 +142,16 @@ class ODESolver:
         )
 
         assert result.y is not None
+
+        if self.forward_model.sundman is not None:
+            # Find the array index containing the integrated time
+            ind_t = keys.index("t") + 1
+            result_t = result.y[ind_t]
+            # Instantiate interpolator
+            intp = PchipInterpolator(x=result_t, y=result.y, axis=1)
+            # Interpolate to requested time base
+            result_int = intp(t)
+            return Variables.from_array(result_int, keys)
 
         return Variables.from_array(result.y, keys)
 
@@ -246,6 +273,28 @@ class ODESolver:
         return result.ys
 
     @eqx.filter_jit
+    def evaluate_at_t(self, sol: dfx.Solution, t_eval: Float[Array, "Nt"]) -> Variables:
+
+        ts = sol.interpolation.ts  # type: ignore
+        tmax = jnp.nanmax(jnp.where(jnp.isfinite(ts), ts, jnp.nan))
+
+        def root_fn(r, target_t):
+            state = sol.evaluate(r)
+            return state.t - target_t
+
+        @jax.vmap
+        def get_state(target_t):
+            solver = optx.Bisection(rtol=1e-5, atol=1e-5)
+            options = {"lower": sol.t0, "upper": tmax}
+            r_guess = jnp.array(0.5 * (sol.t0 + tmax))
+            root = optx.root_find(
+                fn=root_fn, solver=solver, y0=r_guess, args=target_t, options=options
+            )
+            return sol.evaluate(root.value)
+
+        return get_state(t_eval + 1e-12)
+
+    @eqx.filter_jit
     def _solve_forward(
         self,
         t: Float[Array, "Nt"],
@@ -257,32 +306,53 @@ class ODESolver:
     ) -> dfx.Solution:
 
         term = dfx.ODETerm(self._forward_wrapper)
-        t0 = t.min()
-        t1 = t.max()
-        dt0 = t[1] - t[0]
-        saveat = dfx.SaveAt(ts=t)
         args = (params, friction_constants, block_constants)
-
         controller = dfx.PIDController(rtol=self.rtol, atol=self.atol)
         if adjoint is None:
             adjoint = dfx.RecursiveCheckpointAdjoint(checkpoints=self.checkpoints)
         assert isinstance(adjoint, dfx.AbstractAdjoint)
 
+        if self.forward_model.sundman is not None:
+            saveat = dfx.SaveAt(dense=True)
+            t0 = 0
+            t1 = jnp.inf
+            tmax = t.max()
+            root_finder = optx.Bisection(rtol=self.rtol, atol=self.atol)
+            cond_fn = lambda t, y, *args, **kwargs: y.t - tmax
+            event = dfx.Event(cond_fn, root_finder)
+            kwargs = {
+                "saveat": saveat,
+                "t0": t0,
+                "t1": t1,
+                "dt0": 1e-6,
+                "event": event,
+                "max_steps": int(1e5),
+            }
+        else:
+            t0 = t.min()
+            t1 = t.max()
+            dt0 = t[1] - t[0]
+            saveat = dfx.SaveAt(ts=t)
+            kwargs = {"t0": t0, "t1": t1, "dt0": dt0, "saveat": saveat}
+
         sol = dfx.diffeqsolve(
             terms=term,
             solver=dfx.Tsit5(),
-            t0=t0,
-            t1=t1,
-            dt0=dt0,
-            saveat=saveat,
             y0=y0,
             args=args,
             stepsize_controller=controller,
             adjoint=adjoint,
             throw=False,  # Essential for Bayesian (batch) optimisation
+            **kwargs,
         )
 
         assert sol is not None
+
+        if self.forward_model.sundman is not None:
+            ys_at_t = self.evaluate_at_t(sol, t)
+            is_leaf = lambda x: x is None
+            sol = eqx.tree_at(lambda s: s.ys, sol, ys_at_t, is_leaf=is_leaf)
+            sol = eqx.tree_at(lambda s: s.ts, sol, ys_at_t.t, is_leaf=is_leaf)
 
         return sol
 

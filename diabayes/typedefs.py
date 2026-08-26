@@ -39,7 +39,7 @@ class StateDict(eqx.Module):
     def __getitem__(self, k: str) -> Array:
         """Get the value of the variable ``k``"""
         i = self.keys.index(k)
-        return self.vals[i]
+        return self.vals.T[i]
 
     def replace_values(self, **kwargs) -> "StateDict":
         """
@@ -157,7 +157,7 @@ class Variables(eqx.Module):
 
     def __repr__(self) -> str:
         state_str = ", ".join(
-            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals)
+            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals.T)
         )
         return f"Variables(mu={self.mu}, {state_str})"
 
@@ -439,9 +439,13 @@ class RSFStatistics(ParamStatistics):
 
 
 class CNSStatistics(ParamStatistics):
+    alpha: Statistics
+    phi_c: Statistics
+    z: Statistics
+    mu0: Statistics
+    v0: Statistics
     a: Statistics
-    b: Statistics
-    Dc: Statistics
+    cov: Float[Array, "N N"]
 
 
 @dcs.dataclass
@@ -494,8 +498,14 @@ class BayesianSolution:
         self.log_likelihood = log_likelihood
         # Store the number of NaNs encountered during each step
         self.nan_count = nan_count
-        # TODO: need to generalise this...
-        self.statistics = RSFStatistics.from_state(self.final_state)
+
+        if isinstance(log_params, RSFParams):
+            self.statistics = RSFStatistics.from_state(self.final_state)
+        elif isinstance(log_params, CNSParams):
+            self.statistics = CNSStatistics.from_state(self.final_state)
+        else:
+            print(f"Parameters are of unknown type {type(log_params)}")
+            print("Skipping statistics...")
 
     def plot_convergence(self):
         """

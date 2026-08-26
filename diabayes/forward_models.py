@@ -259,6 +259,11 @@ def slip_rate(
 
 
 @eqx.filter_jit
+def _identity(*args, **kwargs) -> Float:
+    return 1
+
+
+@eqx.filter_jit
 def springblock(
     t: Float,
     v: Float,
@@ -383,11 +388,13 @@ class Forward(Generic[BC]):
         friction_model: FrictionModel,
         state_evolution: Dict[str, Callable],
         stress_transfer: StressTransfer[BC],
+        sundman: Callable | None = None,
     ) -> None:
         # Set the friction model and stress transfer model (easy...)
         self.friction_model = friction_model
         self.stress_transfer = stress_transfer
 
+        state_evolution["t"] = _identity
         state_obj = StateDict(
             keys=tuple(state_evolution.keys()),
             vals=-1.0 * jnp.ones(len(state_evolution)),
@@ -396,6 +403,7 @@ class Forward(Generic[BC]):
             mu=jnp.asarray([-1.0], dtype=jnp.float64), state=state_obj
         )
         self.variables = variables
+        self.sundman = sundman
 
         # Compile a function that calls each provided state_evolution item and
         # stacks the results in an array. This way, the "state" can host
@@ -422,6 +430,8 @@ class Forward(Generic[BC]):
 
         """
         scalars = {k: float(jnp.atleast_1d(v).item()) for k, v in kwargs.items()}
+        if scalars.get("t") is None:
+            scalars["t"] = 0.0
         self.variables = self.variables.set_values(**scalars)
 
     @eqx.filter_jit
@@ -463,8 +473,22 @@ class Forward(Generic[BC]):
         )
         # Rate of change of state variables
         dstate = self.state_evolution(v, variables, params, friction_constants)
+
+        # When using a Sundman transformation, the variable `t` is actually
+        # the transformed variable, and so we need to transform it back to
+        # physical time.
+        t_phys = variables.t if self.sundman is not None else t
         # Rate of change of mu (stress transfer)
-        dmu = self.stress_transfer(t, v, v_derivs, variables, dstate, block_constants)
+        dmu = self.stress_transfer(
+            t_phys, v, v_derivs, variables, dstate, block_constants
+        )
+
+        # Sundman transformation
+        if self.sundman is not None:
+            sund = self.sundman(v, variables, params, friction_constants)
+            dstate = dstate * sund
+            dmu = dmu * sund
+
         # Create a new state container for dstate
         state_obj = StateDict(variables.state.keys, dstate)
         # Create a new variables container
