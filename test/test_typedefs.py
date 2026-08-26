@@ -30,7 +30,7 @@ class TestTypedefs:
 
         # Appending scalars
         variables3 = variables.append(variables2)
-        double_array = jnp.vstack([vars_array, vars_array]).T
+        double_array = jnp.vstack([vars_array, vars_array])
         assert jnp.allclose(double_array, variables3.to_array())
 
         # Appending time-series
@@ -41,12 +41,12 @@ class TestTypedefs:
             "b": 2 * jnp.ones_like(mu),
             "c": 3 * jnp.ones_like(mu),
         }
-        state_obj = StateDict(keys=tuple(x.keys()), vals=jnp.array(list(x.values())))
+        state_obj = StateDict(keys=tuple(x.keys()), vals=jnp.vstack(list(x.values())).T)
         variables = Variables(mu=mu, state=state_obj)
         variables2 = Variables(mu=mu, state=state_obj)
         variables3 = variables.append(variables2)
-        array = jnp.array([mu, *x.values()])
-        double_array = jnp.hstack([array, array])
+        array = jnp.column_stack([mu, *x.values()])
+        double_array = jnp.vstack([array, array])
         assert jnp.allclose(double_array, variables3.to_array())
 
     def test_container_slicing(self):
@@ -58,7 +58,7 @@ class TestTypedefs:
             "b": 2 * jnp.ones_like(mu),
             "c": 3 * jnp.ones_like(mu),
         }
-        state_obj = StateDict(keys=tuple(x.keys()), vals=jnp.array(list(x.values())))
+        state_obj = StateDict(keys=tuple(x.keys()), vals=jnp.vstack(list(x.values())).T)
         variables = Variables(mu=mu, state=state_obj)
 
         # Get item by name (returns a specific variable)

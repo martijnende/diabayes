@@ -39,7 +39,7 @@ class StateDict(eqx.Module):
     def __getitem__(self, k: str) -> Array:
         """Get the value of the variable ``k``"""
         i = self.keys.index(k)
-        return self.vals.T[i]
+        return self.vals[..., i]
 
     def replace_values(self, **kwargs) -> "StateDict":
         """
@@ -122,19 +122,18 @@ class Variables(eqx.Module):
 
         # The other option is to select by integer or slice
         if isinstance(key, int) or isinstance(key, slice):
-            mu = jnp.squeeze(self.mu)
-            state = self.state
+            mu = jnp.asarray(self.mu)
+            state_vals = jnp.asarray(self.state.vals)
+
             # If mu is one-dimensional: only one value to select, so
             # return everything as-is
             if mu.ndim == 0:
                 return self
 
             # If mu is a time series, select the requested values
-            mu = jnp.atleast_1d(mu[key])
-            state_keys = state.keys
-            state_vals = jnp.atleast_1d(jnp.atleast_2d(state.vals)[:, key])
-            state_dict = StateDict(keys=state_keys, vals=state_vals)
-
+            mu = mu[key]
+            state_vals = state_vals[key]
+            state_dict = type(self.state)(keys=self.state.keys, vals=state_vals)
             return type(self)(mu=mu, state=state_dict)
 
         raise IndexError
@@ -152,12 +151,12 @@ class Variables(eqx.Module):
         >>> variables = Variables(mu=jnp.asarray(0.6), state=state_dict)
         >>> variables = variables.set_values(mu=..., x=..., y=...)
         """
-        mu = jnp.atleast_1d(kwargs.pop("mu"))
+        mu = jnp.asarray(kwargs.pop("mu"))
         return dcs.replace(self, mu=mu, state=self.state.replace_values(**kwargs))
 
     def __repr__(self) -> str:
         state_str = ", ".join(
-            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals.T)
+            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals)
         )
         return f"Variables(mu={self.mu}, {state_str})"
 
@@ -166,7 +165,7 @@ class Variables(eqx.Module):
         Convert the container values to a JAX array. The order of the output
         follows the order of `StateDict.keys`, with the first item being
         the friction coefficient. For ``n`` state variables, the output is
-        an array of shape ``(1+n,)`` for scalars, and ``(1+n, t)`` for
+        an array of shape ``(1+n,)`` for scalars, and ``(t, 1+n)`` for
         time series.
 
         Examples
@@ -180,48 +179,34 @@ class Variables(eqx.Module):
         Of course, in this example one could simply do ``scalars.mu``
         and ``timeseries.mu`` to extract ``mu`` directly.
         """
-        mu = jnp.asarray(jnp.squeeze(self.mu))
-        state = jnp.asarray(jnp.squeeze(self.state.vals))
+        mu = jnp.squeeze(self.mu)
+        state = jnp.squeeze(self.state.vals)
 
-        # First case: mu and state are scalars
-        # Result shape (2,)
-        if mu.ndim == state.ndim == 0:
-            return jnp.hstack([mu, state])
-        # Second case: mu is scalar, state is vector
-        # (i.e., multiple state variables)
-        # Result shape (1+n,)
-        elif mu.ndim == 0 and state.ndim == 1:
-            return jnp.hstack([mu, *state])
-        # Third case: mu and state are time series of scalars
-        # Result shape: (2, t)
-        elif mu.ndim == state.ndim == 1:
-            return jnp.vstack([mu[None, :], state[None, :]])
-        # Fourth case: mu is time series of scalars,
-        # state is time series of vectors (n, t)
-        # Result shape: (1+n, t)
-        elif mu.ndim == 1 and state.ndim == 2:
-            return jnp.vstack([mu[None, :], state])
-        # Other combinations of shapes should not exist
+        if mu.ndim == 0:
+            return jnp.concatenate([jnp.atleast_1d(mu), state])
         else:
-            raise ValueError(f"Unsupported shapes: mu={mu.shape}, state={state.shape}")
+            return jnp.column_stack([mu, state])
 
     @classmethod
     def from_array(cls, x: Float[Array, "..."], keys: tuple[str, ...]) -> "Variables":
         """
         Import a JAX array to instantiate the class. The array `x` can either be an
         array of scalars (size n for n variables), or an array of time series of
-        shape `(n, t)`. The first element in the array (i.e., `x[0]`) is assumed to
+        shape `(t, n)`. The first element in the array (i.e., `x[..., 0]`) is assumed to
         be the friction coefficient `mu`. The remaining elements are the state
         variables, matching the number and order of the `keys` tuple.
         """
-        # The first element is assumed to be mu
-        mu = jnp.atleast_1d(x[0])
-        # If x is 2D: time series
-        if x.ndim == 2:
-            state = jnp.atleast_2d(x[1:])
-        # Else: scalars
+        x = jnp.asarray(x)
+
+        if x.ndim == 1:
+            mu = x[0]
+            state = x[1:]
+        elif x.ndim == 2:
+            mu = x[:, 0]
+            state = x[:, 1:]
         else:
-            state = jnp.atleast_1d(x[1:])
+            raise ValueError(f"Array must be 1D or 2D, got {x.ndim}D")
+
         # Map `state` to `keys`
         state_obj = StateDict(keys=keys, vals=state)
         return cls(mu=mu, state=state_obj)
@@ -246,15 +231,17 @@ class Variables(eqx.Module):
         mu2 = jnp.atleast_1d(other.mu)
         mu = jnp.concatenate([mu1, mu2])
 
+        state_vals1 = jnp.atleast_2d(self.state.vals)
+
         # Force the state arrays to be at least 2D arrays
-        state_vals = []
+        state_vals2 = []
 
         for key in self.state.keys:
-            state1 = jnp.atleast_1d(getattr(self, key))
-            state2 = jnp.atleast_1d(getattr(other, key))
-            state_vals.append(jnp.concatenate([state1, state2]))
+            col = jnp.atleast_1d(getattr(other, key))
+            state_vals2.append(col)
 
-        state_vals = jnp.array(state_vals)
+        state_vals2 = jnp.column_stack(state_vals2)
+        state_vals = jnp.vstack([state_vals1, state_vals2])
 
         # Create the new StateDict
         state_dict = StateDict(keys=self.state.keys, vals=state_vals)
