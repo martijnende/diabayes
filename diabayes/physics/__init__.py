@@ -8,7 +8,7 @@ from diabayes.typedefs import (
 )
 
 from .rate_and_state import rsf, ageing_law, aging_law, slip_law
-from .chen_niemeijer_spiers import cns, cns_porosity
+from .chen_niemeijer_spiers import cns, cns_porosity, sundman_cns, steady_state_porosity
 from .stress_transfer import springblock, inertial_springblock
 
 

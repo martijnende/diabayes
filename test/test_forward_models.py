@@ -46,10 +46,9 @@ class TestForwardModels:
 
     def test_cns(self):
 
-        variables, params, constants, block_constants = init_params_cns()
+        variables, params, constants, _ = init_params_cns()
 
         mu = variables.mu
-        phi = variables.phi
         keys = variables.state.keys
 
         # Steady-state tests
@@ -58,11 +57,7 @@ class TestForwardModels:
         for i, v in enumerate(10 ** jnp.linspace(-20, 5, 10)):
 
             # Analytic solution for steady-state porosity
-            Z = params.xi * constants.v0 / v
-            A = 2 * params.beta * (params.phi_c - constants.phi0)
-            B = (A * mu - 1) * Z / (1 + mu * Z)
-            tan_psi_ss = 0.5 * B * (1 - jnp.sqrt(1 + 4 * A / (B * (A * mu - 1))))
-            phi_ss = params.phi_c - tan_psi_ss / (2 * params.beta)
+            phi_ss = db_models.steady_state_porosity(v, variables, params, constants)
 
             variables2 = db.Variables(
                 mu=mu, state=StateDict(keys, jnp.atleast_1d(phi_ss))

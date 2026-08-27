@@ -21,6 +21,8 @@ from .physics import (
     slip_law,
     cns,
     cns_porosity,
+    sundman_cns,
+    steady_state_porosity,
     slip_rate,
     springblock,
     inertial_springblock,

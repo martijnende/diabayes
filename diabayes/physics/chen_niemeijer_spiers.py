@@ -9,6 +9,25 @@ from diabayes.typedefs import (
 )
 
 
+def steady_state_porosity(
+    v: Float, variables: Variables, params: CNSParams, constants: CNSConstants
+) -> Float:
+    mu = variables.mu
+    Z = params.xi * constants.v0 / v
+    A = 2 * params.beta * (params.phi_c - constants.phi0)
+    B = (A * mu - 1) * Z / (1 + mu * Z)
+    tan_psi_ss = 0.5 * B * (1 - jnp.sqrt(1 + 4 * A / (B * (A * mu - 1))))
+    phi_ss = params.phi_c - tan_psi_ss / (2 * params.beta)
+    return phi_ss
+
+
+@eqx.filter_jit
+def sundman_cns(
+    v: Float, variables: Variables, params: CNSParams, constants: CNSConstants
+) -> Float:
+    return jnp.squeeze(params.phi_c - variables.phi)
+
+
 @eqx.filter_jit
 def _porosity_func(
     variables: Variables, params: CNSParams, constants: CNSConstants
