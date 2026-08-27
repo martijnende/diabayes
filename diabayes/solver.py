@@ -60,8 +60,8 @@ class ODESolver:
     def __init__(
         self,
         forward_model: Forward,
-        rtol: float = 1e-8,
-        atol: float = 1e-12,
+        rtol: float = 1e-6,
+        atol: float = 1e-10,
         checkpoints: int = 100,
     ) -> None:
         self.forward_model = forward_model
@@ -78,6 +78,7 @@ class ODESolver:
         friction_constants: _Constants,
         block_constants: _BlockConstants,
         method: str = "RK45",
+        interpolate_time: bool = True,
     ) -> Variables:
         """
         Solve a forward problem using SciPy's ``solve_ivp`` routine.
@@ -89,17 +90,25 @@ class ODESolver:
         Parameters
         ----------
         t : Float[Array, "Nt"]
-            A vector of time samples where a solution is requested
+            A vector of time samples where a solution is requested.
         y0 : Variables
             The initial values (fricton and state) wrapped in a
             `Variables` container.
         params : _Params
             The (invertible) parameters that govern the dynamics,
-            wrapped in a `Params` container.
+            wrapped in a ``Params`` container.
         friction_constants : _Constants
             A container object containing the friction constants
         block_constants : _BlockConstants
             A container object containing the block constants
+        method : str
+            The solver used by SciPy's ``solve_ivp``.
+            Default: ``RK45``
+        interpolate_time : bool
+            Whether to interpolate the result to the user-provided
+            time samples (``True``), or to use the samples from the
+            adaptive ODE solver (``False``).
+            Default: ``True``
 
         Returns
         -------
@@ -128,6 +137,9 @@ class ODESolver:
             t_eval = t
             t_span = (t.min(), t.max())
 
+        if not interpolate_time:
+            t_eval = None
+
         result = solve_ivp(
             fun=_forward,
             t_span=t_span,
@@ -142,7 +154,7 @@ class ODESolver:
 
         assert result.y is not None
 
-        if self.forward_model.sundman is not None:
+        if (self.forward_model.sundman is not None) and (interpolate_time is True):
             # Find the array index containing the integrated time
             ind_t = keys.index("t") + 1
             result_t = result.y[ind_t]

@@ -432,7 +432,6 @@ class CNSStatistics(ParamStatistics):
     mu0: Statistics
     v0: Statistics
     a: Statistics
-    cov: Float[Array, "N N"]
 
 
 @dcs.dataclass

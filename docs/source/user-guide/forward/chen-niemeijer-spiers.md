@@ -93,7 +93,7 @@ In this limit, the RSF parameters can be written in terms of CNS parameters, and
 While the translation between RSF and CNS parameters takes up quite a bit of space on paper (see Table 1 in _Chen et al._{footcite}`chen2017`), the following statements generally hold:
 
 1. The RSF parameter $a$ is proportional to the CNS parameter $\alpha$, and both are typically of the same magnitude.
-2. The RSF paramter $b$ is proportional to $\beta \sqrt{\xi}$ (for the definitions of $\tan \psi$ and $f(\phi)$ as implemented in DiaBayes).
+2. The RSF parameter $b$ is proportional to $\beta \sqrt{\xi}$ (for the definitions of $\tan \psi$ and $f(\phi)$ as implemented in DiaBayes).
 3. The RSF parameter $D_c$ is proportional to $h \beta^{-1}$.
 
 It is, of course, not recommended to try to force CNS-like behaviour into a RSF formulation or vice versa.

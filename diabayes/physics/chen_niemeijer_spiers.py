@@ -10,9 +10,8 @@ from diabayes.typedefs import (
 
 
 def steady_state_porosity(
-    v: Float, variables: Variables, params: CNSParams, constants: CNSConstants
+    v: Float, mu: Float, params: CNSParams, constants: CNSConstants
 ) -> Float:
-    mu = variables.mu
     Z = params.xi * constants.v0 / v
     A = 2 * params.beta * (params.phi_c - constants.phi0)
     B = (A * mu - 1) * Z / (1 + mu * Z)
