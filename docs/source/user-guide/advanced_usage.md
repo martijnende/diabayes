@@ -6,4 +6,5 @@ To be written. This page will include
 - Combining multiple state equations
 - Stick-slip inversion
 - Neural Networks
+- Custom Sundman transformations
 ```

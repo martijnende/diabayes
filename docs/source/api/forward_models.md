@@ -19,6 +19,7 @@
    :toctree: ../_autosummary
 
    rsf
+   cns
 ```
 
 ## State evolution models
@@ -29,6 +30,7 @@
 
    ageing_law
    aging_law
+   cns_porosity
    slip_rate
 ```
 

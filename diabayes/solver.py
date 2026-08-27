@@ -1,6 +1,6 @@
 from functools import partial
 from time import time_ns
-from typing import Any, Tuple, Union
+from typing import Tuple, Union
 
 import diffrax as dfx
 import equinox as eqx
@@ -13,12 +13,12 @@ from jax import lax
 from jax_tqdm import scan_tqdm  # type: ignore
 from jaxtyping import Array, Float
 from scipy.integrate import solve_ivp
+from scipy.interpolate import PchipInterpolator
 
 from diabayes.forward_models import Forward
 from diabayes.SVI import compute_phi, mapped_log_likelihood
 from diabayes.typedefs import (
     BayesianSolution,
-    RSFParams,
     Variables,
     _BlockConstants,
     _Constants,
@@ -60,8 +60,8 @@ class ODESolver:
     def __init__(
         self,
         forward_model: Forward,
-        rtol: float = 1e-8,
-        atol: float = 1e-12,
+        rtol: float = 1e-7,
+        atol: float = 1e-10,
         checkpoints: int = 100,
     ) -> None:
         self.forward_model = forward_model
@@ -78,6 +78,7 @@ class ODESolver:
         friction_constants: _Constants,
         block_constants: _BlockConstants,
         method: str = "RK45",
+        interpolate_time: bool = True,
     ) -> Variables:
         """
         Solve a forward problem using SciPy's ``solve_ivp`` routine.
@@ -89,17 +90,25 @@ class ODESolver:
         Parameters
         ----------
         t : Float[Array, "Nt"]
-            A vector of time samples where a solution is requested
+            A vector of time samples where a solution is requested.
         y0 : Variables
             The initial values (fricton and state) wrapped in a
             `Variables` container.
         params : _Params
             The (invertible) parameters that govern the dynamics,
-            wrapped in a `Params` container.
+            wrapped in a ``Params`` container.
         friction_constants : _Constants
             A container object containing the friction constants
         block_constants : _BlockConstants
             A container object containing the block constants
+        method : str
+            The solver used by SciPy's ``solve_ivp``.
+            Default: ``RK45``
+        interpolate_time : bool
+            Whether to interpolate the result to the user-provided
+            time samples (``True``), or to use the samples from the
+            adaptive ODE solver (``False``).
+            Default: ``True``
 
         Returns
         -------
@@ -113,11 +122,30 @@ class ODESolver:
             t, Variables.from_array(y, keys), *args
         ).to_array()
 
+        # If a Sundman transformation is requested, add
+        # termination events based on time
+        if self.forward_model.sundman is not None:
+            ind_t = keys.index("t") + 1
+            t_stop = t.max()
+            events = lambda t, y, *args: y[ind_t] - t_stop
+            events.terminal = True
+            t_eval = None
+            # TODO: set initial condition based on Sundman transformation!
+            t_span = (t.min(), jnp.inf)
+        else:
+            events = None
+            t_eval = t
+            t_span = (t.min(), t.max())
+
+        if not interpolate_time:
+            t_eval = None
+
         result = solve_ivp(
             fun=_forward,
-            t_span=(t.min(), t.max()),
+            t_span=t_span,
             y0=y0.to_array(),
-            t_eval=t,
+            t_eval=t_eval,
+            events=events,
             args=(params, friction_constants, block_constants),
             rtol=self.rtol,
             atol=self.atol,
@@ -126,7 +154,96 @@ class ODESolver:
 
         assert result.y is not None
 
-        return Variables.from_array(result.y, keys)
+        if (self.forward_model.sundman is not None) and (interpolate_time is True):
+            # Find the array index containing the integrated time
+            ind_t = keys.index("t") + 1
+            result_t = result.y[ind_t]
+            # Instantiate interpolator
+            intp = PchipInterpolator(x=result_t, y=result.y.T, axis=0)
+            # Interpolate to requested time base
+            result_int = intp(t)
+            return Variables.from_array(result_int, keys)
+
+        return Variables.from_array(result.y.T, keys)
+
+    def generate_sequence(
+        self,
+        t_steps: Float[Array, "Nsteps"],
+        v_steps: Float[Array, "Nsteps"],
+        dt: Float,
+        y0: Variables,
+        params: _Params,
+        friction_constants: _Constants,
+        block_constants: _BlockConstants,
+        method: str = "RK45",
+    ) -> Tuple[Variables, Float[Array, "Nt"]]:
+        """
+        Solve the forward problem for a sequence of velocity steps.
+        For each load-point velocity in `v_steps`, a forward simulation
+        is run using the previous step's final state as the initial state.
+
+        This routine can be used to generate a sequence of (up/down)
+        velocity steps, or a slide-hold-slide sequence (by setting a given
+        v_step to zero).
+
+        Parameters
+        ----------
+        t_steps : Float[Array, "Nsteps"]
+            A vector of change point times of each step in the sequence
+        v_steps : Float[Array, "Nsteps"]
+            A vector of the load-point velocity values for each step
+            in the sequence
+        dt : Float
+            The desired time sample spacing of the solution
+        y0 : Variables
+            The initial values (fricton and state) wrapped in a
+            `Variables` container.
+        params : _Params
+            The (invertible) parameters that govern the dynamics,
+            wrapped in a `Params` container.
+        friction_constants : _Constants
+            A container object containing the friction constants
+        block_constants : _BlockConstants
+            A container object containing the block constants. Note
+            that the load-point velocity will be updated for each step
+
+        Returns
+        -------
+        result : Variables
+            Solution time series of friction and state
+        t : Float[Array, "Nt"]
+            Solution time samples
+        """
+
+        t_start = 0.0
+
+        # Loop over velocity-steps
+        for i, (t_stop, v) in enumerate(zip(t_steps, v_steps)):
+            # Update load-point velocity
+            block_dict = block_constants.__dict__
+            block_dict["v_lp"] = float(v)
+            block_constants = type(block_constants)(**block_dict)
+            # Define time vector
+            t_i = jnp.arange(t_start, t_stop, dt)
+            # Solve forward problem
+            result_i = self.solve_forward(
+                t_i, y0, params, friction_constants, block_constants, method
+            )
+            # Append results
+            if i == 0:
+                result = result_i
+                t = t_i
+            else:
+                result = result.append(result_i)
+                t = jnp.concatenate([t, t_i])
+
+            # Increment start time
+            t_start = t_stop
+
+            # Update initial state
+            y0 = result_i[-1]
+
+        return result, t
 
     def generate_sequence(
         self,
@@ -246,6 +363,28 @@ class ODESolver:
         return result.ys
 
     @eqx.filter_jit
+    def evaluate_at_t(self, sol: dfx.Solution, t_eval: Float[Array, "Nt"]) -> Variables:
+
+        ts = sol.interpolation.ts  # type: ignore
+        tmax = jnp.nanmax(jnp.where(jnp.isfinite(ts), ts, jnp.nan))
+
+        def root_fn(r, target_t):
+            state = sol.evaluate(r)
+            return state.t - target_t
+
+        @jax.vmap
+        def get_state(target_t):
+            solver = optx.Bisection(rtol=1e-5, atol=1e-5)
+            options = {"lower": sol.t0, "upper": tmax}
+            r_guess = jnp.array(0.5 * (sol.t0 + tmax))
+            root = optx.root_find(
+                fn=root_fn, solver=solver, y0=r_guess, args=target_t, options=options
+            )
+            return sol.evaluate(root.value)
+
+        return get_state(t_eval + 1e-12)
+
+    @eqx.filter_jit
     def _solve_forward(
         self,
         t: Float[Array, "Nt"],
@@ -257,31 +396,53 @@ class ODESolver:
     ) -> dfx.Solution:
 
         term = dfx.ODETerm(self._forward_wrapper)
-        t0 = t.min()
-        t1 = t.max()
-        dt0 = t[1] - t[0]
-        saveat = dfx.SaveAt(ts=t)
         args = (params, friction_constants, block_constants)
-
         controller = dfx.PIDController(rtol=self.rtol, atol=self.atol)
         if adjoint is None:
             adjoint = dfx.RecursiveCheckpointAdjoint(checkpoints=self.checkpoints)
         assert isinstance(adjoint, dfx.AbstractAdjoint)
 
+        if self.forward_model.sundman is not None:
+            saveat = dfx.SaveAt(dense=True)
+            t0 = 0
+            t1 = jnp.inf
+            tmax = t.max()
+            root_finder = optx.Bisection(rtol=self.rtol, atol=self.atol)
+            cond_fn = lambda t, y, *args, **kwargs: y.t - tmax
+            event = dfx.Event(cond_fn, root_finder)
+            kwargs = {
+                "saveat": saveat,
+                "t0": t0,
+                "t1": t1,
+                "dt0": 1e-6,
+                "event": event,
+                "max_steps": int(1e5),
+            }
+        else:
+            t0 = t.min()
+            t1 = t.max()
+            dt0 = t[1] - t[0]
+            saveat = dfx.SaveAt(ts=t)
+            kwargs = {"t0": t0, "t1": t1, "dt0": dt0, "saveat": saveat}
+
         sol = dfx.diffeqsolve(
             terms=term,
             solver=dfx.Tsit5(),
-            t0=t0,
-            t1=t1,
-            dt0=dt0,
-            saveat=saveat,
             y0=y0,
             args=args,
             stepsize_controller=controller,
             adjoint=adjoint,
+            throw=False,  # Essential for Bayesian (batch) optimisation
+            **kwargs,
         )
 
         assert sol is not None
+
+        if self.forward_model.sundman is not None:
+            ys_at_t = self.evaluate_at_t(sol, t)
+            is_leaf = lambda x: x is None
+            sol = eqx.tree_at(lambda s: s.ys, sol, ys_at_t, is_leaf=is_leaf)
+            sol = eqx.tree_at(lambda s: s.ts, sol, ys_at_t.t, is_leaf=is_leaf)
 
         return sol
 
@@ -311,7 +472,9 @@ class ODESolver:
         friction_constants: _Constants,
         block_constants: _BlockConstants,
         verbose: bool = False,
-    ) -> optx.Solution:
+        retries: int = 3,
+        seed: int = 42,
+    ) -> optx.Solution | None:
         r"""
         Minimises the least-squares residuals between the observed friction
         curve and the parameterised one, using the Levenberg-Marquardt
@@ -339,21 +502,20 @@ class ODESolver:
         verbose : bool
             Whether or not to output detailed progress of the inversion.
             Defaults to ``False``
+        retries : int
+            The maximum number of inversion attempts. When the inversion fails
+            to converge, it will retry up to ``retries`` times with randomly
+            perturbed initial parameters.
+        seed : int
+            Seed for the random number generator. This is only used when the
+            initial inversion attempt fails, and the initial parameters are
+            randomly perturbed before the next attempt.
 
         Returns
         -------
         sol : optimistix.Solution
             The inversion result, including various diagnostics. The
             inverted parameter values can be accessed as ``sol.values``
-
-        Notes
-        -----
-        If an error is produced in the first iteration step, it is quite
-        possible that the initial guess parameters were too far off from
-        the "true" values (i.e., the mismatch between the observed and
-        modelled friction curves is too large), breaking the Gauss-Newton
-        step of the Levenberg-Marquardt algorithm. Initial manual tuning
-        is recommended.
         """
 
         options = {"autodiff_mode": "fwd"}
@@ -363,13 +525,39 @@ class ODESolver:
         )
 
         lm_solver = optx.LevenbergMarquardt(rtol=1e-5, atol=1e-5, verbose=verbose)
-        sol = optx.least_squares(
-            _residuals,
-            lm_solver,
-            params,
-            args=mu,
-            options=options,
-        )
+
+        key = jr.PRNGKey(seed)
+
+        sol = None
+
+        for i in range(retries):
+
+            try:
+                sol = optx.least_squares(
+                    _residuals,
+                    lm_solver,
+                    params,
+                    args=mu,
+                    options=options,
+                )
+            except eqx.EquinoxRuntimeError:
+                print(
+                    f"[Attempt {(i+1)}/{retries}] Inversion failed. Retrying with randomised initial parameters..."
+                )
+                key, split_key = jr.split(key)
+                param_vals = params.to_array()
+                jitter = jr.normal(split_key, shape=param_vals.shape)
+                scale = (
+                    0.1 * param_vals
+                )  # Standard deviation equal to 10% of current value
+                param_vals = param_vals + scale * jitter
+                # Recreate params and retry
+                params = type(params).from_array(param_vals)
+
+        if sol is None:
+            print(
+                f"Inversion failed {retries} attempts. Increase the value of `retries` or check the stability of the forward model"
+            )
 
         return sol
 
@@ -443,9 +631,9 @@ class ODESolver:
         friction models.
         """
 
-        assert isinstance(
-            params, RSFParams
-        ), "Bayesian inversion is only implemented for RSF"
+        # assert isinstance(
+        #     params, RSFParams
+        # ), "Bayesian inversion is only implemented for RSF"
 
         if rng is None:
             key = jr.PRNGKey(time_ns())
@@ -463,7 +651,7 @@ class ODESolver:
         log_params = jnp.log(params.to_array())
 
         # Sample particles from a log-normal distribution
-        log_particles = RSFParams.generate(
+        log_particles = type(params).generate(
             N=Nparticles, loc=log_params, scale=scale, key=split_key
         )
 

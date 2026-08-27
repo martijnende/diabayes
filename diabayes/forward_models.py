@@ -1,15 +1,11 @@
-from typing import Callable, Dict, Generic, Iterable, Tuple, TypeVar, Union
+from typing import Callable, Dict, Generic, TypeVar
 
 import equinox as eqx
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from jaxtyping import Float
 
 from diabayes.typedefs import (
     FrictionModel,
-    InertialSpringBlockConstants,
-    RSFConstants,
-    RSFParams,
-    SpringBlockConstants,
     StateDict,
     StressTransfer,
     Variables,
@@ -18,201 +14,26 @@ from diabayes.typedefs import (
     _Params,
 )
 
+from diabayes.physics import (
+    rsf,
+    ageing_law,
+    aging_law,
+    slip_law,
+    cns,
+    cns_porosity,
+    sundman_cns,
+    steady_state_porosity,
+    slip_rate,
+    springblock,
+    inertial_springblock,
+)
+
 BC = TypeVar("BC", bound=_BlockConstants)
 
 
 @eqx.filter_jit
-def rsf(variables: Variables, params: RSFParams, constants: RSFConstants) -> Float:
-    r"""
-    The classical rate-and-state friction law
-
-    .. math::
-
-        v(\mu, \theta) = v_0 \exp \left( \frac{1}{a} \left[ \mu - \mu_0 - b \log \left( \frac{v_0 \theta}{D_c} \right) \right] \right)
-
-    Parameters
-    ----------
-    variables : Variables
-        The friction coefficient ``mu`` and state parameter ``theta``
-    params : RSFParams
-        The rate-and-state parameters ``a``, ``b``, and ``D_c``
-    constants : RSFConstants
-        The constant parameters ``mu0`` and ``v0``
-
-    Returns
-    -------
-    v : Float
-        The instantaneous slip rate in the same units as ``v0``
-    """
-    Omega = params.b * jnp.log(variables.theta * constants.v0 / params.Dc)
-    v = constants.v0 * jnp.exp((variables.mu - constants.mu0 - Omega) / params.a)
-    return jnp.squeeze(v)
-
-
-@eqx.filter_jit
-def ageing_law(
-    v: Float, variables: Variables, params: RSFParams, constants: RSFConstants
-) -> Float:
-    r"""
-    The conventional ageing law state evolution formulation
-
-    .. math::
-
-        \frac{\mathrm{d}\theta}{\mathrm{d}t} = 1 - \frac{v \theta}{D_c}
-
-    Parameters
-    ----------
-    v : Float
-        Instantaneous fault slip rate [m/s].
-    variables : Variables
-        The friction coefficient ``mu`` and state parameter ``theta``
-    params : RSFParams
-        The rate-and-state parameters, including ``D_c``
-    constants : RSFConstants
-        The constant parameters ``mu0`` and ``v0`` (not used)
-
-    Returns
-    -------
-    dtheta : Float
-        The rate of change of the state variable [s/s]
-    """
-    return 1 - v * variables.theta / params.Dc
-
-
-@eqx.filter_jit
-def aging_law(*args, **kwargs):
-    """
-    Alias for the ``ageing_law`` function
-    """
-    return ageing_law(*args, **kwargs)
-
-
-@eqx.filter_jit
-def slip_rate(
-    v: Float, variables: Variables, params: RSFParams, constants: RSFConstants
-) -> Float:
-    r"""
-    Evolve slip from slip rate
-
-    .. math::
-
-        \frac{\mathrm{d} x}{\mathrm{d} t} = v
-
-    Parameters
-    ----------
-    v : Float
-        Instantaneous fault slip rate [m/s]
-    variables : Variables
-        The friction coefficient ``mu`` and state parameter ``theta`` (not used)
-    params : RSFParams
-        The rate-and-state parameters (not used)
-    constants : RSFConstants
-        The constant parameters ``mu0`` and ``v0`` (not used)
-
-    Returns
-    -------
-    v : Float
-        The rate of change of slip [m/s]
-    """
-    return v
-
-
-@eqx.filter_jit
-def springblock(
-    t: Float,
-    v: Float,
-    v_partials: Variables,
-    variables: Variables,
-    dstate: Float[Array, "..."],
-    constants: SpringBlockConstants,
-) -> Float:
-    r"""
-    A conventional (non-inertial) spring-block loading formulation
-
-    .. math::
-
-        \frac{\mathrm{d} \mu}{\mathrm{d} t} = k \left ( v_{lp} - v(t) \right)
-
-    Parameters
-    ----------
-    v : Float
-        Instantaneous fault slip rate [m/s].
-    variables : Variables
-        The instantaneous variables. This argument is not used,
-        but included for call signature consistency.
-    constants : SpringBlockConstants
-        The constant parameters stiffness ``k`` (units of "friction per metre")
-        and load-point velocity ``v_lp`` (same units as ``v``).
-
-    Returns
-    -------
-    dmu : Float
-        The rate of change of the friction coefficient [1/s]
-    """
-    return constants.k * (constants.v_lp - v)
-
-
-@eqx.filter_jit
-def inertial_springblock(
-    t: Float,
-    v: Float,
-    v_partials: Variables,
-    variables: Variables,
-    dstate: Float[Array, "..."],
-    constants: InertialSpringBlockConstants,
-) -> Float:
-    r"""
-    An inertial spring-block loading formulation
-
-    .. math::
-        \frac{\mathrm{d} \mu}{\mathrm{d} t} = \left[ \frac{\partial v}{\partial \mu} \right]^{-1} \left( \frac{1}{M} \left[ k \left( v_{lp} t - x \right) - \mu \right] - \frac{\partial v}{\partial \theta} \frac{\mathrm{d} \theta}{\mathrm{d} t} - \dots \right)
-
-    The acceleration term in the classical inertial spring-block formulation
-    is decomposed into its partial derivatives, avoiding the need for solving
-    a second-order ODE. These partial derivatives (``v_partials``) are computed
-    using the JAX autodiff framework.
-
-    Notes
-    -----
-    This formulation is rather stiff, and for certain parameter values could
-    lead to extremely small time steps necessary to maintain numerical
-    accuracy. It is recommended to use a conventional (non-inenrtial)
-    ``springblock`` formulation for basic velocity-steps and slide-hold-slide
-    simuilations. Inertia is only really needed for stick-slip simulations.
-
-    Parameters
-    ----------
-    t : Float
-        Current value of time [s]
-    v : Float
-        Instantaneous fault slip rate [m/s]
-    v_partials : Variables
-        The partial derivatives of slip rate to the relevant variables
-        (friction and state variables)
-    variables: Variables
-        The instantaneous values of the variables: friction (``mu``),
-        slip (``slip``), and other state variables (not used)
-    dstate : Array
-        The time derivatives of the state variables. The radiation term
-        is ``v_partials @ dstate`` (excluding ``mu``)
-    constants : InertialSpringBlockConstants
-        The spring-block constants containing the mass term ``M``, the
-        stiffness ``k``, and the load-point velocity ``v_lp``
-
-    Returns
-    -------
-    dmu : Float
-        The rate of change of the friction coefficient [1/s]
-
-    """
-    mass_term = (
-        constants.k * (constants.v_lp * t - variables.slip) - variables.mu
-    ) / constants.M
-    # The partials_term contains the summation of the partial derivatives of
-    # v with respect to some variable y, times the time-derivative of y
-    # The first partial derivative is v with respect to mu, and is excluded.
-    partials_term = jnp.dot(v_partials.state.vals, dstate)
-    return (mass_term - partials_term) / v_partials.mu
+def _identity(*args, **kwargs) -> Float:
+    return 1
 
 
 class Forward(Generic[BC]):
@@ -242,11 +63,13 @@ class Forward(Generic[BC]):
         friction_model: FrictionModel,
         state_evolution: Dict[str, Callable],
         stress_transfer: StressTransfer[BC],
+        sundman: Callable | None = None,
     ) -> None:
         # Set the friction model and stress transfer model (easy...)
         self.friction_model = friction_model
         self.stress_transfer = stress_transfer
 
+        state_evolution["t"] = _identity
         state_obj = StateDict(
             keys=tuple(state_evolution.keys()),
             vals=-1.0 * jnp.ones(len(state_evolution)),
@@ -255,6 +78,7 @@ class Forward(Generic[BC]):
             mu=jnp.asarray([-1.0], dtype=jnp.float64), state=state_obj
         )
         self.variables = variables
+        self.sundman = sundman
 
         # Compile a function that calls each provided state_evolution item and
         # stacks the results in an array. This way, the "state" can host
@@ -280,7 +104,9 @@ class Forward(Generic[BC]):
             Key-value pairs of variable names and corresponding values
 
         """
-        scalars = {k: float(jnp.asarray(v).item()) for k, v in kwargs.items()}
+        scalars = {k: float(jnp.atleast_1d(v).item()) for k, v in kwargs.items()}
+        if scalars.get("t") is None:
+            scalars["t"] = 0.0
         self.variables = self.variables.set_values(**scalars)
 
     @eqx.filter_jit
@@ -322,8 +148,22 @@ class Forward(Generic[BC]):
         )
         # Rate of change of state variables
         dstate = self.state_evolution(v, variables, params, friction_constants)
+
+        # When using a Sundman transformation, the variable `t` is actually
+        # the transformed variable, and so we need to transform it back to
+        # physical time.
+        t_phys = variables.t if self.sundman is not None else t
         # Rate of change of mu (stress transfer)
-        dmu = self.stress_transfer(t, v, v_derivs, variables, dstate, block_constants)
+        dmu = self.stress_transfer(
+            t_phys, v, v_derivs, variables, dstate, block_constants
+        )
+
+        # Sundman transformation
+        if self.sundman is not None:
+            sund = self.sundman(v, variables, params, friction_constants)
+            dstate = dstate * sund
+            dmu = dmu * sund
+
         # Create a new state container for dstate
         state_obj = StateDict(variables.state.keys, dstate)
         # Create a new variables container
