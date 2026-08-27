@@ -43,6 +43,9 @@ autodoc_default_options = {
     "undoc-members": True,
     "inherited-members": True,
 }
+autodoc_mock_imports = [
+    "flask",
+]
 
 
 # -- Options for HTML output -------------------------------------------------
