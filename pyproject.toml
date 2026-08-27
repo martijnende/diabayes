@@ -52,7 +52,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["diabayes", "diabayes.gui"]
+packages = ["diabayes", "diabayes.gui", "diabayes.physics"]
 
 [tool.isort]
 profile = "black"
