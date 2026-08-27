@@ -39,7 +39,7 @@ class StateDict(eqx.Module):
     def __getitem__(self, k: str) -> Array:
         """Get the value of the variable ``k``"""
         i = self.keys.index(k)
-        return self.vals[i]
+        return self.vals[..., i]
 
     def replace_values(self, **kwargs) -> "StateDict":
         """
@@ -122,19 +122,18 @@ class Variables(eqx.Module):
 
         # The other option is to select by integer or slice
         if isinstance(key, int) or isinstance(key, slice):
-            mu = jnp.squeeze(self.mu)
-            state = self.state
+            mu = jnp.asarray(self.mu)
+            state_vals = jnp.asarray(self.state.vals)
+
             # If mu is one-dimensional: only one value to select, so
             # return everything as-is
             if mu.ndim == 0:
                 return self
 
             # If mu is a time series, select the requested values
-            mu = jnp.atleast_1d(mu[key])
-            state_keys = state.keys
-            state_vals = jnp.atleast_1d(jnp.atleast_2d(state.vals)[:, key])
-            state_dict = StateDict(keys=state_keys, vals=state_vals)
-
+            mu = mu[key]
+            state_vals = state_vals[key]
+            state_dict = type(self.state)(keys=self.state.keys, vals=state_vals)
             return type(self)(mu=mu, state=state_dict)
 
         raise IndexError
@@ -152,12 +151,12 @@ class Variables(eqx.Module):
         >>> variables = Variables(mu=jnp.asarray(0.6), state=state_dict)
         >>> variables = variables.set_values(mu=..., x=..., y=...)
         """
-        mu = jnp.atleast_1d(kwargs.pop("mu"))
+        mu = jnp.asarray(kwargs.pop("mu"))
         return dcs.replace(self, mu=mu, state=self.state.replace_values(**kwargs))
 
     def __repr__(self) -> str:
         state_str = ", ".join(
-            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals)
+            f"{k}={v}" for k, v in zip(self.state.keys, self.state.vals.T)
         )
         return f"Variables(mu={self.mu}, {state_str})"
 
@@ -180,48 +179,34 @@ class Variables(eqx.Module):
         Of course, in this example one could simply do ``scalars.mu``
         and ``timeseries.mu`` to extract ``mu`` directly.
         """
-        mu = jnp.asarray(jnp.squeeze(self.mu))
-        state = jnp.asarray(jnp.squeeze(self.state.vals))
+        mu = jnp.squeeze(self.mu)
+        state = jnp.squeeze(self.state.vals)
 
-        # First case: mu and state are scalars
-        # Result shape (2,)
-        if mu.ndim == state.ndim == 0:
-            return jnp.hstack([mu, state])
-        # Second case: mu is scalar, state is vector
-        # (i.e., multiple state variables)
-        # Result shape (1+n,)
-        elif mu.ndim == 0 and state.ndim == 1:
-            return jnp.hstack([mu, *state])
-        # Third case: mu and state are time series of scalars
-        # Result shape: (2, t)
-        elif mu.ndim == state.ndim == 1:
-            return jnp.vstack([mu[None, :], state[None, :]])
-        # Fourth case: mu is time series of scalars,
-        # state is time series of vectors (n, t)
-        # Result shape: (1+n, t)
-        elif mu.ndim == 1 and state.ndim == 2:
-            return jnp.vstack([mu[None, :], state])
-        # Other combinations of shapes should not exist
+        if mu.ndim == 0:
+            return jnp.concatenate([jnp.atleast_1d(mu), jnp.atleast_1d(state)])
         else:
-            raise ValueError(f"Unsupported shapes: mu={mu.shape}, state={state.shape}")
+            return jnp.column_stack([mu, state])
 
     @classmethod
     def from_array(cls, x: Float[Array, "..."], keys: tuple[str, ...]) -> "Variables":
         """
         Import a JAX array to instantiate the class. The array `x` can either be an
         array of scalars (size n for n variables), or an array of time series of
-        shape `(n, t)`. The first element in the array (i.e., `x[0]`) is assumed to
+        shape `(t, n)`. The first element in the array (i.e., `x[..., 0]`) is assumed to
         be the friction coefficient `mu`. The remaining elements are the state
         variables, matching the number and order of the `keys` tuple.
         """
-        # The first element is assumed to be mu
-        mu = jnp.atleast_1d(x[0])
-        # If x is 2D: time series
-        if x.ndim == 2:
-            state = jnp.atleast_2d(x[1:])
-        # Else: scalars
+        x = jnp.asarray(x)
+
+        if x.ndim == 1:
+            mu = x[0]
+            state = x[1:]
+        elif x.ndim == 2:
+            mu = x[:, 0]
+            state = x[:, 1:]
         else:
-            state = jnp.atleast_1d(x[1:])
+            raise ValueError(f"Array must be 1D or 2D, got {x.ndim}D")
+
         # Map `state` to `keys`
         state_obj = StateDict(keys=keys, vals=state)
         return cls(mu=mu, state=state_obj)
@@ -246,15 +231,17 @@ class Variables(eqx.Module):
         mu2 = jnp.atleast_1d(other.mu)
         mu = jnp.concatenate([mu1, mu2])
 
+        state_vals1 = jnp.atleast_2d(self.state.vals)
+
         # Force the state arrays to be at least 2D arrays
-        state_vals = []
+        state_vals2 = []
 
         for key in self.state.keys:
-            state1 = jnp.atleast_1d(getattr(self, key))
-            state2 = jnp.atleast_1d(getattr(other, key))
-            state_vals.append(jnp.concatenate([state1, state2]))
+            col = jnp.atleast_1d(getattr(other, key))
+            state_vals2.append(col)
 
-        state_vals = jnp.array(state_vals)
+        state_vals2 = jnp.column_stack(state_vals2)
+        state_vals = jnp.vstack([state_vals1, state_vals2])
 
         # Create the new StateDict
         state_dict = StateDict(keys=self.state.keys, vals=state_vals)
@@ -285,6 +272,11 @@ class Params(eqx.Module):
         key = dcs.fields(self)[0].name
         return len(getattr(self, key))
 
+    def __repr__(self):
+        return ", ".join(
+            f"{key.name}={float(getattr(self, key.name))}" for key in dcs.fields(self)
+        )
+
     def to_array(self):
         return jnp.squeeze(jnp.array(jax.tree_util.tree_flatten(self)[0]))
 
@@ -314,14 +306,26 @@ class RSFConstants:
 
 
 class CNSParams(Params):
+    alpha: Float
+    """Direct effect parameter for the granular flow process [-]"""
+    beta: Float
+    """Geometric factor that controls dilatation by granular flow [-]"""
     phi_c: Float
-    Z: Float
+    """Critical-state (maximum) porosity [-]"""
+    xi: Float
+    """Rate parameter of the creep process (normalised) [-]"""
+    mu0: Float
+    """Reference friction for the granular flow process [-]"""
 
 
 @dcs.dataclass(frozen=True)
 class CNSConstants:
-    phi_c: Float
-    Z: Float
+    h: Float
+    """Gouge layer thickness (ignoring localisation) [m]"""
+    phi0: Float
+    """Lower cut-off porosity [-]"""
+    v0: Float
+    """Reference velocity for the granular flow process [m/s]"""
 
 
 @dcs.dataclass(frozen=True)
@@ -340,7 +344,7 @@ class InertialSpringBlockConstants:
 # These typedefs should only be used for type checking,
 # and should not be instantiated.
 _Params = Union[RSFParams, CNSParams]
-_Constants = Union[RSFConstants]
+_Constants = Union[RSFConstants, CNSConstants]
 _BlockConstants = Union[SpringBlockConstants, InertialSpringBlockConstants]
 BC = TypeVar("BC", bound=_BlockConstants, contravariant=True)
 
@@ -422,9 +426,12 @@ class RSFStatistics(ParamStatistics):
 
 
 class CNSStatistics(ParamStatistics):
+    alpha: Statistics
+    phi_c: Statistics
+    z: Statistics
+    mu0: Statistics
+    v0: Statistics
     a: Statistics
-    b: Statistics
-    Dc: Statistics
 
 
 @dcs.dataclass
@@ -477,8 +484,14 @@ class BayesianSolution:
         self.log_likelihood = log_likelihood
         # Store the number of NaNs encountered during each step
         self.nan_count = nan_count
-        # TODO: need to generalise this...
-        self.statistics = RSFStatistics.from_state(self.final_state)
+
+        if isinstance(log_params, RSFParams):
+            self.statistics = RSFStatistics.from_state(self.final_state)
+        elif isinstance(log_params, CNSParams):
+            self.statistics = CNSStatistics.from_state(self.final_state)
+        else:
+            print(f"Parameters are of unknown type {type(log_params)}")
+            print("Skipping statistics...")
 
     def plot_convergence(self):
         """

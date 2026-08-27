@@ -20,13 +20,13 @@ class TestSolvers:
 
         variables, params, constants, block_constants = init_params()
         forward = Forward(rsf, {"theta": ageing_law}, springblock)
+        forward.set_initial_values(mu=variables.mu, theta=variables.theta, t=0.0)
+        y0 = forward.variables
         solver = ODESolver(forward)
 
         t = jnp.linspace(0.0, 100.0, 1000)
-        result = solver.solve_forward(t, variables, params, constants, block_constants)
-        result_jax = solver._solve_forward(
-            t, variables, params, constants, block_constants
-        )
+        result = solver.solve_forward(t, y0, params, constants, block_constants)
+        result_jax = solver._solve_forward(t, y0, params, constants, block_constants)
 
         assert result is not None
         assert result_jax is not None
@@ -51,17 +51,18 @@ class TestSolvers:
 
         variables, params, constants, block_constants = init_params()
         forward = Forward(rsf, {"theta": ageing_law}, springblock)
+        forward.set_initial_values(mu=variables.mu, theta=variables.theta, t=0.0)
+        y0 = forward.variables
         solver = ODESolver(forward)
 
         dt = 0.01
         v0 = constants.v0
-        # Three steps at t = 10, 20, 35 seconds
+        # Three steps at t = 300, 600, 1000 seconds
         t_steps = jnp.array([300.0, 600.0, 1000.0])
-        # v_steps = jnp.array([10 * v0, 0.1 * v0, v0])
-        v_steps = jnp.array([1.1 * v0, 0.9 * v0, v0])
+        v_steps = jnp.array([10 * v0, 0.1 * v0, v0])
 
         result, t = solver.generate_sequence(
-            t_steps, v_steps, dt, variables, params, constants, block_constants
+            t_steps, v_steps, dt, y0, params, constants, block_constants
         )
         # Check that time vector is ok
         assert jnp.isclose(t.min(), 0)
@@ -101,6 +102,7 @@ class TestSolvers:
         result_inv = solver.max_likelihood_inversion(
             t, mu, y0, params2, constants, block_constants, verbose=True
         )
+        assert result_inv is not None
         params_inv = result_inv.value
 
         # Reproduce friction curve
