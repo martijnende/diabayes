@@ -165,7 +165,7 @@ class Variables(eqx.Module):
         Convert the container values to a JAX array. The order of the output
         follows the order of `StateDict.keys`, with the first item being
         the friction coefficient. For ``n`` state variables, the output is
-        an array of shape ``(1+n,)`` for scalars, and ``(t, 1+n)`` for
+        an array of shape ``(1+n,)`` for scalars, and ``(1+n, t)`` for
         time series.
 
         Examples
