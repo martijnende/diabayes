@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -36,10 +36,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
@@ -328,8 +328,10 @@
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Forward models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.Forward.html">diabayes.forward_models.Forward</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.cns.html">diabayes.forward_models.cns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.ageing_law.html">diabayes.forward_models.ageing_law</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.aging_law.html">diabayes.forward_models.aging_law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.cns_porosity.html">diabayes.forward_models.cns_porosity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.slip_rate.html">diabayes.forward_models.slip_rate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.springblock.html">diabayes.forward_models.springblock</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/diabayes.forward_models.inertial_springblock.html">diabayes.forward_models.inertial_springblock</a></li>
@@ -420,8 +422,11 @@
 <h2>Friction laws<a class="headerlink" href="#friction-laws" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.rsf" title="diabayes.forward_models.rsf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsf</span></code></a>(variables, params, constants)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.rsf.html#diabayes.forward_models.rsf" title="diabayes.forward_models.rsf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsf</span></code></a>(variables, params, constants)</p></td>
 <td><p>The classical rate-and-state friction law</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.cns.html#diabayes.forward_models.cns" title="diabayes.forward_models.cns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cns</span></code></a>(variables, params, constants)</p></td>
+<td><p>The Chen-Niemeijer-Spiers (CNS) friction law</p></td>
 </tr>
 </tbody>
 </table>
@@ -431,13 +436,16 @@
 <h2>State evolution models<a class="headerlink" href="#state-evolution-models" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.ageing_law" title="diabayes.forward_models.ageing_law"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ageing_law</span></code></a>(v, variables, params, constants)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.ageing_law.html#diabayes.forward_models.ageing_law" title="diabayes.forward_models.ageing_law"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ageing_law</span></code></a>(v, variables, params, constants)</p></td>
 <td><p>The conventional ageing law state evolution formulation</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.aging_law" title="diabayes.forward_models.aging_law"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aging_law</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.aging_law.html#diabayes.forward_models.aging_law" title="diabayes.forward_models.aging_law"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aging_law</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Alias for the <code class="docutils literal notranslate"><span class="pre">ageing_law</span></code> function</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.slip_rate" title="diabayes.forward_models.slip_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slip_rate</span></code></a>(v, variables, params, constants)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.cns_porosity.html#diabayes.forward_models.cns_porosity" title="diabayes.forward_models.cns_porosity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cns_porosity</span></code></a>(v, variables, params, constants)</p></td>
+<td><p>The porosity (state) evolution for the Chen-Niemeijer-Spiers model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.slip_rate.html#diabayes.forward_models.slip_rate" title="diabayes.forward_models.slip_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slip_rate</span></code></a>(v, variables, params, constants)</p></td>
 <td><p>Evolve slip from slip rate</p></td>
 </tr>
 </tbody>
@@ -448,10 +456,10 @@
 <h2>Stress-transfer models<a class="headerlink" href="#stress-transfer-models" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.springblock" title="diabayes.forward_models.springblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springblock</span></code></a>(t, v, v_partials, variables, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.springblock.html#diabayes.forward_models.springblock" title="diabayes.forward_models.springblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springblock</span></code></a>(t, v, v_partials, variables, ...)</p></td>
 <td><p>A conventional (non-inertial) spring-block loading formulation</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="diabayes.html#diabayes.forward_models.inertial_springblock" title="diabayes.forward_models.inertial_springblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inertial_springblock</span></code></a>(t, v, v_partials, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../_autosummary/diabayes.forward_models.inertial_springblock.html#diabayes.forward_models.inertial_springblock" title="diabayes.forward_models.inertial_springblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inertial_springblock</span></code></a>(t, v, v_partials, ...)</p></td>
 <td><p>An inertial spring-block loading formulation</p></td>
 </tr>
 </tbody>
@@ -526,8 +534,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -561,7 +569,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

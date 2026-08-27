@@ -1,0 +1,37 @@
+diabayes.physics package
+========================
+
+Submodules
+----------
+
+diabayes.physics.chen\_niemeijer\_spiers module
+-----------------------------------------------
+
+.. automodule:: diabayes.physics.chen_niemeijer_spiers
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+diabayes.physics.rate\_and\_state module
+----------------------------------------
+
+.. automodule:: diabayes.physics.rate_and_state
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+diabayes.physics.stress\_transfer module
+----------------------------------------
+
+.. automodule:: diabayes.physics.stress_transfer
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: diabayes.physics
+   :members:
+   :show-inheritance:
+   :undoc-members:

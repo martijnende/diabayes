@@ -15,6 +15,7 @@
    
       ~ODESolver.__init__
       ~ODESolver.bayesian_inversion
+      ~ODESolver.evaluate_at_t
       ~ODESolver.generate_sequence
       ~ODESolver.max_likelihood_inversion
       ~ODESolver.solve_forward

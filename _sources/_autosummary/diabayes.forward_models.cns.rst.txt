@@ -1,0 +1,6 @@
+﻿diabayes.forward\_models.cns
+============================
+
+.. currentmodule:: diabayes.forward_models
+
+.. autofunction:: cns

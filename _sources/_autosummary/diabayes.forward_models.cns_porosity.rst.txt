@@ -1,0 +1,6 @@
+﻿diabayes.forward\_models.cns\_porosity
+======================================
+
+.. currentmodule:: diabayes.forward_models
+
+.. autofunction:: cns_porosity

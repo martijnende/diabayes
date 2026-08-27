@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -35,10 +35,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -399,7 +399,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get the value of the variable ``k``"""</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
 
 <div class="viewcode-block" id="StateDict.replace_values">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.StateDict.replace_values">[docs]</a>
@@ -488,19 +488,18 @@
 
         <span class="c1"># The other option is to select by integer or slice</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
-            <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
+            <span class="n">state_vals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">)</span>
+
             <span class="c1"># If mu is one-dimensional: only one value to select, so</span>
             <span class="c1"># return everything as-is</span>
             <span class="k">if</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span>
 
             <span class="c1"># If mu is a time series, select the requested values</span>
-            <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
-            <span class="n">state_keys</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">keys</span>
-            <span class="n">state_vals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">)[:,</span> <span class="n">key</span><span class="p">])</span>
-            <span class="n">state_dict</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">state_keys</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">state_vals</span><span class="p">)</span>
-
+            <span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">state_vals</span> <span class="o">=</span> <span class="n">state_vals</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">state_dict</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)(</span><span class="n">keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">state_vals</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">IndexError</span>
@@ -520,13 +519,13 @@
 <span class="sd">        &gt;&gt;&gt; variables = Variables(mu=jnp.asarray(0.6), state=state_dict)</span>
 <span class="sd">        &gt;&gt;&gt; variables = variables.set_values(mu=..., x=..., y=...)</span>
 <span class="sd">        """</span>
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"mu"</span><span class="p">))</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"mu"</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dcs</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">replace_values</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">state_str</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"Variables(mu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">state_str</span><span class="si">}</span><span class="s2">)"</span>
 
@@ -551,30 +550,13 @@
 <span class="sd">        Of course, in this example one could simply do ``scalars.mu``</span>
 <span class="sd">        and ``timeseries.mu`` to extract ``mu`` directly.</span>
 <span class="sd">        """</span>
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">)</span>
 
-        <span class="c1"># First case: mu and state are scalars</span>
-        <span class="c1"># Result shape (2,)</span>
-        <span class="k">if</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="p">])</span>
-        <span class="c1"># Second case: mu is scalar, state is vector</span>
-        <span class="c1"># (i.e., multiple state variables)</span>
-        <span class="c1"># Result shape (1+n,)</span>
-        <span class="k">elif</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">mu</span><span class="p">,</span> <span class="o">*</span><span class="n">state</span><span class="p">])</span>
-        <span class="c1"># Third case: mu and state are time series of scalars</span>
-        <span class="c1"># Result shape: (2, t)</span>
-        <span class="k">elif</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mu</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">state</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]])</span>
-        <span class="c1"># Fourth case: mu is time series of scalars,</span>
-        <span class="c1"># state is time series of vectors (n, t)</span>
-        <span class="c1"># Result shape: (1+n, t)</span>
-        <span class="k">elif</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mu</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">state</span><span class="p">])</span>
-        <span class="c1"># Other combinations of shapes should not exist</span>
+        <span class="k">if</span> <span class="n">mu</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">mu</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">state</span><span class="p">)])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported shapes: mu=</span><span class="si">{</span><span class="n">mu</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, state=</span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="Variables.from_array">
@@ -584,18 +566,21 @@
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Import a JAX array to instantiate the class. The array `x` can either be an</span>
 <span class="sd">        array of scalars (size n for n variables), or an array of time series of</span>
-<span class="sd">        shape `(n, t)`. The first element in the array (i.e., `x[0]`) is assumed to</span>
+<span class="sd">        shape `(t, n)`. The first element in the array (i.e., `x[..., 0]`) is assumed to</span>
 <span class="sd">        be the friction coefficient `mu`. The remaining elements are the state</span>
 <span class="sd">        variables, matching the number and order of the `keys` tuple.</span>
 <span class="sd">        """</span>
-        <span class="c1"># The first element is assumed to be mu</span>
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="c1"># If x is 2D: time series</span>
-        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-        <span class="c1"># Else: scalars</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">state</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Array must be 1D or 2D, got </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">D"</span><span class="p">)</span>
+
         <span class="c1"># Map `state` to `keys`</span>
         <span class="n">state_obj</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state_obj</span><span class="p">)</span></div>
@@ -623,15 +608,17 @@
         <span class="n">mu2</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">mu1</span><span class="p">,</span> <span class="n">mu2</span><span class="p">])</span>
 
+        <span class="n">state_vals1</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">vals</span><span class="p">)</span>
+
         <span class="c1"># Force the state arrays to be at least 2D arrays</span>
-        <span class="n">state_vals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">state_vals2</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
-            <span class="n">state1</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
-            <span class="n">state2</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
-            <span class="n">state_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">state1</span><span class="p">,</span> <span class="n">state2</span><span class="p">]))</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="n">state_vals2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
 
-        <span class="n">state_vals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">state_vals</span><span class="p">)</span>
+        <span class="n">state_vals2</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">state_vals2</span><span class="p">)</span>
+        <span class="n">state_vals</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">state_vals1</span><span class="p">,</span> <span class="n">state_vals2</span><span class="p">])</span>
 
         <span class="c1"># Create the new StateDict</span>
         <span class="n">state_dict</span> <span class="o">=</span> <span class="n">StateDict</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">vals</span><span class="o">=</span><span class="n">state_vals</span><span class="p">)</span>
@@ -665,6 +652,11 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">dcs</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dcs</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Params.to_array">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.Params.to_array">[docs]</a>
@@ -713,8 +705,16 @@
 <div class="viewcode-block" id="CNSParams">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.CNSParams">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CNSParams</span><span class="p">(</span><span class="n">Params</span><span class="p">):</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Float</span>
+<span class="w">    </span><span class="sd">"""Direct effect parameter for the granular flow process [-]"""</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Float</span>
+<span class="w">    </span><span class="sd">"""Geometric factor that controls dilatation by granular flow [-]"""</span>
     <span class="n">phi_c</span><span class="p">:</span> <span class="n">Float</span>
-    <span class="n">Z</span><span class="p">:</span> <span class="n">Float</span></div>
+<span class="w">    </span><span class="sd">"""Critical-state (maximum) porosity [-]"""</span>
+    <span class="n">xi</span><span class="p">:</span> <span class="n">Float</span>
+<span class="w">    </span><span class="sd">"""Rate parameter of the creep process (normalised) [-]"""</span>
+    <span class="n">mu0</span><span class="p">:</span> <span class="n">Float</span>
+<span class="w">    </span><span class="sd">"""Reference friction for the granular flow process [-]"""</span></div>
 
 
 
@@ -722,8 +722,12 @@
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.CNSConstants">[docs]</a>
 <span class="nd">@dcs</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CNSConstants</span><span class="p">:</span>
-    <span class="n">phi_c</span><span class="p">:</span> <span class="n">Float</span>
-    <span class="n">Z</span><span class="p">:</span> <span class="n">Float</span></div>
+    <span class="n">h</span><span class="p">:</span> <span class="n">Float</span>
+<span class="w">    </span><span class="sd">"""Gouge layer thickness (ignoring localisation) [m]"""</span>
+    <span class="n">phi0</span><span class="p">:</span> <span class="n">Float</span>
+<span class="w">    </span><span class="sd">"""Lower cut-off porosity [-]"""</span>
+    <span class="n">v0</span><span class="p">:</span> <span class="n">Float</span>
+<span class="w">    </span><span class="sd">"""Reference velocity for the granular flow process [m/s]"""</span></div>
 
 
 
@@ -749,7 +753,7 @@
 <span class="c1"># These typedefs should only be used for type checking,</span>
 <span class="c1"># and should not be instantiated.</span>
 <span class="n">_Params</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFParams</span><span class="p">,</span> <span class="n">CNSParams</span><span class="p">]</span>
-<span class="n">_Constants</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFConstants</span><span class="p">]</span>
+<span class="n">_Constants</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">RSFConstants</span><span class="p">,</span> <span class="n">CNSConstants</span><span class="p">]</span>
 <span class="n">_BlockConstants</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpringBlockConstants</span><span class="p">,</span> <span class="n">InertialSpringBlockConstants</span><span class="p">]</span>
 <span class="n">BC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"BC"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_BlockConstants</span><span class="p">,</span> <span class="n">contravariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -866,9 +870,12 @@
 <div class="viewcode-block" id="CNSStatistics">
 <a class="viewcode-back" href="../../api/diabayes.html#diabayes.typedefs.CNSStatistics">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CNSStatistics</span><span class="p">(</span><span class="n">ParamStatistics</span><span class="p">):</span>
-    <span class="n">a</span><span class="p">:</span> <span class="n">Statistics</span>
-    <span class="n">b</span><span class="p">:</span> <span class="n">Statistics</span>
-    <span class="n">Dc</span><span class="p">:</span> <span class="n">Statistics</span></div>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Statistics</span>
+    <span class="n">phi_c</span><span class="p">:</span> <span class="n">Statistics</span>
+    <span class="n">z</span><span class="p">:</span> <span class="n">Statistics</span>
+    <span class="n">mu0</span><span class="p">:</span> <span class="n">Statistics</span>
+    <span class="n">v0</span><span class="p">:</span> <span class="n">Statistics</span>
+    <span class="n">a</span><span class="p">:</span> <span class="n">Statistics</span></div>
 
 
 
@@ -926,8 +933,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log_likelihood</span> <span class="o">=</span> <span class="n">log_likelihood</span>
         <span class="c1"># Store the number of NaNs encountered during each step</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nan_count</span> <span class="o">=</span> <span class="n">nan_count</span>
-        <span class="c1"># TODO: need to generalise this...</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">RSFStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span></div>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">log_params</span><span class="p">,</span> <span class="n">RSFParams</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">RSFStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">log_params</span><span class="p">,</span> <span class="n">CNSParams</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="n">CNSStatistics</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">final_state</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Parameters are of unknown type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">log_params</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Skipping statistics..."</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BayesianSolution.plot_convergence">
@@ -1183,8 +1196,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1218,7 +1231,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,10 +36,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -52,6 +52,8 @@
     <script src="../../_static/togglebutton.js?v=b8b12719"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/forward/chen-niemeijer-spiers';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -219,6 +221,10 @@
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -329,6 +335,7 @@
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_usage.html">Advanced use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../adding_features.html">Adding custom physics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units_conventions.html">Units and conventions</a></li>
 </ul>
 </div>
 </nav></div>
@@ -394,11 +401,171 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="chen-niemeijer-spiers">
 <h1>Chen-Niemeijer-Spiers<a class="headerlink" href="#chen-niemeijer-spiers" title="Link to this heading">#</a></h1>
-<div class="admonition-future-work admonition">
-<p class="admonition-title">Future work</p>
-<p>To be written</p>
+<p>One major limitation of the rate-and-state friction (RSF) model, is that it is a purely empirical framework.
+There have been numerous efforts to explain the origins of the (logarithmic) dependencies on time, slip rate, and slip as originally proposed, and yet it has proven difficult to come up with a physical mechanism that correctly describes the wide range of frictional phenomena.
+For example, the RSF parameters <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, and <span class="math notranslate nohighlight">\(D_c\)</span> are presumed to be independent of the instantaneous slip rate, which would give a constant value of the rate dependence <span class="math notranslate nohighlight">\((a - b)\)</span>, even though steady-state experiments show that this is far from true (see e.g. Fig. 1 in the section on <a class="reference internal" href="../friction_experiments.html"><span class="doc std std-doc">friction experiments</span></a>).</p>
+<p>Since this kind of behaviour is essential for the dynamics of earthquake nucleation and rupture, a model based on physical principles would give us much more confidence when trying to extrapolate laboratory observations to natural faults.
+This is, in a nutshell, the motivation for the models proposed by <em>Niemeijer &amp; Spiers</em><a class="footnote-reference brackets" href="#footcite-niemeijer2006" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and <em>Chen &amp; Spiers</em><a class="footnote-reference brackets" href="#footcite-chen2016" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, denoted collectively as the <em>Chen-Niemeijer-Spiers</em> (CNS) model. The remainder of this section will focus on the mathematical formulations rather than the physical processes. For an extensive summary of these models and the experimental observations that preceded them, see <em>Verberne et al.</em><a class="footnote-reference brackets" href="#footcite-verberne2020" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<section id="original-formulation">
+<h2>Original formulation<a class="headerlink" href="#original-formulation" title="Link to this heading">#</a></h2>
+<p>Just like for the RSF model, the original CNS formulation comprises a friction law (i.e., fault slip rate as a function of stress and other variables) and a state evolution law. While for the RSF model the “state” is a somewhat nebulous concept, in the CNS framework the state is taken as the fault gouge porosity.
+This is one of the main advantages of the CNS model: since porosity is a well-defined observable, we can directly see and measure the “state” of a fault in the lab and in rock samples, and we have a clear sense for what controls the evolution of it.</p>
+<p>Without going into the derivations, the friction law of the CNS model is written as resulting from the added (parallel) shear rate contributions of granular flow (<span class="math notranslate nohighlight">\(\dot{\gamma}_{\text{gr}}\)</span>) and a creep process (<span class="math notranslate nohighlight">\(\dot{\gamma}_{\text{creep}}\)</span>) operating within a gouge layer of thickness <span class="math notranslate nohighlight">\(h\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+v(\tau, \phi) = h \left( \dot{\gamma}_{\text{gr}} + \dot{\gamma}_{\text{creep}} \right) \\
+\dot{\gamma}_{\text{gr}} = \dot{\gamma}_0 \exp \left( \frac{\tau \left[ 1 - \mu_0 \tan \psi \right] - \sigma \left[ \mu_0 + \tan \psi \right]}{\alpha \left[\sigma + \tau \tan \psi \right]} \right) \\
+\dot{\gamma}_{\text{creep}} = Z \tau f(\phi)
+\end{split}\end{split}\]</div>
+<p>In these equations, <span class="math notranslate nohighlight">\(\tau\)</span> denotes the instantaneous shear stress, <span class="math notranslate nohighlight">\(\sigma\)</span> the effective normal stress, <span class="math notranslate nohighlight">\(\phi\)</span> the gouge porosity, <span class="math notranslate nohighlight">\(\alpha\)</span> a parameter that is similar to the RSF parameter <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(\dot{\gamma}_0\)</span> and <span class="math notranslate nohighlight">\(\mu_0\)</span> co-dependent parameters similarly defined as the RSF <span class="math notranslate nohighlight">\(v_0\)</span> and <span class="math notranslate nohighlight">\(\mu_0\)</span>, and <span class="math notranslate nohighlight">\(Z\)</span> the rate parameter of the creep process.
+The two remaining terms are defined as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+\tan \psi = 2 \beta \left( \phi_c - \phi \right) \\
+f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
+\end{split}\end{split}\]</div>
+<p>The first equation is known in the soil mechanics literature as the <em>dilatancy angle</em>, and it controls how much an over-consolidated gouge dilates for an increment of shear strain. It introduces two new parameters, <span class="math notranslate nohighlight">\(\beta\)</span> being a geometric constant of order 1, and <span class="math notranslate nohighlight">\(\phi_c\)</span> the <em>critical state porosity</em> (the highest possible porosity that a granular gouge can support).
+The second equation describes how the nominally imposed stress (<span class="math notranslate nohighlight">\(\tau, \sigma\)</span>) translates into the average stress supported by individual grain contacts, and can therefore be seen as a porosity-dependent stress amplification factor.
+The parameter <span class="math notranslate nohighlight">\(\phi_0\)</span> determines the lowest possible porosity (typically ~3%), such that <span class="math notranslate nohighlight">\(\phi_0 &lt; \phi &lt; \phi_c\)</span> at all times.
+There exist variations to these equations, but these are the ones that are quite convenient for numerical modelling.</p>
+<p>Lastly, the state (porosity) evolution law captures the competition of slip-dependent dilatancy caused by granular flow versus time-dependent compaction caused by creep, resulting in both slip and time-dependent state evolution:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+\frac{\mathrm{d} \phi}{\mathrm{d} t} = -\left( 1 - \phi \right) \left( \dot{\varepsilon}_{\text{gr}} + \dot{\varepsilon}_{\text{creep}} \right) \\
+\dot{\varepsilon}_{\text{gr}} = - \tan \psi \dot{\gamma}_{\text{gr}} \\
+\dot{\varepsilon}_{\text{creep}} = Z \sigma f(\phi)
+\end{split}\end{split}\]</div>
+<p>Admittedly, these equations seem a lot more complicated than the original RSF formulation, but in return, the CNS model produces a wealth of frictional sliding behaviours that RSF cannot reproduce, which makes the extra effort worth it.
+Moreover, there are a few more tweaks that can be applied to obtain a more digestible set of equations and parameters.</p>
+</section>
+<section id="diabayes-modifications">
+<h2>DiaBayes modifications<a class="headerlink" href="#diabayes-modifications" title="Link to this heading">#</a></h2>
+<p>Without loss of generality, DiaBayes makes several symbolic adjustments to simplify the numerical implementation and to reduce the number of unconstrained parameters for inversion.
+Firstly, all stresses are normalised by <span class="math notranslate nohighlight">\(\sigma\)</span>, distances by <span class="math notranslate nohighlight">\(h\)</span>, and time is normalised as <span class="math notranslate nohighlight">\(t' = \dot{\gamma}_0 t = t v_0 h^{-1}\)</span>, which gives:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+v'(\mu, \phi) = \exp \left( \frac{\mu \left[ 1 - \mu_0 \tan \psi \right] - \left[ \mu_0 + \tan \psi \right]}{\alpha \left[1 + \mu \tan \psi \right]} \right) + \xi \mu f(\phi) \\
+\frac{\mathrm{d} \phi}{\mathrm{d} t'} = -\left( 1 - \phi \right) \left(- \tan \psi \left[ v' - \xi \mu f(\phi) \right] + \xi f(\phi) \right)
+\end{split}\end{split}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\xi = h Z \left(v_0 \sigma \right)^{-1}\)</span>.</p>
+<p>From this normalisation exercise, we can easily count the number of invertible (non-dimensional) parameters: <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(\mu_0\)</span>, <span class="math notranslate nohighlight">\(\xi\)</span>, and <span class="math notranslate nohighlight">\(\phi_c\)</span>, assuming that <span class="math notranslate nohighlight">\(\phi_0\)</span> is a known constant that is sufficiently small (a few per cent) to not matter much.
+Comparing this to RSF, which has the governing parameters <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, and <span class="math notranslate nohighlight">\(D_c\)</span>, the symbolic complexity of the CNS model doesn’t seem excessive, especially considering that RSF also requires <span class="math notranslate nohighlight">\(\mu_0\)</span> and <span class="math notranslate nohighlight">\(v_0\)</span> to be determined for absolute friction values.
+However, in contrast to typical RSF inversion practice, <span class="math notranslate nohighlight">\(\mu_0\)</span> cannot generally be interpreted as the “initial” friction, e.g. at the start of a velocity step.
+This is because the CNS model considers two independent physical processes (granular flow and viscous creep) that both contribute to the slip rate, and correspondingly friction, while <span class="math notranslate nohighlight">\(\mu_0\)</span> is exclusively a property of granular flow.
+However, for the range of fault slip rates in which granular flow dominates (<span class="math notranslate nohighlight">\(\dot{\gamma}_{\text{gr}} \gg \dot{\gamma}_{\text{creep}}\)</span>), <span class="math notranslate nohighlight">\(\mu_0\)</span> can reasonably be interpreted as an initial or reference friction value.</p>
+</section>
+<section id="numerical-solution-strategy">
+<h2>Numerical solution strategy<a class="headerlink" href="#numerical-solution-strategy" title="Link to this heading">#</a></h2>
+<p>In addition to the normalisation described above, DiaBayes has another trick up its sleeve to improve numerical stability of the numerical integration of the ODE.
+Due to the functional form of <span class="math notranslate nohighlight">\(f(\phi) \propto \left(\phi_c - \phi \right)^{-1}\)</span>, having a singularity at <span class="math notranslate nohighlight">\(\phi \rightarrow \phi_c\)</span>, numerical integrators tend to struggle to correctly resolve the ODE when <span class="math notranslate nohighlight">\(\phi\)</span> approaches <span class="math notranslate nohighlight">\(\phi_c\)</span>.
+In other words, the conventional CNS formulation is <a class="reference external" href="https://en.wikipedia.org/wiki/Stiff_equation">numerically stiff</a>.
+Fortunately, a simple change of variables eliminates the singularity; define <span class="math notranslate nohighlight">\(t' = \left(\phi_c - \phi \right) r\)</span> giving:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+\frac{\mathrm{d} \phi}{\mathrm{d} r} &amp;= \frac{\mathrm{d} t'}{\mathrm{d} r} \frac{\mathrm{d} \phi}{\mathrm{d} t'} \\
+&amp;= -\left( 1 - \phi \right) \left(- \tan \psi \left[ v' \left(\phi_c - \phi \right) - \xi \mu \left( \phi - \phi_0 \right) \right] + \xi \left[ \phi - \phi_0 \right] \right)
+\end{split}\end{split}\]</div>
+<p>Let it be clear that this expression no longer has any singularities.
+Such a manipulation is known as a <em>Sundman transformation</em>, and it is commonly used when dealing with planetary orbits to avoid the gravity singularity.
+The flip-side is that the ODE is now expressed as a function of <span class="math notranslate nohighlight">\(r\)</span> and not <span class="math notranslate nohighlight">\(t\)</span>, and so it is not immediately obvious what the integration bounds are (<em>which range of</em> <span class="math notranslate nohighlight">\(r = t \left( \phi_c - \phi(t) \right)\)</span> <em>corresponds with</em> <span class="math notranslate nohighlight">\(t \in [t_0, t_1 )\)</span>?).
+DiaBayes solves this conundrum by adding an additional equation to the ODE:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\mathrm{d} t'}{\mathrm{d} r} = \left( \phi_c - \phi \right)\]</div>
+<p>As the integration marches forward, it continuously tracks <span class="math notranslate nohighlight">\(t'\)</span> integrated over <span class="math notranslate nohighlight">\(r\)</span> until it exceeds <span class="math notranslate nohighlight">\(t_1\)</span>, at which point the integrator stops.
+The final results of the integration are then interpolated onto the user-requested time grid, so that the results can be correctly interpreted as varying with (physical) time and compared with measurements.
+Both the normalisation logic and Sundman transformations are abstracted away from the user, so that the overall user experience is no different between the RSF and CNS formulations.</p>
+</section>
+<section id="relationship-with-rsf">
+<h2>Relationship with RSF<a class="headerlink" href="#relationship-with-rsf" title="Link to this heading">#</a></h2>
+<p>Since both the RSF and CNS models aim to describe the same phenomenon (fault friction), there should exist approximate or asymptotic mappings between the two.
+In the limit of an infinitesimal slip rate (or stress) perturbation, it has been shown that the two formulations converge.
+In this limit, the RSF parameters can be written in terms of CNS parameters, and the RSF state evolution laws (ageing or slip laws) can be expressed as the evolution of porosity.
+While the translation between RSF and CNS parameters takes up quite a bit of space on paper (see Table 1 in <em>Chen et al.</em><a class="footnote-reference brackets" href="#footcite-chen2017" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>), the following statements generally hold:</p>
+<ol class="arabic simple">
+<li><p>The RSF parameter <span class="math notranslate nohighlight">\(a\)</span> is proportional to the CNS parameter <span class="math notranslate nohighlight">\(\alpha\)</span>, and both are typically of the same magnitude.</p></li>
+<li><p>The RSF parameter <span class="math notranslate nohighlight">\(b\)</span> is proportional to <span class="math notranslate nohighlight">\(\beta \sqrt{\xi}\)</span> (for the definitions of <span class="math notranslate nohighlight">\(\tan \psi\)</span> and <span class="math notranslate nohighlight">\(f(\phi)\)</span> as implemented in DiaBayes).</p></li>
+<li><p>The RSF parameter <span class="math notranslate nohighlight">\(D_c\)</span> is proportional to <span class="math notranslate nohighlight">\(h \beta^{-1}\)</span>.</p></li>
+</ol>
+<p>It is, of course, not recommended to try to force CNS-like behaviour into a RSF formulation or vice versa.
+Previous works listed at the bottom of this page clearly explain the interpretation of the CNS parameters and how to calculate them from e.g. temperature, grain size, and geometry, so there is no reason to compute them using RSF parameter values as an input.</p>
+</section>
+<section id="example-usage">
+<h2>Example usage<a class="headerlink" href="#example-usage" title="Link to this heading">#</a></h2>
+<p>See <code class="docutils literal notranslate"><span class="pre">examples/cns_model.ipynb</span></code> for a hands-on tutorial of forward modelling using the CNS model.</p>
+<p>The example code below represents a minimalistic and self-contained case of running a CNS forward model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">diabyayes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">db</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.forward_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Forward</span><span class="p">,</span> <span class="n">cns</span><span class="p">,</span> <span class="n">cns_porosity</span><span class="p">,</span> <span class="n">springblock</span><span class="p">,</span> <span class="n">steady_state_porosity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diabayes.solver</span><span class="w"> </span><span class="kn">import</span> <span class="n">ODESolver</span>
+
+<span class="c1"># Constants</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">1e-3</span>      <span class="c1"># Gouge layer thickness [m]</span>
+<span class="n">phi0</span> <span class="o">=</span> <span class="mf">0.03</span>   <span class="c1"># Minimum porosity (not initial porosity!) [-]</span>
+<span class="n">v0</span> <span class="o">=</span> <span class="mf">1e-6</span>     <span class="c1"># Reference velocity [m/s]</span>
+<span class="n">constants</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">CNSConstants</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">phi0</span><span class="o">=</span><span class="n">phi0</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="n">v0</span><span class="p">)</span>
+
+<span class="c1"># Spring-block constants</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mf">1e2</span>       <span class="c1"># Stiffness [1/m]</span>
+<span class="n">v_lp</span> <span class="o">=</span> <span class="mf">1e-5</span>   <span class="c1"># Load-point velocity [m/s]</span>
+<span class="n">block_constants</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">SpringBlockConstants</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">v_lp</span><span class="o">=</span><span class="n">v_lp</span><span class="p">)</span>
+
+<span class="c1"># Parameters (all dimensionless)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span>   <span class="c1"># Rate parameter</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">0.3</span>     <span class="c1"># Dilatancy geometric factor</span>
+<span class="n">phi_c</span> <span class="o">=</span> <span class="mf">0.4</span>    <span class="c1"># Critical-state porosity</span>
+<span class="n">xi</span> <span class="o">=</span> <span class="mf">1e-1</span>      <span class="c1"># Creep process rate parameter</span>
+<span class="n">mu0</span> <span class="o">=</span> <span class="mf">0.6</span>      <span class="c1"># Reference friction</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">CNSParams</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">phi_c</span><span class="o">=</span><span class="n">phi_c</span><span class="p">,</span> <span class="n">xi</span><span class="o">=</span><span class="n">xi</span><span class="p">,</span> <span class="n">mu0</span><span class="o">=</span><span class="n">mu0</span><span class="p">)</span>
+
+<span class="c1"># Calculate the steady-state porosity from these parameters</span>
+<span class="n">phi_ini</span> <span class="o">=</span> <span class="n">steady_state_porosity</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">mu0</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">constants</span><span class="p">)</span>
+
+<span class="c1"># Assemble forward model</span>
+<span class="n">state_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"phi"</span><span class="p">:</span> <span class="n">cns_porosity</span><span class="p">}</span>
+<span class="n">forward</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">(</span>
+    <span class="n">friction_model</span><span class="o">=</span><span class="n">cns</span><span class="p">,</span>
+    <span class="n">state_evolution</span><span class="o">=</span><span class="n">state_dict</span><span class="p">,</span>
+    <span class="n">stress_transfer</span><span class="o">=</span><span class="n">springblock</span>
+<span class="p">)</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">ODESolver</span><span class="p">(</span><span class="n">forward_model</span><span class="o">=</span><span class="n">forward</span><span class="p">)</span>
+
+<span class="c1"># Set initial values</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">set_initial_values</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu0</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi_ini</span><span class="p">)</span>
+<span class="n">y0</span> <span class="o">=</span> <span class="n">forward</span><span class="o">.</span><span class="n">variables</span>
+
+<span class="c1"># Run the forward simulation</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1000.</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve_forward</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+    <span class="n">friction_constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
+    <span class="n">block_constants</span><span class="o">=</span><span class="n">block_constants</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<div class="docutils container" id="id5">
 </div>
 </section>
+</section>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-niemeijer2006" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>A.R. Niemeijer and C.J. Spiers. Velocity dependence of strength and healing behaviour in simulated phyllosilicate-bearing fault gouge. <em>Tectonophysics</em>, 2006. <a class="reference external" href="https://doi.org/10.1016/j.tecto.2006.03.048">doi:10.1016/j.tecto.2006.03.048</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-chen2016" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Jianye Chen and Christopher J. Spiers. Rate and state frictional and healing behavior of carbonate fault gouge explained using microphysical model. <em>Journal of Geophysical Research: Solid Earth</em>, 121(12):8642–8665, December 2016. <a class="reference external" href="https://doi.org/10.1002/2016JB013470">doi:10.1002/2016JB013470</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-verberne2020" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Berend A. Verberne, Martijn P. A. van den Ende, Jianye Chen, André R. Niemeijer, and Christopher J. Spiers. The physics of fault friction: insights from experiments on simulated gouges at low shearing velocities. <em>Solid Earth</em>, 11(6):2075–2095, November 2020. <a class="reference external" href="https://doi.org/10.5194/se-11-2075-2020">doi:10.5194/se-11-2075-2020</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-chen2017" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Jianye Chen, A. R. Niemeijer, and Christopher J. Spiers. Microphysically Derived Expressions for Rate-and-State Friction Parameters, a, b, and Dc. <em>Journal of Geophysical Research: Solid Earth</em>, 122(12):9627–9657, December 2017. <a class="reference external" href="https://doi.org/10.1002/2017JB014226">doi:10.1002/2017JB014226</a>.</p>
+</aside>
+</aside>
 
 
                 </article>
@@ -435,6 +602,28 @@
             
             
               
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#original-formulation">Original formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes-modifications">DiaBayes modifications</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-solution-strategy">Numerical solution strategy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relationship-with-rsf">Relationship with RSF</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-usage">Example usage</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
             
           </div>
           <footer class="bd-footer-content">
@@ -446,8 +635,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -481,7 +670,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

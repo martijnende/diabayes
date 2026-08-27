@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -36,10 +36,10 @@
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -363,30 +363,58 @@
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
 <section id="installation-guide">
 <h2>Installation guide<a class="headerlink" href="#installation-guide" title="Link to this heading">#</a></h2>
-<p>It is recommended to create a dedicated Python environment using either <code class="docutils literal notranslate"><span class="pre">conda</span></code> or <code class="docutils literal notranslate"><span class="pre">venv</span></code>. DiaBayes will install numerous JAX-related packages that might conflict with your existing Python environments, especially when GPU support is enabled (which installs CUDA binaries). To create a new environment using <code class="docutils literal notranslate"><span class="pre">conda</span></code>, use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>diabayes<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11<span class="w"> </span>pip
+<p>It is recommended to create a dedicated Python environment using either <code class="docutils literal notranslate"><span class="pre">conda</span></code> or <code class="docutils literal notranslate"><span class="pre">venv</span></code>. DiaBayes will install numerous JAX-related packages that might conflict with your existing Python environments, especially when GPU support is enabled (which installs CUDA binaries).</p>
+<section id="pip-conda">
+<h3>Pip / conda<a class="headerlink" href="#pip-conda" title="Link to this heading">#</a></h3>
+<p>If you use <a class="reference external" href="https://conda.io">conda</a>, create or switch to the desired environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>diabayes<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.14<span class="w"> </span>pip
 conda<span class="w"> </span>activate<span class="w"> </span>diabayes
 </pre></div>
 </div>
-<p>You can then install the latest version using <code class="docutils literal notranslate"><span class="pre">pip</span></code> directly from GitHub:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"git+https://github.com/martijnende/diabayes.git#egg=diabayes"</span>
+<p>Install the latest version with CPU support from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git@github.com:martijnende/diabayes.git<span class="w">  </span><span class="c1"># Base version</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"diabayes[gpu,gui] @ git+github.com:martijnende/diabayes.git"</span><span class="w">  </span><span class="c1"># Base version + GPU support + GUI</span>
 </pre></div>
 </div>
-<p>To enable Nvidia GPU support (CUDA version 12):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"git+https://github.com/martijnende/diabayes.git#egg=diabayes[gpu]"</span>
+<p>You can also install from a local directory after cloning the repository</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:martijnende/diabayes.git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>diabayes
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="w">           </span><span class="c1"># Base version</span>
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>gpu,gui<span class="o">]</span><span class="w">  </span><span class="c1"># Base version + GPU support + GUI</span>
 </pre></div>
 </div>
-<p>If you plan to make direct changes to the code base, you can clone the repository and install from the local repository:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/martijnende/diabayes.git
-<span class="nb">cd</span><span class="w"> </span>diabayes
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>gpu<span class="o">]</span>
+<p>If you plan to contribute to the development of this package, please include the development tools:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
 </pre></div>
 </div>
-<p>Note that you’ll need to repeat <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> every time you make changes. If you also plan to push these changes to the original DiaBayes project, please include the development and documentation tools:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>gpu,docs,dev<span class="o">]</span>
+</section>
+<section id="uv">
+<h3>UV<a class="headerlink" href="#uv" title="Link to this heading">#</a></h3>
+<p>Using <a class="reference external" href="https://docs.astral.sh/uv/">Astral UV</a>, you create a dedicated environment with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:martijnende/diabayes.git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>diabayes
+uv<span class="w"> </span>sync<span class="w">                          </span><span class="c1"># Install just the base environment</span>
+uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>gui<span class="w"> </span>--extra<span class="w"> </span>gpu<span class="w">  </span><span class="c1"># Equivalent to pip install .[gui,gpu]</span>
+uv<span class="w"> </span>sync<span class="w"> </span>--extra-all<span class="w">              </span><span class="c1"># Install everything</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">dev</span></code> packages include <a class="reference external" href="https://github.com/psf/black"><code class="docutils literal notranslate"><span class="pre">black</span></code></a> and <a class="reference external" href="https://github.com/PyCQA/isort"><code class="docutils literal notranslate"><span class="pre">isort</span></code></a>, which (re-)structure your code to a consistent format whenever you execute these in the repository root directory.</p>
+<p>When working from a different workspace directory, you can instruct UV to use a specific virtual environment by setting an environment variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">VIRTUAL_ENV</span><span class="o">=</span><span class="s2">"/path/to/diabayes/.venv/"</span><span class="w">   </span><span class="c1"># For bash, zsh, ...</span>
+<span class="nb">set</span><span class="w"> </span>-gx<span class="w"> </span>VIRTUAL_ENV<span class="w"> </span><span class="s2">"/path/to/diabayes/.venv/"</span><span class="w">  </span><span class="c1"># For fish</span>
+</pre></div>
+</div>
+<p>You can then run the DiaBayes GUI from a different workspace directory as:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/workspace
+uv<span class="w"> </span>run<span class="w"> </span>diabayes<span class="w"> </span>init<span class="w"> </span>.
+uv<span class="w"> </span>run<span class="w"> </span>diabayes<span class="w"> </span>run
+</pre></div>
+</div>
+</section>
+<section id="a-note-on-gpu-support">
+<h3>A note on GPU support<a class="headerlink" href="#a-note-on-gpu-support" title="Link to this heading">#</a></h3>
+<p>Currently DiaBayes only supports Nvidia GPUs with Cuda version 12, simply because that is what I have on my local machine.
+Feel free to change the <code class="docutils literal notranslate"><span class="pre">gpu</span></code> option in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> to change the JAX version that is supported by your hardware.
+See the <a class="reference external" href="https://docs.jax.dev/en/latest/installation.html">JAX installation guide</a> for detailed instructions.
+Note that the GPU is only used for Bayesian inference (SVI); all other components of the software use the CPU.</p>
+</section>
 </section>
 <section id="basic-usage">
 <h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading">#</a></h2>
@@ -492,6 +520,21 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </pre></div>
 </div>
 </section>
+<section id="using-the-gui">
+<h3>Using the GUI<a class="headerlink" href="#using-the-gui" title="Link to this heading">#</a></h3>
+<p>DiaBayes comes with a web-based GUI that exposes a number of basic features, like data visualisation, forward modelling, and inversion, using the more conventional friction models.
+This GUI persistently stores its environment state so that you can resume the analysis over consecutive sessions.
+You can also export and share this environment state, for example as a supplementary material to a publication.</p>
+<p>To enable the GUI, make sure to install it first (see the next section).
+Then, to initialise a workspace, execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/workspace
+diabayes<span class="w"> </span>init<span class="w"> </span>.<span class="w">  </span><span class="c1"># Initialise the environment (run only once per environment)</span>
+diabayes<span class="w"> </span>run<span class="w">     </span><span class="c1"># Start the GUI server</span>
+</pre></div>
+</div>
+<p>Point your browser at the URL printed after the <code class="docutils literal notranslate"><span class="pre">run</span></code> command (default: <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:5000</span></code>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">init</span></code> command will produce a default <code class="docutils literal notranslate"><span class="pre">workspace.toml</span></code> file with settings that can be adjusted by the user (requires relaunching the server to take effect).</p>
+</section>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
@@ -550,10 +593,16 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-guide">Installation guide</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-guide">Installation guide</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-conda">Pip / conda</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#uv">UV</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-gpu-support">A note on GPU support</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-usage">Basic usage</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-models">Forward models</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inversion">Inversion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-gui">Using the GUI</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
@@ -574,8 +623,8 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -609,7 +658,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Adding custom physics &#8212; DiaBayes  documentation</title>
+    <title>diabayes.forward_models.cns &#8212; DiaBayes  documentation</title>
   
   
   
@@ -52,12 +52,14 @@
     <script src="../_static/togglebutton.js?v=b8b12719"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/adding_features';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/diabayes.forward_models.cns';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Units and conventions" href="units_conventions.html" />
-    <link rel="prev" title="Advanced use cases" href="advanced_usage.html" />
+    <link rel="next" title="diabayes.forward_models.ageing_law" href="diabayes.forward_models.ageing_law.html" />
+    <link rel="prev" title="diabayes.forward_models.rsf" href="diabayes.forward_models.rsf.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -149,14 +151,14 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../api/index.html">
     API Reference
   </a>
@@ -219,6 +221,10 @@
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -252,14 +258,14 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../api/index.html">
     API Reference
   </a>
@@ -315,21 +321,35 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="friction_experiments.html">Rock friction experiments</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="forward/index.html">Forward modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="forward/rate-and-state.html">Rate-and-state friction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forward/chen-niemeijer-spiers.html">Chen-Niemeijer-Spiers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="forward/spring-block.html">Spring-blocks</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/typedefs.html">Data containers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.Variables.html">diabayes.typedefs.Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.StateDict.html">diabayes.typedefs.StateDict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.typedefs.BayesianSolution.html">diabayes.typedefs.BayesianSolution</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="inversion/index.html">Inverse modelling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="inversion/max-likelihood.html">Maximum-likelihood inversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inversion/bayesian.html">Bayesian inversion</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api/forward_models.html">Forward models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.Forward.html">diabayes.forward_models.Forward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.rsf.html">diabayes.forward_models.rsf</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">diabayes.forward_models.cns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.ageing_law.html">diabayes.forward_models.ageing_law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.aging_law.html">diabayes.forward_models.aging_law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.cns_porosity.html">diabayes.forward_models.cns_porosity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.slip_rate.html">diabayes.forward_models.slip_rate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.springblock.html">diabayes.forward_models.springblock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.forward_models.inertial_springblock.html">diabayes.forward_models.inertial_springblock</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced use cases</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Adding custom physics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="units_conventions.html">Units and conventions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/solver.html">Solver routines</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.html">diabayes.solver.ODESolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.bayesian_inversion.html">diabayes.solver.ODESolver.bayesian_inversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.max_likelihood_inversion.html">diabayes.solver.ODESolver.max_likelihood_inversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.solver.ODESolver.solve_forward.html">diabayes.solver.ODESolver.solve_forward</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/svi.html">Stein Variational Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diabayes.SVI.compute_phi.html">diabayes.SVI.compute_phi</a></li>
+</ul>
+</details></li>
 </ul>
 </div>
 </nav></div>
@@ -371,9 +391,12 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    <li class="breadcrumb-item"><a href="../api/index.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Adding custom physics</span></li>
+    
+    <li class="breadcrumb-item"><a href="../api/forward_models.html" class="nav-link">Forward models</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">diabayes.forward_models.cns</span></li>
   </ul>
 </nav>
 </div>
@@ -390,17 +413,31 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="adding-custom-physics">
-<h1>Adding custom physics<a class="headerlink" href="#adding-custom-physics" title="Link to this heading">#</a></h1>
-<div class="admonition-future-work admonition">
-<p class="admonition-title">Future work</p>
-<p>To be written. This will include</p>
-<ul class="simple">
-<li><p>Friction laws</p></li>
-<li><p>State equations</p></li>
-<li><p>Stress transfer</p></li>
+  <section id="diabayes-forward-models-cns">
+<h1>diabayes.forward_models.cns<a class="headerlink" href="#diabayes-forward-models-cns" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="diabayes.forward_models.cns">
+<span class="sig-prename descclassname"><span class="pre">diabayes.forward_models.</span></span><span class="sig-name descname"><span class="pre">cns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><span class="pre">Variables</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><span class="pre">CNSParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSConstants" title="diabayes.typedefs.CNSConstants"><span class="pre">CNSConstants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Float</span></span></span><a class="reference internal" href="../_modules/diabayes/physics/chen_niemeijer_spiers.html#cns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diabayes.forward_models.cns" title="Link to this definition">#</a></dt>
+<dd><p>The Chen-Niemeijer-Spiers (CNS) friction law</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}v(\mu, \phi) = v_0 \left( v_{\text{gr}}(\mu, \phi) + v_{\text{creep}}(\mu, \phi) \right)\\v_{\text{gr}} = \exp \left( \frac{\mu \left[1 - \mu_0 \tan \psi \right] - \mu_0 - \tan \psi}{\alpha \left[ 1 + \mu \tan \psi \right]} \right)\\v_{\text{creep}} = \xi \mu f(\phi)\\\tan \psi = 2 \beta \left( \phi_c - \phi \right)\\f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}\end{aligned}\end{align} \]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variables</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.Variables" title="diabayes.typedefs.Variables"><em>Variables</em></a>) – The friction coefficient <code class="docutils literal notranslate"><span class="pre">mu</span></code> and gouge porosity <code class="docutils literal notranslate"><span class="pre">phi</span></code></p></li>
+<li><p><strong>params</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSParams" title="diabayes.typedefs.CNSParams"><em>CNSParams</em></a>) – The CNS parameters <code class="docutils literal notranslate"><span class="pre">alpha</span></code>, <code class="docutils literal notranslate"><span class="pre">beta</span></code>, <code class="docutils literal notranslate"><span class="pre">phi_c</span></code>, <code class="docutils literal notranslate"><span class="pre">xi</span></code>, and <code class="docutils literal notranslate"><span class="pre">mu0</span></code></p></li>
+<li><p><strong>constants</strong> (<a class="reference internal" href="../api/diabayes.html#diabayes.typedefs.CNSConstants" title="diabayes.typedefs.CNSConstants"><em>CNSConstants</em></a>) – The constant parameters <code class="docutils literal notranslate"><span class="pre">v0</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, and <code class="docutils literal notranslate"><span class="pre">phi0</span></code></p></li>
 </ul>
-</div>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>v</strong> – The instantaneous slip rate in the same units as <code class="docutils literal notranslate"><span class="pre">v0</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -414,20 +451,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="advanced_usage.html"
+       href="diabayes.forward_models.rsf.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Advanced use cases</p>
+        <p class="prev-next-title">diabayes.forward_models.rsf</p>
       </div>
     </a>
     <a class="right-next"
-       href="units_conventions.html"
+       href="diabayes.forward_models.ageing_law.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Units and conventions</p>
+        <p class="prev-next-title">diabayes.forward_models.ageing_law</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -437,6 +474,24 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diabayes.forward_models.cns"><code class="docutils literal notranslate"><span class="pre">cns()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
