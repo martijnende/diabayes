@@ -14,7 +14,7 @@ from diabayes.typedefs import (
     _Params,
 )
 
-from .physics import (
+from diabayes.physics import (
     rsf,
     ageing_law,
     aging_law,
