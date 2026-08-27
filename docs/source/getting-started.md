@@ -2,30 +2,58 @@
 
 ## Installation guide
 
-It is recommended to create a dedicated Python environment using either `conda` or `venv`. DiaBayes will install numerous JAX-related packages that might conflict with your existing Python environments, especially when GPU support is enabled (which installs CUDA binaries). To create a new environment using `conda`, use:
+It is recommended to create a dedicated Python environment using either `conda` or `venv`. DiaBayes will install numerous JAX-related packages that might conflict with your existing Python environments, especially when GPU support is enabled (which installs CUDA binaries).
+
+### Pip / conda
+
+If you use [conda](https://conda.io), create or switch to the desired environment:
 ```bash
-conda create -n diabayes python=3.11 pip
+conda create -n diabayes python=3.14 pip
 conda activate diabayes
 ```
-You can then install the latest version using `pip` directly from GitHub:
+Install the latest version with CPU support from GitHub:
 ```bash
-pip install "git+https://github.com/martijnende/diabayes.git#egg=diabayes"
+pip install git@github.com:martijnende/diabayes.git  # Base version
+pip install "diabayes[gpu,gui] @ git+github.com:martijnende/diabayes.git"  # Base version + GPU support + GUI
 ```
-To enable Nvidia GPU support (CUDA version 12):
+You can also install from a local directory after cloning the repository
 ```bash
-pip install "git+https://github.com/martijnende/diabayes.git#egg=diabayes[gpu]"
+git clone git@github.com:martijnende/diabayes.git && cd diabayes
+pip install .           # Base version
+pip install .[gpu,gui]  # Base version + GPU support + GUI
 ```
-If you plan to make direct changes to the code base, you can clone the repository and install from the local repository:
+If you plan to contribute to the development of this package, please include the development tools:
 ```bash
-git clone https://github.com/martijnende/diabayes.git
-cd diabayes
-pip install -e .[gpu]
+pip install .[dev]
 ```
-Note that you'll need to repeat `pip install` every time you make changes. If you also plan to push these changes to the original DiaBayes project, please include the development and documentation tools:
+
+### UV
+
+Using [Astral UV](https://docs.astral.sh/uv/), you create a dedicated environment with:
 ```bash
-pip install .[gpu,docs,dev]
+git clone git@github.com:martijnende/diabayes.git && cd diabayes
+uv sync                          # Install just the base environment
+uv sync --extra gui --extra gpu  # Equivalent to pip install .[gui,gpu]
+uv sync --extra-all              # Install everything
 ```
-The `dev` packages include [`black`](https://github.com/psf/black) and [`isort`](https://github.com/PyCQA/isort), which (re-)structure your code to a consistent format whenever you execute these in the repository root directory.
+When working from a different workspace directory, you can instruct UV to use a specific virtual environment by setting an environment variable:
+```bash
+export VIRTUAL_ENV="/path/to/diabayes/.venv/"   # For bash, zsh, ...
+set -gx VIRTUAL_ENV "/path/to/diabayes/.venv/"  # For fish
+```
+You can then run the DiaBayes GUI from a different workspace directory as:
+```bash
+cd /path/to/workspace
+uv run diabayes init .
+uv run diabayes run
+```
+
+### A note on GPU support
+
+Currently DiaBayes only supports Nvidia GPUs with Cuda version 12, simply because that is what I have on my local machine.
+Feel free to change the `gpu` option in `pyproject.toml` to change the JAX version that is supported by your hardware.
+See the [JAX installation guide](https://docs.jax.dev/en/latest/installation.html) for detailed instructions.
+Note that the GPU is only used for Bayesian inference (SVI); all other components of the software use the CPU.
 
 ## Basic usage
 
@@ -136,6 +164,23 @@ samples, sample_results = bayesian_result.sample(
     nsamples=100
 )
 ```
+
+### Using the GUI
+
+DiaBayes comes with a web-based GUI that exposes a number of basic features, like data visualisation, forward modelling, and inversion, using the more conventional friction models.
+This GUI persistently stores its environment state so that you can resume the analysis over consecutive sessions.
+You can also export and share this environment state, for example as a supplementary material to a publication.
+
+To enable the GUI, make sure to install it first (see the next section).
+Then, to initialise a workspace, execute:
+```bash
+cd /path/to/workspace
+diabayes init .  # Initialise the environment (run only once per environment)
+diabayes run     # Start the GUI server
+```
+Point your browser at the URL printed after the `run` command (default: `http://127.0.0.1:5000`).
+
+The `init` command will produce a default `workspace.toml` file with settings that can be adjusted by the user (requires relaunching the server to take effect).
 
 ## Examples
 

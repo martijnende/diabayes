@@ -1,0 +1,148 @@
+import equinox as eqx
+import jax.numpy as jnp
+from jaxtyping import Float
+
+from diabayes.typedefs import (
+    CNSConstants,
+    CNSParams,
+    Variables,
+)
+
+
+@eqx.filter_jit
+def _porosity_func(
+    variables: Variables, params: CNSParams, constants: CNSConstants
+) -> Float:
+    r"""
+    The porosity modulation function proposed by [1]_
+
+    .. math::
+
+        f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
+
+    Parameters
+    ----------
+    variables : Variables
+        The friction coefficient ``mu`` and gouge porosity ``phi``
+    params : CNSParams
+        The CNS parameters ``alpha``, ``phi_c``, ``z``, ``mu0``, ``v0`` and ``a``
+    constants : CNSConstants
+        The constant parameters ``h`` and ``phi0``
+
+    Returns
+    -------
+    f_phi : Float
+        The porosity modulation function
+
+    References
+    ----------
+    .. [1] van den Ende, Chen, Ampuero, Niemeijer (2018), A comparison between rate-and-state friction and microphysical models, based on numerical simulations of fault slip, doi:10.1016/j.tecto.2017.11.040
+    """
+    phi = variables.phi
+    phi0 = constants.phi0
+    phi_c = params.phi_c
+    f_phi = (phi - phi0) / (phi_c - phi)
+    return f_phi
+
+
+@eqx.filter_jit
+def cns(variables: Variables, params: CNSParams, constants: CNSConstants) -> Float:
+    r"""
+    The Chen-Niemeijer-Spiers (CNS) friction law
+
+    .. math::
+
+        v(\mu, \phi) = v_{\text{gr}}(\mu, \phi) + v_{\text{creep}}(\mu, \phi)
+
+        v_{\text{gr}} = v_0 \exp \left( \frac{\mu \left[1 - \mu_0 \tan \psi \right] - \mu_0 - \tan \psi}{a \left[ 1 + \mu \tan \psi \right]} \right)
+
+        v_{\text{creep}} = h z \mu f(\phi)
+
+        \tan \psi = 2 \alpha \left( \phi_c - \phi \right)
+
+        f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
+
+
+    Parameters
+    ----------
+    variables : Variables
+        The friction coefficient ``mu`` and gouge porosity ``phi``
+    params : CNSParams
+        The CNS parameters ``alpha``, ``phi_c``, ``z``, ``mu0``, ``v0`` and ``a``
+    constants : CNSConstants
+        The constant parameters ``h`` and ``phi0``
+
+    Returns
+    -------
+    v : Float
+        The instantaneous slip rate in the same units as ``v0``
+    """
+
+    # Granular flow components
+    tan_psi = 2 * params.alpha * (params.phi_c - variables.phi)
+    A = variables.mu * (1 - params.mu0 * tan_psi) - params.mu0 - tan_psi
+    B = params.a * (1 + variables.mu * tan_psi)
+    v_gr = params.v0 * jnp.exp(A / B)
+
+    # Creep components
+    f_phi = _porosity_func(variables, params, constants)
+    v_creep = constants.h * params.z * variables.mu * f_phi
+
+    # Assembly
+    v = v_gr + v_creep
+
+    return jnp.squeeze(v)
+
+
+@eqx.filter_jit
+def cns_porosity(
+    v: Float, variables: Variables, params: CNSParams, constants: CNSConstants
+) -> Float:
+    r"""
+    The porosity (state) evolution for the Chen-Niemeijer-Spiers model
+
+    .. math::
+
+        \frac{\mathrm{d}\phi}{\mathrm{d}t} = - \left(1 - \phi \right) \left(\dot{\varepsilon}_{\text{gr}} + \dot{\varepsilon}_{\text{creep}} \right)
+
+        \dot{\varepsilon}_{\text{gr}} = - \frac{\tan \psi}{h} \left(v - v_{\text{creep}} \right)
+
+        \dot{\varepsilon}_{\text{creep}} = z f(\phi)
+
+        v_{\text{creep}} = h z f(\phi) \mu
+
+        \tan \psi = 2 \alpha \left( \phi_c - \phi \right)
+
+        f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
+
+
+    Parameters
+    ----------
+    v : Float
+        Instantaneous fault slip rate [m/s].
+    variables : Variables
+        The friction coefficient ``mu`` and gouge porosity ``phi``
+    params : CNSParams
+        The CNS parameters ``alpha``, ``phi_c``, ``z``, ``mu0``, ``v0`` and ``a``
+    constants : CNSConstants
+        The constant parameters ``h`` and ``phi0``
+
+    Returns
+    -------
+    dphi : Float
+        The rate of change of the porosity [1/s]
+    """
+
+    # Creep components
+    f_phi = _porosity_func(variables, params, constants)
+    e_creep = params.z * f_phi
+    v_creep = constants.h * e_creep * variables.mu
+
+    # Granular flow components
+    tan_psi = 2 * params.alpha * (params.phi_c - variables.phi)
+    e_gr = -tan_psi * (v - v_creep) / constants.h
+
+    # Assembly
+    dphi = -(1 - variables.phi) * (e_gr + e_creep)
+
+    return jnp.squeeze(dphi)

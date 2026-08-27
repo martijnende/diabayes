@@ -46,7 +46,7 @@ Moreover, there are a few more tweaks that can be applied to obtain a more diges
 
 ## DiaBayes modifications
 
-Without loss of generality, _DiaBayes_ makes several symbolic adjustments to simplify the numerical implementation and to reduce the number of unconstrained parameters for inversion.
+Without loss of generality, DiaBayes makes several symbolic adjustments to simplify the numerical implementation and to reduce the number of unconstrained parameters for inversion.
 Firstly, all stresses are normalised by $\sigma$, distances by $h$, and time is normalised as $t' = \dot{\gamma}_0 t = t v_0 h^{-1}$, which gives:
 ```{math}
 \begin{split}
@@ -56,7 +56,7 @@ v'(\mu, \phi) = \exp \left( \frac{\mu \left[ 1 - \mu_0 \tan \psi \right] - \left
 ```
 with $\xi = h Z \left(v_0 \sigma \right)^{-1}$.
 
-From this normalisation exercise, we can easily count the number of invertible (non-dimensional) parameters: $\alpha$, $\beta$, $\mu_0$, $\xi$, and $\phi_c$, assuming that $\phi_0$ is a known constant that is sufficiently small (a few per cent) to not matter.
+From this normalisation exercise, we can easily count the number of invertible (non-dimensional) parameters: $\alpha$, $\beta$, $\mu_0$, $\xi$, and $\phi_c$, assuming that $\phi_0$ is a known constant that is sufficiently small (a few per cent) to not matter much.
 Comparing this to RSF, which has the governing parameters $a$, $b$, and $D_c$, the symbolic complexity of the CNS model doesn't seem excessive, especially considering that RSF also requires $\mu_0$ and $v_0$ to be determined for absolute friction values.
 However, in contrast to typical RSF inversion practice, $\mu_0$ cannot generally be interpreted as the "initial" friction, e.g. at the start of a velocity step.
 This is because the CNS model considers two independent physical processes (granular flow and viscous creep) that both contribute to the slip rate, and correspondingly friction, while $\mu_0$ is exclusively a property of granular flow.
@@ -64,8 +64,8 @@ However, for the range of fault slip rates in which granular flow dominates ($\d
 
 ## Numerical solution strategy
 
-In addition to the normalisation described above, _DiaBayes_ has another trick up its sleeve to improve numerical stability of the numerical integration of the ODE.
-Due to the functional form of $f(\phi) \propto \left(\phi_c - \phi \right)^{-1}$, having a singularity at $\phi = \phi_c$, numerical integrators tend to struggle to correctly resolve the ODE when $\phi$ approaches $\phi_c$ (from below).
+In addition to the normalisation described above, DiaBayes has another trick up its sleeve to improve numerical stability of the numerical integration of the ODE.
+Due to the functional form of $f(\phi) \propto \left(\phi_c - \phi \right)^{-1}$, having a singularity at $\phi \rightarrow \phi_c$, numerical integrators tend to struggle to correctly resolve the ODE when $\phi$ approaches $\phi_c$.
 In other words, the conventional CNS formulation is [numerically stiff](https://en.wikipedia.org/wiki/Stiff_equation).
 Fortunately, a simple change of variables eliminates the singularity; define $t' = \left(\phi_c - \phi \right) r$ giving:
 ```{math}
@@ -77,7 +77,7 @@ Fortunately, a simple change of variables eliminates the singularity; define $t'
 Let it be clear that this expression no longer has any singularities.
 Such a manipulation is known as a _Sundman transformation_, and it is commonly used when dealing with planetary orbits to avoid the gravity singularity.
 The flip-side is that the ODE is now expressed as a function of $r$ and not $t$, and so it is not immediately obvious what the integration bounds are (_which range of_ $r = t \left( \phi_c - \phi(t) \right)$ _corresponds with_ $t \in [t_0, t_1 )$?).
-_DiaBayes_ solves this conundrum by adding an additional equation to the ODE:
+DiaBayes solves this conundrum by adding an additional equation to the ODE:
 ```{math}
 \frac{\mathrm{d} t'}{\mathrm{d} r} = \left( \phi_c - \phi \right)
 ```

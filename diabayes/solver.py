@@ -1,6 +1,6 @@
 from functools import partial
 from time import time_ns
-from typing import Any, Tuple, Union
+from typing import Tuple, Union
 
 import diffrax as dfx
 import equinox as eqx
@@ -19,7 +19,6 @@ from diabayes.forward_models import Forward
 from diabayes.SVI import compute_phi, mapped_log_likelihood
 from diabayes.typedefs import (
     BayesianSolution,
-    RSFParams,
     Variables,
     _BlockConstants,
     _Constants,

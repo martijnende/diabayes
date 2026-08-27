@@ -183,7 +183,7 @@ class Variables(eqx.Module):
         state = jnp.squeeze(self.state.vals)
 
         if mu.ndim == 0:
-            return jnp.concatenate([jnp.atleast_1d(mu), state])
+            return jnp.concatenate([jnp.atleast_1d(mu), jnp.atleast_1d(state)])
         else:
             return jnp.column_stack([mu, state])
 

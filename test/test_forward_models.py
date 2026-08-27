@@ -47,7 +47,7 @@ class TestForwardModels:
 
         mu = variables.mu
         phi = variables.phi
-        keys = ("mu",) + variables.state.keys
+        keys = variables.state.keys
 
         # Steady-state tests
 
@@ -61,7 +61,9 @@ class TestForwardModels:
             tan_psi_ss = 0.5 * B * (1 - jnp.sqrt(1 + 4 * A / (B * (A * mu - 1))))
             phi_ss = params.phi_c - tan_psi_ss / (2 * params.alpha)
 
-            variables2 = db.Variables.from_array(jnp.array([mu, phi_ss]), keys=keys)
+            variables2 = db.Variables(
+                mu=mu, state=StateDict(keys, jnp.atleast_1d(phi_ss))
+            )
 
             # Compare steady-state phi (i.e., dphi = 0) with analytical benchmark
             phi_dot = db_models.cns_porosity(v, variables2, params, constants)
