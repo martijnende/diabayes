@@ -85,6 +85,20 @@ As the integration marches forward, it continuously tracks $t'$ integrated over 
 The final results of the integration are then interpolated onto the user-requested time grid, so that the results can be correctly interpreted as varying with (physical) time and compared with measurements.
 Both the normalisation logic and Sundman transformations are abstracted away from the user, so that the overall user experience is no different between the RSF and CNS formulations.
 
+## Relationship with RSF
+
+Since both the RSF and CNS models aim to describe the same phenomenon (fault friction), there should exist approximate or asymptotic mappings between the two.
+In the limit of an infinitesimal slip rate (or stress) perturbation, it has been shown that the two formulations converge.
+In this limit, the RSF parameters can be written in terms of CNS parameters, and the RSF state evolution laws (ageing or slip laws) can be expressed as the evolution of porosity.
+While the translation between RSF and CNS parameters takes up quite a bit of space on paper (see Table 1 in _Chen et al._{footcite}`chen2017`), the following statements generally hold:
+
+1. The RSF parameter $a$ is proportional to the CNS parameter $\alpha$, and both are typically of the same magnitude.
+2. The RSF paramter $b$ is proportional to $\beta \sqrt{\xi}$ (for the definitions of $\tan \psi$ and $f(\phi)$ as implemented in DiaBayes).
+3. The RSF parameter $D_c$ is proportional to $h \beta^{-1}$.
+
+It is, of course, not recommended to try to force CNS-like behaviour into a RSF formulation or vice versa.
+Previous works listed at the bottom of this page clearly explain the interpretation of the CNS parameters and how to calculate them from e.g. temperature, grain size, and geometry, so there is no reason to compute them using RSF parameter values as an input.
+
 ## Example usage
 
 ```{rubric} References
