@@ -23,6 +23,9 @@ class TestForwardModels:
         dtheta = db_models.ageing_law(constants.v0, variables, params, constants)
         assert jnp.allclose(dtheta, 0.0)
 
+        dtheta = db_models.slip_law(constants.v0, variables, params, constants)
+        assert jnp.allclose(dtheta, 0.0)
+
         v = db_models.rsf(variables, params, constants)
         assert jnp.allclose(v, constants.v0)
 

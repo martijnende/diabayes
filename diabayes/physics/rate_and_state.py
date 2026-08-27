@@ -73,3 +73,34 @@ def aging_law(*args, **kwargs):
     Alias for the ``ageing_law`` function
     """
     return ageing_law(*args, **kwargs)
+
+
+@eqx.filter_jit
+def slip_law(
+    v: Float, variables: Variables, params: RSFParams, constants: RSFConstants
+) -> Float:
+    r"""
+    The conventional slip law state evolution formulation
+
+    .. math::
+
+        \frac{\mathrm{d}\theta}{\mathrm{d}t} = - \frac{v \theta}{D_c} \ln \left( \frac{v \theta}{D_c} \right)
+
+    Parameters
+    ----------
+    v : Float
+        Instantaneous fault slip rate [m/s].
+    variables : Variables
+        The friction coefficient ``mu`` and state parameter ``theta``
+    params : RSFParams
+        The rate-and-state parameters, including ``D_c``
+    constants : RSFConstants
+        The constant parameters ``mu0`` and ``v0`` (not used)
+
+    Returns
+    -------
+    dtheta : Float
+        The rate of change of the state variable [s/s]
+    """
+    O = v * variables.theta / params.Dc
+    return -O * jnp.log(O)

@@ -7,7 +7,7 @@ from diabayes.typedefs import (
     Variables,
 )
 
-from .rate_and_state import rsf, ageing_law, aging_law
+from .rate_and_state import rsf, ageing_law, aging_law, slip_law
 from .chen_niemeijer_spiers import cns, cns_porosity
 from .stress_transfer import springblock, inertial_springblock
 

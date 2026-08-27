@@ -18,6 +18,7 @@ from .physics import (
     rsf,
     ageing_law,
     aging_law,
+    slip_law,
     cns,
     cns_porosity,
     slip_rate,
