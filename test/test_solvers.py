@@ -24,9 +24,6 @@ class TestSolvers:
         y0 = forward.variables
         solver = ODESolver(forward)
 
-        print(variables)
-        print(variables.to_array())
-
         t = jnp.linspace(0.0, 100.0, 1000)
         result = solver.solve_forward(t, y0, params, constants, block_constants)
         result_jax = solver._solve_forward(t, y0, params, constants, block_constants)

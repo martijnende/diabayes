@@ -101,6 +101,59 @@ Previous works listed at the bottom of this page clearly explain the interpretat
 
 ## Example usage
 
+See `examples/cns_model.ipynb` for a hands-on tutorial of forward modelling using the CNS model.
+
+The example code below represents a minimalistic and self-contained case of running a CNS forward model:
+```python
+import jax.numpy as jnp
+import diabyayes as db
+from diabayes.forward_models import Forward, cns, cns_porosity, springblock, steady_state_porosity
+from diabayes.solver import ODESolver
+
+# Constants
+h = 1e-3      # Gouge layer thickness [m]
+phi0 = 0.03   # Minimum porosity (not initial porosity!) [-]
+v0 = 1e-6     # Reference velocity [m/s]
+constants = db.CNSConstants(h=h, phi0=phi0, v0=v0)
+
+# Spring-block constants
+k = 1e2       # Stiffness [1/m]
+v_lp = 1e-5   # Load-point velocity [m/s]
+block_constants = db.SpringBlockConstants(k=k, v_lp=v_lp)
+
+# Parameters (all dimensionless)
+alpha = 0.01   # Rate parameter
+beta = 0.3     # Dilatancy geometric factor
+phi_c = 0.4    # Critical-state porosity
+xi = 1e-1      # Creep process rate parameter
+mu0 = 0.6      # Reference friction
+params = db.CNSParams(alpha=alpha, beta=beta, phi_c=phi_c, xi=xi, mu0=mu0)
+
+# Calculate the steady-state porosity from these parameters
+phi_ini = steady_state_porosity(v0, mu0, params, constants)
+
+# Assemble forward model
+state_dict = {"phi": cns_porosity}
+forward = Forward(
+    friction_model=cns,
+    state_evolution=state_dict,
+    stress_transfer=springblock
+)
+solver = ODESolver(forward_model=forward)
+
+# Set initial values
+forward.set_initial_values(mu=mu0, phi=phi_ini)
+y0 = forward.variables
+
+# Run the forward simulation
+t = jnp.linspace(0, 1000., 1000)
+result = solver.solve_forward(
+    t, y0, params=params,
+    friction_constants=constants,
+    block_constants=block_constants
+)
+```
+
 ```{rubric} References
 ```
 ```{footbibliography}

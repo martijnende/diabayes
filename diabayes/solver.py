@@ -60,7 +60,7 @@ class ODESolver:
     def __init__(
         self,
         forward_model: Forward,
-        rtol: float = 1e-6,
+        rtol: float = 1e-7,
         atol: float = 1e-10,
         checkpoints: int = 100,
     ) -> None:
