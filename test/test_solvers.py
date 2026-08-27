@@ -105,6 +105,7 @@ class TestSolvers:
         result_inv = solver.max_likelihood_inversion(
             t, mu, y0, params2, constants, block_constants, verbose=True
         )
+        assert result_inv is not None
         params_inv = result_inv.value
 
         # Reproduce friction curve

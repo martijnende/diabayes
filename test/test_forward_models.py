@@ -55,11 +55,11 @@ class TestForwardModels:
         for i, v in enumerate(10 ** jnp.linspace(-20, 5, 10)):
 
             # Analytic solution for steady-state porosity
-            Z = constants.h * params.z / v
-            A = 2 * params.alpha * (params.phi_c - constants.phi0)
+            Z = params.xi * constants.v0 / v
+            A = 2 * params.beta * (params.phi_c - constants.phi0)
             B = (A * mu - 1) * Z / (1 + mu * Z)
             tan_psi_ss = 0.5 * B * (1 - jnp.sqrt(1 + 4 * A / (B * (A * mu - 1))))
-            phi_ss = params.phi_c - tan_psi_ss / (2 * params.alpha)
+            phi_ss = params.phi_c - tan_psi_ss / (2 * params.beta)
 
             variables2 = db.Variables(
                 mu=mu, state=StateDict(keys, jnp.atleast_1d(phi_ss))

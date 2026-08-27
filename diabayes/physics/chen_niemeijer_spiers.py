@@ -25,9 +25,9 @@ def _porosity_func(
     variables : Variables
         The friction coefficient ``mu`` and gouge porosity ``phi``
     params : CNSParams
-        The CNS parameters ``alpha``, ``phi_c``, ``z``, ``mu0``, ``v0`` and ``a``
+        The CNS parameters ``alpha``, ``beta``, ``phi_c``, ``xi``, and ``mu0``
     constants : CNSConstants
-        The constant parameters ``h`` and ``phi0``
+        The constant parameters ``v0``, ``h``, and ``phi0``
 
     Returns
     -------
@@ -52,13 +52,13 @@ def cns(variables: Variables, params: CNSParams, constants: CNSConstants) -> Flo
 
     .. math::
 
-        v(\mu, \phi) = v_{\text{gr}}(\mu, \phi) + v_{\text{creep}}(\mu, \phi)
+        v(\mu, \phi) = v_0 \left( v_{\text{gr}}(\mu, \phi) + v_{\text{creep}}(\mu, \phi) \right)
 
-        v_{\text{gr}} = v_0 \exp \left( \frac{\mu \left[1 - \mu_0 \tan \psi \right] - \mu_0 - \tan \psi}{a \left[ 1 + \mu \tan \psi \right]} \right)
+        v_{\text{gr}} = \exp \left( \frac{\mu \left[1 - \mu_0 \tan \psi \right] - \mu_0 - \tan \psi}{\alpha \left[ 1 + \mu \tan \psi \right]} \right)
 
-        v_{\text{creep}} = h z \mu f(\phi)
+        v_{\text{creep}} = \xi \mu f(\phi)
 
-        \tan \psi = 2 \alpha \left( \phi_c - \phi \right)
+        \tan \psi = 2 \beta \left( \phi_c - \phi \right)
 
         f(\phi) = \frac{\phi - \phi_0}{\phi_c - \phi}
 
@@ -68,9 +68,9 @@ def cns(variables: Variables, params: CNSParams, constants: CNSConstants) -> Flo
     variables : Variables
         The friction coefficient ``mu`` and gouge porosity ``phi``
     params : CNSParams
-        The CNS parameters ``alpha``, ``phi_c``, ``z``, ``mu0``, ``v0`` and ``a``
+        The CNS parameters ``alpha``, ``beta``, ``phi_c``, ``xi``, and ``mu0``
     constants : CNSConstants
-        The constant parameters ``h`` and ``phi0``
+        The constant parameters ``v0``, ``h``, and ``phi0``
 
     Returns
     -------
@@ -79,17 +79,17 @@ def cns(variables: Variables, params: CNSParams, constants: CNSConstants) -> Flo
     """
 
     # Granular flow components
-    tan_psi = 2 * params.alpha * (params.phi_c - variables.phi)
+    tan_psi = 2 * params.beta * (params.phi_c - variables.phi)
     A = variables.mu * (1 - params.mu0 * tan_psi) - params.mu0 - tan_psi
-    B = params.a * (1 + variables.mu * tan_psi)
-    v_gr = params.v0 * jnp.exp(A / B)
+    B = params.alpha * (1 + variables.mu * tan_psi)
+    v_gr = jnp.exp(A / B)
 
     # Creep components
     f_phi = _porosity_func(variables, params, constants)
-    v_creep = constants.h * params.z * variables.mu * f_phi
+    v_creep = params.xi * variables.mu * f_phi
 
     # Assembly
-    v = v_gr + v_creep
+    v = constants.v0 * (v_gr + v_creep)
 
     return jnp.squeeze(v)
 
@@ -105,11 +105,11 @@ def cns_porosity(
 
         \frac{\mathrm{d}\phi}{\mathrm{d}t} = - \left(1 - \phi \right) \left(\dot{\varepsilon}_{\text{gr}} + \dot{\varepsilon}_{\text{creep}} \right)
 
-        \dot{\varepsilon}_{\text{gr}} = - \frac{\tan \psi}{h} \left(v - v_{\text{creep}} \right)
+        \dot{\varepsilon}_{\text{gr}} = - \frac{\tan \psi}{h} \left( v - v_{\text{creep}} \right)
 
-        \dot{\varepsilon}_{\text{creep}} = z f(\phi)
+        \dot{\varepsilon}_{\text{creep}} = \frac{v_0}{h} \xi f(\phi)
 
-        v_{\text{creep}} = h z f(\phi) \mu
+        v_{\text{creep}} = v_0 \xi f(\phi) \mu
 
         \tan \psi = 2 \alpha \left( \phi_c - \phi \right)
 
@@ -123,9 +123,9 @@ def cns_porosity(
     variables : Variables
         The friction coefficient ``mu`` and gouge porosity ``phi``
     params : CNSParams
-        The CNS parameters ``alpha``, ``phi_c``, ``z``, ``mu0``, ``v0`` and ``a``
+        The CNS parameters ``alpha``, ``beta``, ``phi_c``, ``xi``, and ``mu0``
     constants : CNSConstants
-        The constant parameters ``h`` and ``phi0``
+        The constant parameters ``v0``, ``h``, and ``phi0``
 
     Returns
     -------
@@ -135,11 +135,11 @@ def cns_porosity(
 
     # Creep components
     f_phi = _porosity_func(variables, params, constants)
-    e_creep = params.z * f_phi
+    e_creep = (constants.v0 / constants.h) * params.xi * f_phi
     v_creep = constants.h * e_creep * variables.mu
 
     # Granular flow components
-    tan_psi = 2 * params.alpha * (params.phi_c - variables.phi)
+    tan_psi = 2 * params.beta * (params.phi_c - variables.phi)
     e_gr = -tan_psi * (v - v_creep) / constants.h
 
     # Assembly
